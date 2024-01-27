@@ -1,14 +1,18 @@
-export const PATHS = {
+export const PATHS: {
+	bunshell: string;
+	bins: string;
+	config: string;
+} = {
 	bunshell: `${os.homedir()}/.bunshell`,
 	bins: `${os.homedir()}/.bunshell/bin`,
 	config: `${os.homedir()}/.bunshell/config.json`,
 }
 
-export function get(key = false) {
+export function get(key: string | boolean = false): any | boolean {
 	if (!fs.pathExistsSync(PATHS.config)) {
 		return false;
 	}
-	const json = JSON.parse(fs.readFileSync(PATHS.config));
+	const json = JSON.parse(fs.readFileSync(PATHS.config, "utf-8"));
 	if (key === false) {
 		return json;
 	}
@@ -20,7 +24,7 @@ export function get(key = false) {
 	return false;
 }
 
-export function update(key, value) {
+export function update(key: string, value: any): void {
 	let json = {};
 	if (fs.pathExistsSync(PATHS.config)) {
 		json = get();
