@@ -5,6 +5,13 @@ export default async function env_requirements() {
 	const PATH = Bun.env.PATH;
 	const BIN_PATH = `${os.homedir()}/.bunshell/bin`
 
+	if (!PATH) {
+		console.log("Your $PATH is not set.");
+		console.log("Please set your $PATH to include the bin directory.");
+		console.log(BIN_PATH);
+		return false;
+	}
+
 	if (getSourceDirectories().size === 0) {
 		console.log("Welcome! Where should bunshell store your scripts?")
 		await addSourceDirectory();
