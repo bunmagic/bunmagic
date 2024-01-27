@@ -6,7 +6,6 @@ import {
 	addSourceDirectory,
 	getScripts,
 } from "./sources";
-import { confirm, selection } from "./helpers";
 import { getBins, relinkBins, makeScriptExecutable } from "./bins";
 import { PATHS, get, update as updateConfig } from "./config";
 import { version } from "./github";
@@ -45,7 +44,7 @@ async function clean() {
 		}
 
 		const name = path.basename(bin);
-		if (await confirm(`Delete ${name}?`, "y")) {
+		if (ack(`Delete ${name}?`, "y")) {
 			await $`rm ${bin}`;
 		}
 	}
@@ -70,7 +69,7 @@ async function create(slug) {
 		console.log(`${chalk.bold(slug)} already exists:`, `\n`, `-> ${file}`);
 
 		if (
-			await confirm(`Would you like to edit ${chalk.bold(slug)} ?`, "y")
+			ack(`Would you like to edit ${chalk.bold(slug)} ?`, "y")
 		) {
 			return await edit(slug);
 		}
@@ -88,7 +87,7 @@ async function create(slug) {
 	}
 
 	if (
-		false === (await confirm(`Create new command "${chalk.bold(slug)}"?`))
+		false === (ack(`Create new command "${chalk.bold(slug)}"?`))
 	) {
 		process.exit(0);
 	}
@@ -187,7 +186,7 @@ async function remove(slug) {
 		return;
 	}
 
-	if (false === (await confirm(`Delete command "${chalk.bold(slug)}"?`))) {
+	if (false === (ack(`Delete command "${chalk.bold(slug)}"?`))) {
 		return false;
 	}
 
@@ -280,7 +279,7 @@ async function update() {
 	if (
 		currentVersion &&
 		currentVersion !== latestVersion &&
-		false === (await confirm(confirmUpdate, "y"))
+		false === (ack(confirmUpdate, "y"))
 	) {
 		return;
 	}
@@ -305,7 +304,7 @@ async function add_source(sourceDir) {
 			`The path you provided doesn't exist. Are you sure it's correct?`,
 		);
 		console.log(path.resolve(sourceDir));
-		if (!(await confirm("\nContinue?"))) {
+		if (!(ack("\nContinue?"))) {
 			return;
 		}
 	}
@@ -341,7 +340,7 @@ async function install(scriptURL) {
 
 	// If the script already exists, ask if we should overwrite it
 	if (file) {
-		if (false === await confirm(`Overwrite existing script "${chalk.bold(slug)}"?`)) {
+		if (false === ack(`Overwrite existing script "${chalk.bold(slug)}"?`)) {
 			return false;
 		}
 		targetFile = file;

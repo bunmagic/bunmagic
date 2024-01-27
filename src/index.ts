@@ -20,4 +20,5 @@ declare global {
 	const argv: typeof globals.argv;
 	const selection: typeof globals.selection;
 	const cd: typeof globals.cd;
+	const ack: typeof globals.ack;
 }
