@@ -39,7 +39,7 @@ async function setupPath() {
 		pathQuestion += `\n> `
 	}
 
-	let append = await question(pathQuestion)
+	let append = await prompt(pathQuestion)
 
 	if (!append) {
 		append = "y";

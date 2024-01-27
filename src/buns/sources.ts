@@ -64,7 +64,7 @@ export async function addSourceDirectory(pathToAdd = false) {
 		const sourcePath = `Enter full path to source directory:\n${chalk.gray(
 			`Default: ${defaultSource}`
 		)}\n> `;
-		pathToAdd = (await question(sourcePath)) || defaultSource;
+		pathToAdd = (await prompt(sourcePath)) || defaultSource;
 	}
 
 	pathToAdd = path.resolve(pathToAdd);
