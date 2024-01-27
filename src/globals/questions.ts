@@ -27,3 +27,27 @@ export async function question(
 		})
 	)
 }
+
+export async function confirm(q: string, defaultAnswer: "y" | "n" = "n"): Promise<boolean> {
+	let yes_no = `(y/N)`;
+	if (defaultAnswer === "y") {
+		yes_no = `(Y/n)`;
+	}
+
+	let answer = await question(`${q} ${yes_no} `);
+
+	if (!answer) {
+		answer = defaultAnswer;
+	}
+
+	return "y" === answer;
+}
+
+export async function selection(options: string[], selectionQuestion: string) {
+	options.forEach((opt, index) => {
+		console.log(`> ${chalk.bold(index + 1)}:  ${opt} `)
+	})
+
+	const selected = parseInt(await question(selectionQuestion + "(default: 1): \n")) ?? 1;
+	return options[selected - 1];
+}
