@@ -1,8 +1,15 @@
 import { PATHS, get, update } from "./config";
 
 
+type Script = {
+	slug: string;
+	bin: string;
+	file: string;
+	filename: string;
+	directory: string;
+}
 
-export function scriptPaths(file) {
+export function scriptInfo(file: string): Script {
 	const slug = path.parse(file).name;
 	const filename = path.parse(file).base;
 	const bin = `${PATHS.bins}/${slug}`;
@@ -18,21 +25,19 @@ export function scriptPaths(file) {
 
 
 
-export async function binfo() {
-	return (await getScriptSources()).map(scriptPaths)
+export async function binfo(): Promise<Script[]> {
+	return (await getScriptSources()).map(scriptInfo)
 }
 
 
-export async function search(slug) {
+export async function search(slug: string): Promise<Script | undefined> {
 	const bins = await binfo();
-	return bins.find(bin =>
-		bin.slug === slug
-	) || {}
+	return bins.find(bin => bin.slug === slug);
 
 }
 
 
-export async function getScripts(directory) {
+export async function getScripts(directory: string) {
 	return await globby(`${directory}/*.mjs`);
 }
 
@@ -44,18 +49,18 @@ export async function getScriptSources() {
 }
 
 
-export function getSourceDirectories() {
+export function getSourceDirectories(): Set<string> {
 
 	const sources = get("sources");
 	if (!sources) {
 		return new Set([]);
 	}
 
-	return new Set(sources.filter(n => n));
+	return new Set(sources.filter(Boolean));
 }
 
 
-export async function addSourceDirectory(pathToAdd = false) {
+export async function addSourceDirectory(pathToAdd: string | false = false) {
 
 	const sources = await getSourceDirectories();
 	const defaultSource = `${PATHS.bunshell}/default`;
@@ -71,11 +76,5 @@ export async function addSourceDirectory(pathToAdd = false) {
 	sources.add(pathToAdd);
 	fs.ensureDirSync(pathToAdd)
 
-	const addedName = path.basename(pathToAdd)
-	const addedSymlink = `${PATHS.sources}/${addedName}`
-
-	if (defaultSource !== pathToAdd && !fs.pathExistsSync(addedSymlink)) {
-		await $`ln -s ${pathToAdd} ${addedSymlink}`;
-	}
 	update("sources", [...sources]);
 }

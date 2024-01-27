@@ -2,7 +2,7 @@ import {
 	binfo,
 	search,
 	getSourceDirectories,
-	scriptPaths,
+	scriptInfo,
 	addSourceDirectory,
 	getScripts,
 } from "./sources";
@@ -56,14 +56,20 @@ commandInfo.create = {
 	desc: `Create a new script`,
 	usage: `bunshell create <script-name>`,
 };
-async function create(slug) {
+async function create(slug?: string) {
+
 	if (!slug) {
 		throw new Error(
 			`Scripts must have a name.\n${commandInfo.create.usage}`,
 		);
 	}
 
-	const { file, bin } = await search(slug);
+	const script = await search(slug);
+	if (!script) {
+		return true;
+	}
+
+	const { file, bin } = script;
 
 	if (await fs.pathExists(file)) {
 		console.log(`${chalk.bold(slug)} already exists:`, `\n`, `-> ${file}`);
@@ -105,7 +111,7 @@ async function create(slug) {
 		throw new Error("No directory selected");
 	}
 
-	const info = scriptPaths(`${directory}/${slug}.mjs`);
+	const info = scriptInfo(`${directory}/${slug}.mjs`);
 
 	await $`echo '#!/usr/bin/env zx' >> ${info.file}`;
 	await $`chmod +x ${info.file}`;
@@ -208,7 +214,7 @@ async function list() {
 		output += chalk.gray(path.dirname(directory) + "/");
 		output += chalk.bold.gray(path.basename(directory));
 
-		let scriptList = scripts.map(scriptPaths);
+		let scriptList = scripts.map(scriptInfo);
 		let maxScriptNameLength = 0;
 
 		scriptList.forEach(({ slug, bin }) => {

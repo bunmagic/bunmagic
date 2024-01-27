@@ -17,7 +17,7 @@ export function get(key: string | boolean = false): any | boolean {
 		return json;
 	}
 
-	if (json[key]) {
+	if (typeof key === "string" && key in json) {
 		return json[key];
 	}
 
@@ -25,13 +25,8 @@ export function get(key: string | boolean = false): any | boolean {
 }
 
 export function update(key: string, value: any): void {
-	let json = {};
-	if (fs.pathExistsSync(PATHS.config)) {
-		json = get();
-	}
-
+	const json = fs.pathExistsSync(PATHS.config) ? get() : {};
 	json[key] = value;
-
 	fs.writeFileSync(PATHS.config, JSON.stringify(json, null, 4), {
 		encoding: "utf8",
 	});
