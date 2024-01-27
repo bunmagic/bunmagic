@@ -74,10 +74,10 @@ async function create(slug) {
 		return true;
 	}
 
-	const commandExists = await nothrow($`which ${slug}`);
+	const commandExists = await $`which ${slug}`;
 
 	if (commandExists.exitCode !== 1) {
-		const alias = (await $`which ${slug}`).stdout;
+		const alias = await $`which ${slug}`.text();
 		console.log(
 			`Command "${chalk.bold(slug)}" is already aliased to "${alias.trim()}"\n`,
 		);
@@ -118,7 +118,7 @@ commandInfo.edit = {
 	desc: `Edit scripts. If no script name is specified, will open all scripts and the ~/.bunshell directory`,
 	usage: `bunshell edit [script-name]`,
 };
-async function edit(slug) {
+async function edit(slug: string) {
 	if (slug) {
 		const { file } = await search(slug);
 		if (file && (await fs.pathExists(file))) {
@@ -142,28 +142,28 @@ async function edit(slug) {
 	await editor(PATHS.bunshell);
 }
 
-async function editor(path) {
-	const edit = process.env.EDITOR || `code`;
+async function editor(path: string) {
+	const edit = Bun.env.EDITOR || `code`;
 
 	// If using VSCode, open in a new window
 	let res;
 	if (edit === "code") {
-		res = await nothrow($`code -n ${path}`);
+		res = await $`code -n ${path}`;
 	} else {
-		res = await $`${edit} ${path}`.pipe(process.stdout);
+		res = await $`${edit} ${path} > /dev/tty`;
 	}
 
 	if (res.exitCode == 0) {
 		return true;
 	}
-
+	console.log(res);
 	console.log("");
 	console.log(chalk.bold("Editor missing!"));
 	console.log(`I tried to use "${chalk.bold(edit)}" to open ${path}`);
 	console.log(
 		`\n 🔗 ${chalk.bold("Read more here: ")}\nhttps://github.com/pyronaur/bunshell/tree/main#code-editor\n`,
 	);
-	throw new Error(res);
+	throw new Error(res.stdout.toString() || res.stderr.toString());
 }
 
 commandInfo.remove = {
