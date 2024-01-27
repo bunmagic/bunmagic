@@ -11,7 +11,10 @@ import { getBins, relinkBins, makeScriptExecutable } from "./bins";
 import { PATHS, get, update as updateConfig } from "./config";
 import { version } from "./github";
 
-let commandInfo = {};
+let commandInfo: Record<string, {
+	desc: string;
+	usage: string;
+}> = {};
 
 commandInfo.link = {
 	desc: "Ensure all your script files have an executable in the bin directory.",
