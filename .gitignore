@@ -10,7 +10,7 @@ yarn-error.log*
 lerna-debug.log*
 .pnpm-debug.log*
 
-# Caches 
+# Caches
 
 .cache
 
@@ -168,8 +168,9 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-# IntelliJ based IDEs
+# IDEs
 .idea
+*.code-workspace
 
 # Finder (MacOS) folder config
 .DS_Store
