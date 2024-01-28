@@ -4,12 +4,10 @@ import {
 } from "../sources";
 import { PATHS } from "../config";
 
-export const info = {
-	desc: `Edit scripts. If no script name is specified, will open all scripts and the ~/.bunshell directory`,
-	usage: `bunshell edit [script-name]`,
-};
+export const desc = `Edit scripts. If no script name is specified, will open all scripts and the ~/.bunshell directory`;
+export const usage = `bunshell edit [script-name]`;
 
-export async function run() {
+export default async function run() {
 	const path = argv._[0];
 	const edit = Bun.env.EDITOR || `code`;
 

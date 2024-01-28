@@ -4,20 +4,16 @@ import {
 	scriptInfo
 } from "../sources";
 import { makeScriptExecutable } from "../bins";
-import { run as edit } from "./edit";
+import edit from "./edit";
 
-export const info = {
-	desc: `Create a new script`,
-	usage: `bunshell create <script-name>`,
-	alias: ["new"],
-};
+export const desc = `Create a new script`;
+export const usage = `bunshell create <script-name>`;
+export const alias = ["new"];
 
-export async function run() {
+export default async function run() {
 	const slug = argv._[0];
 	if (!slug) {
-		throw new Error(
-			`Scripts must have a name.\n${info.usage}`,
-		);
+		throw new Error('Scripts must have a name.');
 	}
 
 	const script = await search(slug);

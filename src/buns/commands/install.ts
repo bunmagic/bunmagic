@@ -1,11 +1,9 @@
 import { search } from "../sources";
 
-export const info = {
-	desc: "Install a zx script from a remote URL.",
-	usage: `bunshell install <url> [--slug <slug>]`
-};
+export const desc = "Install a script from a remote URL.";
+export const usage = `bunshell install <url> [--slug <slug>]`;
 
-export async function run() {
+export default async function run() {
 	const scriptURL = argv._[0];
 	const sourceRequest = await fetch(scriptURL);
 	if (sourceRequest.status !== 200) {

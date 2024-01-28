@@ -3,12 +3,10 @@ import {
 } from "../sources";
 import { getBins } from "../bins";
 
-export const info = {
-	desc: "Remove bin files from the bin directory that don't have a matching script.",
-	usage: `bunshell clean`,
-};
+export const desc = "Remove bin files from the bin directory that don't have a matching script.";
+export const usage = `bunshell clean`;
 
-export async function run() {
+export default async function run() {
 	console.log("Cleaning up the the bin directory.");
 
 	const realBins = await getBins();

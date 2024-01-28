@@ -1,12 +1,10 @@
 import { search } from "../sources";
 
-export const info = {
-	desc: `Remove and unlink a script`,
-	usage: `bunshell remove <script-name>`,
-	alias: ["rm"],
-};
+export const desc = `Remove and unlink a script`;
+export const usage = `bunshell remove <script-name>`;
+export const alias = ["rm"];
 
-export async function run() {
+export default async function run() {
 	const slug = argv._[0];
 
 	if (!slug) {

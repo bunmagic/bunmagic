@@ -1,6 +1,6 @@
 import type { Command } from '../commands';
-import { run as help } from './help';
-import { run as create } from './create';
+import help from './help';
+import create from './create';
 
 export type InternalCommand = Command & {
 	info: {
@@ -9,8 +9,8 @@ export type InternalCommand = Command & {
 		usage: string;
 	}
 }
-
-export async function router(command: undefined | Command, commands: Map<string, InternalCommand>) {
+export const isRouter = true;
+export default async function router(cmd: () => Promise<void>, command: undefined | Command, commands: Map<string, InternalCommand>) {
 
 	let input = argv._[0];
 
@@ -24,9 +24,9 @@ export async function router(command: undefined | Command, commands: Map<string,
 	}
 
 	try {
-		await command.run();
+		await cmd();
 	} catch (e) {
-		console.log(chalk.bold.red("Error: ") + e.message);
+		console.log(chalk.bold.red("Error: "), e);
 		if (argv.verbose) {
 			console.log(e);
 		}

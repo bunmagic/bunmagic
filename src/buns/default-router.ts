@@ -1,7 +1,7 @@
 import type { Command } from './commands';
 
 
-export async function run(command?: Command) {
+export default async function run(command?: Command) {
 	if (!command) {
 		console.log("No command found.");
 		return;

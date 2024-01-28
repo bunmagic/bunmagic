@@ -3,12 +3,10 @@ import {
 } from "../sources";
 import { relinkBins } from "../bins";
 
-export const info = {
-	desc: `Add an additional directory to use as script source.`,
-	usage: `bunshell add_source`
-}
+export const desc = 'Add an additional directory to use as script source.';
+export const usage = 'bunshell add_source';
 
-export async function run() {
+export default async function run() {
 	const sourceDir = argv._[0];
 	if (sourceDir && !fs.pathExistsSync(sourceDir)) {
 		console.log(

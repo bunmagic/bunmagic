@@ -24,13 +24,23 @@ const files = (await $`ls ${sourceDirectory}`.text())
 
 
 
-const { router, commands } = await getCommands(files);
+const { router: routerInfo, commands } = await getCommands(files);
 const input = argv._[0];
 
 try {
+	if (!routerInfo) {
+		throw new Error(`No router found.`);
+	}
+
+	const router = await import(routerInfo.file).then(m => m.default);
+	if (!router) {
+		throw new Error(`Couldn't load the router: ${router.file}`);
+	}
+
 	const command = commands.get(input);
 	if (command === undefined || command.type === "command") {
-		await router.run(command, commands);
+		const cmd = command?.file ? await import(command.file).then(m => m.default) : undefined;
+		await router(cmd, command, commands);
 	}
 
 } catch (e) {

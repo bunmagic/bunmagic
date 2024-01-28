@@ -1,43 +1,62 @@
 export type Command = {
 	type: "command";
+	file: string;
 	name: string;
-	desc: string;
+	desc?: string;
 	usage?: string;
 	alias?: string[];
-	run: (subtask?: string) => Promise<void>;
 }
 
 export type Router = {
 	type: "router";
-	run: (command: Command | undefined, commands: Map<string, Command>) => Promise<void>;
+	file: string;
 }
 
 export type NotFound = {
-	file: string;
 	type: "not-found";
-}
-
-export type RawCommand = Command & {
-	type: "raw-command";
-	run: void;
 	file: string;
 }
 
-async function importCommand(file: string): Promise<Command | Router | NotFound> {
-	const handle = await import(file);
-	if ("router" in handle) {
-		return {
-			type: "router",
-			run: handle.router
+export type RawCommand = {
+	type: "raw-command";
+	file: string;
+}
+
+
+
+async function importCommand(file: string): Promise<Command | RawCommand | Router | NotFound> {
+	const lines = (await Bun.file(file).text()).split("\n");
+
+	if (lines.find(line => line.trim().startsWith("export default"))) {
+		const handle = await import(file);
+
+		if ("isRouter" in handle && handle.isRouter) {
+			return {
+				type: "router",
+				file,
+			}
+		}
+
+		if ("default" in handle) {
+			const meta = { ...handle, default: undefined };
+			return {
+				type: "command",
+				file,
+				name: path.parse(file).name,
+				...meta,
+			}
 		}
 	}
-	if ("info" in handle && "run" in handle) {
+
+	else {
 		return {
-			type: "command",
-			name: path.parse(file).name,
-			...handle
+			type: "raw-command",
+			file
 		}
 	}
+
+
+
 	return {
 		file,
 		type: "not-found"
@@ -79,10 +98,10 @@ export async function getCommands<C extends Command>(files: string[]): Promise<C
 	}
 
 	if (router === undefined) {
-		const { run } = await import("./default-router");
+		const defaultRouter = path.resolve(import.meta.dirname, "default-router.ts");
 		router = {
 			type: "router",
-			run
+			file: defaultRouter
 		};
 	}
 
