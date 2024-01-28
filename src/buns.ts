@@ -9,7 +9,7 @@ BUNS.verbose = argv.verbose || process.env.DEBUG || false;
 const source = path.resolve(import.meta.dir, "buns/commands");
 
 cd(source);
-const files = (await $`ls *.ts`.text())
+const files = (await $`ls`.text())
 	.split("\n")
 	.map((file: string) => file.trim())
 	.filter(Boolean)
