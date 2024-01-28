@@ -77,8 +77,13 @@ export async function addSourceDirectory(pathToAdd: string | false = false) {
 		pathToAdd = (await prompt(sourcePath)) || defaultSource;
 	}
 
+	const binName = prompt("Enter bin name (optional):") || undefined;
+
 	pathToAdd = path.resolve(pathToAdd);
-	sources.add(pathToAdd);
+	sources.add({
+		path: pathToAdd,
+		bin: binName,
+	});
 	fs.ensureDirSync(pathToAdd)
 
 	update("sources", [...sources]);
