@@ -2,7 +2,15 @@ import type { Command } from '../commands';
 import { run as help } from './help';
 import { run as create } from './create';
 
-export async function router(command?: Command) {
+export type InternalCommand = Command & {
+	info: {
+		name: string;
+		desc: string;
+		usage: string;
+	}
+}
+
+export async function router(command: undefined | Command, commands: Map<string, InternalCommand>) {
 
 	let input = argv._[0];
 
@@ -12,7 +20,7 @@ export async function router(command?: Command) {
 	}
 
 	if (argv.h || input === "help" || !command) {
-		return help();
+		return help(commands);
 	}
 
 	try {

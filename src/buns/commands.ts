@@ -9,12 +9,18 @@ export type Command = {
 
 export type Router = {
 	type: "router";
-	run: (command: Command | undefined) => Promise<void>;
+	run: (command: Command | undefined, commands: Map<string, Command>) => Promise<void>;
 }
 
 export type NotFound = {
 	file: string;
 	type: "not-found";
+}
+
+export type RawCommand = Command & {
+	type: "raw-command";
+	run: void;
+	file: string;
 }
 
 async function importCommand(file: string): Promise<Command | Router | NotFound> {
