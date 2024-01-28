@@ -14,10 +14,8 @@ export default async function () {
 	if (!slug) {
 		throw new Error('You must specify a script to edit.');
 	}
-	console.log("EDITING: " + slug);
 	const target = await findFile(slug);
 
-	console.log("TARGET: " + target);
 	if (target) {
 		return await openEditor(target);
 	}
@@ -26,8 +24,6 @@ export default async function () {
 }
 
 export async function openEditor(path: string) {
-	console.log("Opening editor for path: " + path);
-	return;
 	const edit = Bun.env.EDITOR || `code`;
 
 	// If using VSCode, open in a new window
@@ -61,10 +57,8 @@ export async function findFile(slug: string) {
 
 	fs.ensureDir(PATHS.bunshell);
 	for (const source of await getSourceDirectories()) {
-		const dirname = path.basename(source.path);
-		console.log(dirname, slug);
-		if (dirname === slug) {
-			return source;
+		if (source?.bin === slug || path.basename(source.path) === slug) {
+			return source.path;
 		}
 	}
 
