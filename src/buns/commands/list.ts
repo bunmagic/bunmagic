@@ -4,12 +4,13 @@ import {
 	getScripts,
 } from "../sources";
 
-commandInfo.list = {
+export const info = {
 	desc: `List all known scripts.`,
 	usage: `bunshell list ${chalk.gray(`| bunshell ls`)}`,
+	alias: ["ls"],
 };
 
-async function list() {
+export async function run() {
 	const sourceDirs = getSourceDirectories();
 
 	let output = "";

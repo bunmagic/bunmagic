@@ -1,24 +1,21 @@
 import {
-	binfo,
 	search,
 	getSourceDirectories,
-	scriptInfo,
-	addSourceDirectory,
-	getScripts,
+	scriptInfo
 } from "../sources";
-import { getBins, relinkBins, makeScriptExecutable } from "../bins";
-import { PATHS, get, update as updateConfig } from "../config";
-import { version } from "../github";
+import { makeScriptExecutable } from "../bins";
 
-commandInfo.create = {
+export const info = {
 	desc: `Create a new script`,
 	usage: `bunshell create <script-name>`,
+	alias: ["new"],
 };
-async function create(slug?: string) {
 
+export async function run() {
+	const slug = argv._[0];
 	if (!slug) {
 		throw new Error(
-			`Scripts must have a name.\n${commandInfo.create.usage}`,
+			`Scripts must have a name.\n${info.usage}`,
 		);
 	}
 
@@ -69,13 +66,13 @@ async function create(slug?: string) {
 		throw new Error("No directory selected");
 	}
 
-	const info = scriptInfo(`${directory}/${slug}.mjs`);
+	const scriptFile = scriptInfo(`${directory}/${slug}.mjs`);
 
-	await $`echo '#!/usr/bin/env zx' >> ${info.file}`;
-	await $`chmod +x ${info.file}`;
+	await $`echo '#!/usr/bin/env zx' >> ${scriptFile.file}`;
+	await $`chmod +x ${scriptFile.file}`;
 
-	await makeScriptExecutable(info)
+	await makeScriptExecutable(scriptFile)
 	await edit(slug)
 
-	return info.file;
+	return scriptFile.file;
 }

@@ -4,12 +4,13 @@ import {
 } from "../sources";
 import { PATHS } from "../config";
 
-commandInfo.edit = {
+export const info = {
 	desc: `Edit scripts. If no script name is specified, will open all scripts and the ~/.bunshell directory`,
 	usage: `bunshell edit [script-name]`,
 };
 
-async function editor(path: string) {
+export async function run() {
+	const path = argv._[0];
 	const edit = Bun.env.EDITOR || `code`;
 
 	// If using VSCode, open in a new window

@@ -1,13 +1,17 @@
 import { search } from "../sources";
 
-commandInfo.remove = {
+export const info = {
 	desc: `Remove and unlink a script`,
 	usage: `bunshell remove <script-name>`,
+	alias: ["rm"],
 };
-async function remove(slug) {
+
+export async function run() {
+	const slug = argv._[0];
+
 	if (!slug) {
 		throw new Error(
-			`You mus specify which script to remove.\n${commandInfo.remove.usage}`,
+			`You must specify which script to remove.\n${info.usage}`,
 		);
 	}
 

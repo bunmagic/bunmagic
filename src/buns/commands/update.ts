@@ -1,11 +1,13 @@
 import { PATHS, get, update as updateConfig } from "../config";
 import { version } from "../github";
 
-commandInfo.update = {
+export const info = {
+	name: `update`,
 	desc: `Update bunshell from GitHub`,
 	usage: `bunshell update`,
 };
-async function update() {
+
+export async function run() {
 	const latestVersion = await version();
 	const currentVersion = await get("version");
 

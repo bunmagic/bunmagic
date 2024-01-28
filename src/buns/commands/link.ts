@@ -1,12 +1,12 @@
 import { relinkBins } from "../bins";
 
-commandInfo.link = {
+export const info = {
 	desc: "Ensure all your script files have an executable in the bin directory.",
 	usage: `bunshell link [--force]`,
 };
 
 
-async function link() {
+export async function run() {
 	if (await relinkBins()) {
 		console.log("\nDone!");
 	} else {

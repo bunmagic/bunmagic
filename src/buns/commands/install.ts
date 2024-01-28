@@ -1,10 +1,12 @@
 import { search } from "../sources";
 
-commandInfo.install = {
+export const info = {
 	desc: "Install a zx script from a remote URL.",
 	usage: `bunshell install <url> [--slug <slug>]`
 };
-async function install(scriptURL) {
+
+export async function run() {
+	const scriptURL = argv._[0];
 	const sourceRequest = await fetch(scriptURL);
 	if (sourceRequest.status !== 200) {
 		throw new Error(`Could not download script from ${scriptURL}`)
