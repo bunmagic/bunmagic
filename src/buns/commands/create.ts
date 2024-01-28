@@ -4,6 +4,7 @@ import {
 	scriptInfo
 } from "../sources";
 import { makeScriptExecutable } from "../bins";
+import { run as edit } from "./edit";
 
 export const info = {
 	desc: `Create a new script`,
@@ -20,22 +21,22 @@ export async function run() {
 	}
 
 	const script = await search(slug);
-	if (!script) {
-		return true;
-	}
+	if (script) {
+		const { file, bin } = script;
+		if (await fs.pathExists(file)) {
+			console.log(`${chalk.bold(slug)} already exists:`, `\n`, `-> ${file}`);
 
-	const { file, bin } = script;
-
-	if (await fs.pathExists(file)) {
-		console.log(`${chalk.bold(slug)} already exists:`, `\n`, `-> ${file}`);
-
-		if (
-			ack(`Would you like to edit ${chalk.bold(slug)} ?`, "y")
-		) {
-			return await edit(slug);
+			if (
+				ack(`Would you like to edit ${chalk.bold(slug)} ?`, "y")
+			) {
+				return await edit();
+			}
+			return true;
 		}
-		return true;
 	}
+
+
+
 
 	const commandExists = await $`which ${slug}`;
 
@@ -47,9 +48,7 @@ export async function run() {
 		process.exit(1);
 	}
 
-	if (
-		false === (ack(`Create new command "${chalk.bold(slug)}"?`))
-	) {
+	if (!ack(`Create new command "${chalk.bold(slug)}"?`)) {
 		process.exit(0);
 	}
 
@@ -59,7 +58,7 @@ export async function run() {
 	let directory = directories[0];
 
 	if (directories.length > 1) {
-		directory = await selection(directories, `Which directory to use?`);
+		directory = selection(directories, `Which directory to use?`);
 	}
 
 	if (!directory) {
@@ -72,7 +71,7 @@ export async function run() {
 	await $`chmod +x ${scriptFile.file}`;
 
 	await makeScriptExecutable(scriptFile)
-	await edit(slug)
+	await edit()
 
 	return scriptFile.file;
 }
