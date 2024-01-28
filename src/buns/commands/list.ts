@@ -9,9 +9,24 @@ export const usage = `bunshell list ${chalk.gray(`| bunshell ls`)}`;
 export const alias = ["ls"];
 
 export default async function () {
-	const sourceDirs = await getSourceDirectories();
+	const sources = await getSourceDirectories();
 
-	let output = "";
+	const sourceDirs = Array.from(sources).filter(dir => !dir.bin);
+	const sourceBins = Array.from(sources).filter(dir => dir.bin);
+
+	let output = chalk.underline.bold("Groups");
+	for (const source of sourceBins) {
+		output += `\n`;
+		output += chalk.bold.white(source.bin);
+		output += " → ";
+		output += chalk.gray(path.dirname(source.path) + "/");
+		output += chalk.bold.gray(path.basename(source.path));
+		output += chalk.gray(" (linked)");
+	}
+
+
+	output += `\n\n`;
+	output += chalk.underline.bold("Scripts");
 	for (const source of sourceDirs) {
 		const scripts = await getScripts(source);
 		output += `\n `;
