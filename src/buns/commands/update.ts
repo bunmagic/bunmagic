@@ -5,7 +5,7 @@ export const name = `update`;
 export const desc = `Update bunshell from GitHub`;
 export const usage = `bunshell update`;
 
-export default async function run() {
+export default async function () {
 	const latestVersion = await version();
 	const currentVersion = await get("version");
 

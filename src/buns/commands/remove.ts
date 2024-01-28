@@ -4,7 +4,7 @@ export const desc = `Remove and unlink a script`;
 export const usage = `bunshell remove <script-name>`;
 export const alias = ["rm"];
 
-export default async function run() {
+export default async function () {
 	const slug = argv._[0];
 
 	if (!slug) {

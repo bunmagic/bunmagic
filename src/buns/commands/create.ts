@@ -10,7 +10,7 @@ export const desc = `Create a new script`;
 export const usage = `bunshell create <script-name>`;
 export const alias = ["new"];
 
-export default async function run() {
+export default async function () {
 	const slug = argv._[0];
 	if (!slug) {
 		throw new Error('Scripts must have a name.');

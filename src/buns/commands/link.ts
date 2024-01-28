@@ -3,7 +3,7 @@ import { relinkBins } from "../bins";
 export const desc = "Ensure all your script files have an executable in the bin directory.";
 export const usage = `bunshell link [--force]`;
 
-export default async function run() {
+export default async function () {
 	if (await relinkBins()) {
 		console.log("\nDone!");
 	} else {

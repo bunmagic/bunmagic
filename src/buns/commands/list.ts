@@ -8,7 +8,7 @@ export const desc = `List all known scripts.`;
 export const usage = `bunshell list ${chalk.gray(`| bunshell ls`)}`;
 export const alias = ["ls"];
 
-export default async function run() {
+export default async function () {
 	const sourceDirs = getSourceDirectories();
 
 	let output = "";

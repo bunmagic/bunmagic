@@ -6,7 +6,7 @@ import { getBins } from "../bins";
 export const desc = "Remove bin files from the bin directory that don't have a matching script.";
 export const usage = `bunshell clean`;
 
-export default async function run() {
+export default async function () {
 	console.log("Cleaning up the the bin directory.");
 
 	const realBins = await getBins();
