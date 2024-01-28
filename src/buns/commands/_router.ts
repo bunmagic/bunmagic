@@ -2,15 +2,8 @@ import type { Command } from '../commands';
 import help from './help';
 import create from './create';
 
-export type InternalCommand = Command & {
-	info: {
-		name: string;
-		desc: string;
-		usage: string;
-	}
-}
 export const isRouter = true;
-export default async function router(cmd: () => Promise<void>, command: undefined | Command, commands: Map<string, InternalCommand>) {
+export default async function router(cmd: () => Promise<void>, command: undefined | Command, commands: Map<string, Command>) {
 
 	let input = argv._[0];
 
