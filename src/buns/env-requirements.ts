@@ -12,7 +12,7 @@ export default async function env_requirements() {
 		return false;
 	}
 
-	if (getSourceDirectories().size === 0) {
+	if ((await getSourceDirectories()).size === 0) {
 		console.log("Welcome! Where should bunshell store your scripts?")
 		await addSourceDirectory();
 		await relinkBins();

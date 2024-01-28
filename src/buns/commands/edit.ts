@@ -3,12 +3,31 @@ import {
 	getSourceDirectories,
 } from "../sources";
 import { PATHS } from "../config";
+import { create } from './create';
 
 export const desc = `Edit scripts. If no script name is specified, will open all scripts and the ~/.bunshell directory`;
 export const usage = `bunshell edit [script-name]`;
 
+
 export default async function () {
-	const path = argv._[0];
+	const slug = argv._[0];
+	if (!slug) {
+		throw new Error('You must specify a script to edit.');
+	}
+	console.log("EDITING: " + slug);
+	const target = await findFile(slug);
+
+	console.log("TARGET: " + target);
+	if (target) {
+		return await openEditor(target);
+	}
+
+	return create(slug);
+}
+
+export async function openEditor(path: string) {
+	console.log("Opening editor for path: " + path);
+	return;
 	const edit = Bun.env.EDITOR || `code`;
 
 	// If using VSCode, open in a new window
@@ -32,27 +51,22 @@ export default async function () {
 	throw new Error(res.stdout.toString() || res.stderr.toString());
 }
 
-
-async function edit(slug: string) {
+export async function findFile(slug: string) {
 	if (slug) {
-		const { file } = await search(slug);
-		if (file && (await fs.pathExists(file))) {
-			return await editor(file);
+		const script = await search(slug);
+		if (script && script.file && (await Bun.file(script.file).exists())) {
+			return script.file;
 		}
 	}
 
-	fs.ensureDir(PATHS.sources);
-
-	for (const source of getSourceDirectories()) {
-		const dirname = path.basename(source);
-		const symlink = `${PATHS.sources}/${dirname}`;
-		if (
-			!fs.pathExistsSync(symlink) &&
-			fs.pathExistsSync(source) &&
-			fs.isDirectorySync(source)
-		) {
-			await $`ln -s ${source} ${symlink}`;
+	fs.ensureDir(PATHS.bunshell);
+	for (const source of await getSourceDirectories()) {
+		const dirname = path.basename(source.path);
+		console.log(dirname, slug);
+		if (dirname === slug) {
+			return source;
 		}
 	}
-	await editor(PATHS.bunshell);
+
+	return false;
 }

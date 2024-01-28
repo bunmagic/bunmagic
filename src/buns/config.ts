@@ -8,26 +8,30 @@ export const PATHS: {
 	config: `${os.homedir()}/.bunshell/config.json`,
 }
 
-export function get(key: string | boolean = false): any | boolean {
-	if (!fs.pathExistsSync(PATHS.config)) {
-		return false;
-	}
-	const json = JSON.parse(fs.readFileSync(PATHS.config, "utf-8"));
-	if (key === false) {
-		return json;
-	}
+export const SUPPORTED_FILES = ["mjs", "js", "ts"] as const;
 
-	if (typeof key === "string" && key in json) {
-		return json[key];
-	}
-
-	return false;
+export type Config = {
+	extension: string & typeof SUPPORTED_FILES[number];
+	sources?: {
+		path: string;
+		bin?: string;
+	}[]
 }
 
-export function update(key: string, value: any): void {
-	const json = fs.pathExistsSync(PATHS.config) ? get() : {};
+async function config(): Promise<Config> {
+	try {
+		return await Bun.file(PATHS.config).json<Config>();
+	} catch (error) {
+		return {} as Config;
+	}
+}
+
+export async function get<K extends keyof Config>(key: K, fallback?: Config[K] | undefined): Promise<Config[K]> {
+	return (await config())[key];
+}
+
+export async function update<K extends keyof Config>(key: K, value: Config[K]) {
+	const json = await config();
 	json[key] = value;
-	fs.writeFileSync(PATHS.config, JSON.stringify(json, null, 4), {
-		encoding: "utf8",
-	});
+	return await Bun.write(PATHS.config, JSON.stringify(json, null, 4));
 }

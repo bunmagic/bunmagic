@@ -1,10 +1,10 @@
-import type { InternalCommand } from './_router';
+import type { Command } from '../commands';
 
 export const name = "help";
 export const desc = "Get the full list of available commands";
 export const usage = "buns help";
 
-export default async function run(commands: Map<string, InternalCommand>) {
+export default async function run(commands: Map<string, Command>) {
 	const help = Array.from(commands.values()).map((command) => {
 		let output = `\n  `;
 		output += `${chalk.bold(command.name)}`

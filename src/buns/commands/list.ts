@@ -9,14 +9,14 @@ export const usage = `bunshell list ${chalk.gray(`| bunshell ls`)}`;
 export const alias = ["ls"];
 
 export default async function () {
-	const sourceDirs = getSourceDirectories();
+	const sourceDirs = await getSourceDirectories();
 
 	let output = "";
-	for (const directory of sourceDirs) {
-		const scripts = await getScripts(directory);
+	for (const source of sourceDirs) {
+		const scripts = await getScripts(source);
 		output += `\n `;
-		output += chalk.gray(path.dirname(directory) + "/");
-		output += chalk.bold.gray(path.basename(directory));
+		output += chalk.gray(path.dirname(source.path) + "/");
+		output += chalk.bold.gray(path.basename(source.path));
 
 		let scriptList = scripts.map(scriptInfo);
 		let maxScriptNameLength = 0;
@@ -34,7 +34,7 @@ export default async function () {
 
 		const leaderDotSpacing = 2; // Number of spaces between the script names and the leader dots
 
-		scriptList = scriptList.map(({ slug, bin, file }) => {
+		const list = scriptList.map(({ slug, bin, file }) => {
 			const binExists = fs.pathExistsSync(bin);
 			const symbol = binExists
 				? chalk.bold.green("·")
@@ -64,7 +64,7 @@ export default async function () {
 			return line;
 		});
 
-		output += scriptList.join("");
+		output += list.join("");
 		output += `\n `;
 	}
 

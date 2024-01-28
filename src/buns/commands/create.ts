@@ -4,7 +4,8 @@ import {
 	scriptInfo
 } from "../sources";
 import { makeScriptExecutable } from "../bins";
-import edit from "./edit";
+import { openEditor } from "./edit";
+import { get } from '../config';
 
 export const desc = `Create a new script`;
 export const usage = `bunshell create <script-name>`;
@@ -15,7 +16,10 @@ export default async function () {
 	if (!slug) {
 		throw new Error('Scripts must have a name.');
 	}
+	return await create(slug);
+}
 
+export async function create(slug: string) {
 	const script = await search(slug);
 	if (script) {
 		const { file, bin } = script;
@@ -25,14 +29,11 @@ export default async function () {
 			if (
 				ack(`Would you like to edit ${chalk.bold(slug)} ?`, "y")
 			) {
-				return await edit();
+				return await openEditor(file);
 			}
 			return true;
 		}
 	}
-
-
-
 
 	const commandExists = await $`which ${slug}`;
 
@@ -50,7 +51,7 @@ export default async function () {
 
 	console.log("Creating a new command: " + slug);
 
-	const directories = [...getSourceDirectories()];
+	const directories = await getSourceDirectories().then(d => [...d].map(d => d.path));
 	let directory = directories[0];
 
 	if (directories.length > 1) {
@@ -61,13 +62,13 @@ export default async function () {
 		throw new Error("No directory selected");
 	}
 
-	const scriptFile = scriptInfo(`${directory}/${slug}.mjs`);
+	const extension = await get("extension", "ts");
+	const scriptFile = scriptInfo(`${directory}/${slug}.${extension}`);
 
-	await $`echo '#!/usr/bin/env zx' >> ${scriptFile.file}`;
 	await $`chmod +x ${scriptFile.file}`;
 
 	await makeScriptExecutable(scriptFile)
-	await edit()
+	await openEditor(slug)
 
 	return scriptFile.file;
 }

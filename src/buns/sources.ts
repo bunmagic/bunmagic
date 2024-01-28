@@ -1,4 +1,4 @@
-import { PATHS, get, update } from "./config";
+import { PATHS, SUPPORTED_FILES, get, update } from "./config";
 
 
 type Script = {
@@ -7,6 +7,11 @@ type Script = {
 	file: string;
 	filename: string;
 	directory: string;
+}
+
+type SourceDir = {
+	path: string;
+	bin?: string;
 }
 
 export function scriptInfo(file: string): Script {
@@ -37,21 +42,21 @@ export async function search(slug: string): Promise<Script | undefined> {
 }
 
 
-export async function getScripts(directory: string) {
-	return await globby(`${directory}/*.mjs`);
+export async function getScripts(directory: SourceDir) {
+	const files = await globby(`${directory.path}/*.{${SUPPORTED_FILES.join(",")}}`)
+	return files;
 }
 
 
 export async function getScriptSources() {
-	const sources = [...getSourceDirectories()];
+	const sources = [...await getSourceDirectories()];
 	const scripts = await Promise.all(sources.map(getScripts))
 	return scripts.flat();
 }
 
+export async function getSourceDirectories(): Promise<Set<SourceDir>> {
 
-export function getSourceDirectories(): Set<string> {
-
-	const sources = get("sources");
+	const sources = await get("sources");
 	if (!sources) {
 		return new Set([]);
 	}

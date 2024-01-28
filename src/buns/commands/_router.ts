@@ -5,7 +5,7 @@ import create from './create';
 export const isRouter = true;
 export default async function router(cmd: () => Promise<void>, command: undefined | Command, commands: Map<string, Command>) {
 
-	let input = argv._[0];
+	let input = argv._.shift();
 
 	// Offer to create utility if it doesn't exist.
 	if (input && !command) {
