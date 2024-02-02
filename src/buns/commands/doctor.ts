@@ -1,16 +1,18 @@
-import { addSourceDirectory } from './commands/add_source';
-import { relinkBins } from './commands/link';
-import { getSources } from './sources'
+import { addSourceDirectory } from './add_source';
+import { relinkBins } from './link';
+import { getSources } from '../sources'
 
-export default async function env_requirements() {
+export default async function setup() {
 	const PATH = Bun.env.PATH;
 	const BIN_PATH = `${os.homedir()}/.bunshell/bin`
 
+	let issues = 0;
+
 	if (!PATH) {
+		issues++;
 		console.log("Your $PATH is not set.");
 		console.log("Please set your $PATH to include the bin directory.");
 		console.log(BIN_PATH);
-		return false;
 	}
 
 	if ((await getSources()).length === 0) {
@@ -22,13 +24,17 @@ export default async function env_requirements() {
 		console.log(`run ${chalk.bold("bunshell add_source")}`);
 	}
 
-	if (!PATH.includes(BIN_PATH)) {
+	if (PATH && !PATH.includes(BIN_PATH)) {
+		issues++;
 		console.log("Make sure that you've set up the $PATH correctly.");
 		console.log(PATH);
 		console.log(`Your $PATH should include ${BIN_PATH}`);
 		return false;
 	}
 
-
-	return true;
+	if (issues === 0) {
+		console.log("Your setup looks good!");
+	} else {
+		console.log(`Found ${issues} issue(s).`);
+	}
 }

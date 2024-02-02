@@ -1,13 +1,6 @@
 import "./index";
 import { getCommands } from './buns/commands';
-import env_requirements from "./buns/env-requirements";
 import { getSources } from './buns/sources';
-
-
-if (true !== await env_requirements()) {
-	console.log(`Environment requirements not met.`);
-	process.exit(1);
-}
 
 const namespace = argv._.shift();
 if (!namespace) {
