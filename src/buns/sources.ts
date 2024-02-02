@@ -1,90 +1,50 @@
-import { PATHS, SUPPORTED_FILES, get, update } from "./config";
+import { PATHS, SUPPORTED_FILES, get, type Script, type NamespacedScripts, type Scripts } from "./config";
 
 
-type Script = {
-	slug: string;
-	bin: string;
-	file: string;
-	filename: string;
-	directory: string;
-}
 
-type SourceDir = {
-	path: string;
-	bin?: string;
-}
-
-export function scriptInfo(file: string): Script {
+async function getScript(file: string, parent?: string): Promise<Script> {
 	const slug = path.parse(file).name;
 	const filename = path.parse(file).base;
 	const bin = `${PATHS.bins}/${slug}`;
 	const directory = path.dirname(file);
+	const command = parent ? `${parent} ${slug}` : slug;
 	return {
 		slug,
 		bin,
 		file,
 		filename,
-		directory
+		command,
+		path: directory
 	};
 }
 
-
-
-export async function binfo(): Promise<Script[]> {
-	return (await getScriptSources()).map(scriptInfo)
+async function getScripts(directory: string, parent?: string): Promise<Script[]> {
+	const files = await globby(`${directory}/*.{${SUPPORTED_FILES.join(",")}}`);
+	return Promise.all(files.map((file) => getScript(file, parent)));
 }
 
-
-export async function search(slug: string): Promise<Script | undefined> {
-	const bins = await binfo();
-	return bins.find(bin => bin.slug === slug);
-
-}
-
-
-export async function getScripts(directory: SourceDir) {
-	const files = await globby(`${directory.path}/*.{${SUPPORTED_FILES.join(",")}}`)
-	return files;
-}
-
-
-export async function getScriptSources() {
-	const sources = [...await getSourceDirectories()];
-	const scripts = await Promise.all(sources.map(getScripts))
-	return scripts.flat();
-}
-
-export async function getSourceDirectories(): Promise<Set<SourceDir>> {
-
+export async function getSources(): Promise<(Scripts | NamespacedScripts)[]> {
 	const sources = await get("sources");
 	if (!sources) {
-		return new Set([]);
+		throw new Error("No sources defined.");
 	}
 
-	return new Set(sources.filter(Boolean));
+	const output: (Scripts | NamespacedScripts)[] = [];
+	for (const source of sources) {
+		const scripts = await getScripts(source.path, 'namespace' in source ? source.namespace : undefined);
+		output.push({
+			...source,
+			scripts
+		});
+	}
+
+	return output;
 }
 
 
-export async function addSourceDirectory(pathToAdd: string | false = false) {
-
-	const sources = await getSourceDirectories();
-	const defaultSource = `${PATHS.bunshell}/default`;
-
-	if (pathToAdd === false) {
-		const sourcePath = `Enter full path to source directory:\n${chalk.gray(
-			`Default: ${defaultSource}`
-		)}\n> `;
-		pathToAdd = (await prompt(sourcePath)) || defaultSource;
-	}
-
-	const binName = prompt("Enter bin name (optional):") || undefined;
-
-	pathToAdd = path.resolve(pathToAdd);
-	sources.add({
-		path: pathToAdd,
-		bin: binName,
-	});
-	fs.ensureDirSync(pathToAdd)
-
-	update("sources", [...sources]);
+export async function search(command: string): Promise<Script | undefined> {
+	const sources = await getSources();
+	const scripts = sources.flatMap(source => source.scripts);
+	return scripts.find(script => script.command === command);
 }
+

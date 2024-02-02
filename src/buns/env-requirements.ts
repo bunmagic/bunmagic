@@ -1,5 +1,6 @@
-import { getSourceDirectories, addSourceDirectory } from './sources'
-import { relinkBins } from './bins'
+import { addSourceDirectory } from './commands/add_source';
+import { relinkBins } from './commands/link';
+import { getSources } from './sources'
 
 export default async function env_requirements() {
 	const PATH = Bun.env.PATH;
@@ -12,7 +13,7 @@ export default async function env_requirements() {
 		return false;
 	}
 
-	if ((await getSourceDirectories()).size === 0) {
+	if ((await getSources()).length === 0) {
 		console.log("Welcome! Where should bunshell store your scripts?")
 		await addSourceDirectory();
 		await relinkBins();

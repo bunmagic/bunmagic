@@ -1,8 +1,8 @@
 import {
+	getSources,
 	search,
-	getSourceDirectories,
+
 } from "../sources";
-import { PATHS } from "../config";
 import { create } from './create';
 
 export const desc = `Edit scripts. If no script name is specified, will open all scripts and the ~/.bunshell directory`;
@@ -10,12 +10,12 @@ export const usage = `bunshell edit [script-name]`;
 
 
 export default async function () {
-	const slug = argv._[0];
+	const slug = argv._.join(" ");
 	if (!slug) {
 		throw new Error('You must specify a script to edit.');
 	}
-	const target = await findFile(slug);
-
+	const target = await getEditTarget(slug);
+	console.log(target);
 	if (target) {
 		return await openEditor(target);
 	}
@@ -47,19 +47,15 @@ export async function openEditor(path: string) {
 	throw new Error(res.stdout.toString() || res.stderr.toString());
 }
 
-export async function findFile(slug: string) {
-	if (slug) {
-		const script = await search(slug);
-		if (script && script.file && (await Bun.file(script.file).exists())) {
-			return script.file;
-		}
+async function getEditTarget(input: string) {
+	const script = await search(input);
+	if (script && script.file && (await Bun.file(script.file).exists())) {
+		return script.file;
 	}
-
-	fs.ensureDir(PATHS.bunshell);
-	for (const source of await getSourceDirectories()) {
-		if (source?.bin === slug || path.basename(source.path) === slug) {
-			return source.path;
-		}
+	const sources = await getSources();
+	const source = sources.find((dir) => 'namespace' in dir && dir.namespace === input);
+	if (source) {
+		return source.path;
 	}
 
 	return false;

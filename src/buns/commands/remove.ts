@@ -1,29 +1,39 @@
+import { PATHS } from '../config';
 import { search } from "../sources";
+import { commandFromStr } from './create';
 
 export const desc = `Remove and unlink a script`;
 export const usage = `bunshell remove <script-name>`;
 export const alias = ["rm"];
 
 export default async function () {
-	const slug = argv._[0];
-
-	if (!slug) {
+	const input = argv._.join(" ");
+	const [command, namespace] = commandFromStr(input);
+	if (!command) {
 		throw new Error(
-			`You must specify which script to remove.\n${info.usage}`,
+			`You must specify which script to remove.\n${usage}`,
 		);
 	}
 
-	const { file, bin } = await search(slug);
-
-	if (!file && !bin) {
-		console.log(`🍀 You're in luck! ${slug} doesn't exist already!`);
+	const script = await search(input);
+	if (!script) {
+		console.log(`The script "${input}" doesn't exist.`);
 		return;
 	}
+	const { file } = script;
 
-	if (false === (ack(`Delete command "${chalk.bold(slug)}"?`))) {
+	if (false === (ack(`Delete command "${chalk.bold(input)}"?`))) {
 		return false;
 	}
 
+	if (!namespace) {
+		const binFile = path.join(PATHS.bins, input);
+		if (!file && !binFile) {
+			console.log(`🍀 You're in luck! ${input} doesn't exist already!`);
+			return;
+		}
+		await $`rm ${binFile}`;
+	}
+
 	await $`rm ${file}`;
-	await $`rm ${bin}`;
 }
