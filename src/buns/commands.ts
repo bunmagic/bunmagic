@@ -69,6 +69,7 @@ type CommandList<C extends Command> = {
 	router: Router;
 	commands: Map<string, C>;
 }
+
 export async function getCommands<C extends Command>(files: string[]): Promise<CommandList<C>> {
 	const validFiles = files.filter((file: string) => SUPPORTED_FILES.includes(path.extname(file).replace('.', '') as Config['extension']));
 	const list = await Promise.all(validFiles.map(importCommand));

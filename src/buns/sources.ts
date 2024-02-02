@@ -1,7 +1,5 @@
 import { PATHS, SUPPORTED_FILES, get, type Script, type NamespacedScripts, type Scripts } from "./config";
 
-
-
 async function getScript(file: string, parent?: string): Promise<Script> {
 	const slug = path.parse(file).name;
 	const filename = path.parse(file).base;

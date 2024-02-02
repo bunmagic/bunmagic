@@ -1,6 +1,7 @@
 import "./index";
 import { getCommands } from './buns/commands';
 import env_requirements from "./buns/env-requirements";
+import { getSources } from './buns/sources';
 
 
 if (true !== await env_requirements()) {
@@ -8,22 +9,18 @@ if (true !== await env_requirements()) {
 	process.exit(1);
 }
 
-const sourceDirectory = argv._.shift();
-if (!sourceDirectory) {
-	throw new Error(`No command file specified.`);
+const namespace = argv._.shift();
+if (!namespace) {
+	throw new Error(`Missing script namespace.`);
 }
 
 // Turn off verbose mode by default
 BUNS.verbose = argv.verbose || Bun.env.DEBUG || false;
 
-const files = (await $`ls ${sourceDirectory}`.text())
-	.split("\n")
-	.map((file: string) => file.trim())
-	.filter(Boolean)
-	.map(file => path.resolve(sourceDirectory, file));
 
-
-
+const sources = await getSources();
+const scripts = sources.find(source => 'namespace' in source && source.namespace === namespace)?.scripts;
+const files = scripts!.map(script => script.file);
 const { router: routerInfo, commands } = await getCommands(files);
 const input = argv._[0];
 
