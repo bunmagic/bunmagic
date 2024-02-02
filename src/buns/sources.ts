@@ -16,9 +16,25 @@ async function getScript(file: string, parent?: string): Promise<Script> {
 	};
 }
 
-async function getScripts(directory: string, parent?: string): Promise<Script[]> {
-	const files = await globby(`${directory}/*.{${SUPPORTED_FILES.join(",")}}`);
-	return Promise.all(files.map((file) => getScript(file, parent)));
+async function getScripts(source: Scripts | NamespacedScripts): Promise<(Scripts | NamespacedScripts)> {
+	const files = await globby(`${source.path}/*.{${SUPPORTED_FILES.join(",")}}`);
+	const scripts = await Promise.all(files.map((file) => getScript(file, source.namespace)));
+	return {
+		...source,
+		scripts
+	}
+}
+
+export async function getSource(name: string): Promise<Scripts | NamespacedScripts> {
+	const sources = await get("sources");
+	if (!sources) {
+		throw new Error("No sources defined.");
+	}
+	const source = sources.find(source => path.basename(source.path) === name);
+	if (!source) {
+		throw new Error(`No source found with the name: ${name}`);
+	}
+	return await getScripts(source);
 }
 
 export async function getSources(): Promise<(Scripts | NamespacedScripts)[]> {
@@ -27,16 +43,12 @@ export async function getSources(): Promise<(Scripts | NamespacedScripts)[]> {
 		throw new Error("No sources defined.");
 	}
 
-	const output: (Scripts | NamespacedScripts)[] = [];
+	const output: Promise<(Scripts | NamespacedScripts)>[] = [];
 	for (const source of sources) {
-		const scripts = await getScripts(source.path, 'namespace' in source ? source.namespace : undefined);
-		output.push({
-			...source,
-			scripts
-		});
+		output.push(getScripts(source));
 	}
 
-	return output;
+	return Promise.all(output);
 }
 
 

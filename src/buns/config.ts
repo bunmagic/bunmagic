@@ -28,6 +28,7 @@ export type NamespacedScripts = {
 }
 
 export type Scripts = {
+	namespace: undefined;
 	path: string;
 	scripts: Script[];
 }
