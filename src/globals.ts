@@ -1,5 +1,6 @@
 // Importing each module
 import { $ } from "bun";
+// @TODO: Remove globby, fs-extra and chalk
 export { default as chalk } from 'chalk';
 export { default as fs } from 'fs-extra';
 export { globby } from 'globby';
