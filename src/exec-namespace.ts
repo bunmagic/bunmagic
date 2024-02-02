@@ -7,10 +7,6 @@ if (!namespace) {
 	throw new Error(`Missing script namespace.`);
 }
 
-// Turn off verbose mode by default
-BUNS.verbose = argv.verbose || Bun.env.DEBUG || false;
-
-
 const sources = await getSources();
 const scripts = sources.find(source => 'namespace' in source && source.namespace === namespace)?.scripts;
 const files = scripts!.map(script => script.file);
