@@ -16,6 +16,7 @@
 	"name": "bunshell",
 	"module": "index.ts",
 	"type": "module",
+	"version": "1.0.0",
 	"peerDependencies": {
 		"typescript": "^5.0.0"
 	}
