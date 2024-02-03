@@ -8,7 +8,7 @@ function template(scriptPath: string): string {
 
 
 export async function getBins(): Promise<string[]> {
-	return await globby([`${PATHS.bins}/*`, `!${PATHS.bins}/bunshell`]);
+	return (await $`ls ${PATHS.bins}`.text()).split("\n");
 }
 
 

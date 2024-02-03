@@ -1,5 +1,13 @@
 import { PATHS, SUPPORTED_FILES, get, type Script, type NamespacedScripts, type Scripts } from "./config";
 
+
+export async function listScripts(target: string): Promise<string[]> {
+	const result = (await $`ls ${target}`.text()).split("\n")
+		.map((file: string) => `${target}/${file}`)
+		.filter((file: string) => SUPPORTED_FILES.some((ext: string) => file.endsWith(ext)));
+	return result;
+}
+
 async function getScript(file: string, parent?: string): Promise<Script> {
 	const slug = path.parse(file).name;
 	const filename = path.parse(file).base;
@@ -17,7 +25,7 @@ async function getScript(file: string, parent?: string): Promise<Script> {
 }
 
 async function getScripts(source: Scripts | NamespacedScripts): Promise<(Scripts | NamespacedScripts)> {
-	const files = await globby(`${source.path}/*.{${SUPPORTED_FILES.join(",")}}`);
+	const files = await listScripts(source.path);
 	const scripts = await Promise.all(files.map((file) => getScript(file, source.namespace)));
 	return {
 		...source,

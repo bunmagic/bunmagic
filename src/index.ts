@@ -13,7 +13,6 @@ declare global {
 	const BUNS: typeof BUNS_GLOBAL;
 	const $: typeof globals.$;
 	const chalk: typeof globals.chalk;
-	const globby: typeof globals.globby;
 	const os: typeof globals.os;
 	const path: typeof globals.path;
 	const argv: typeof globals.argv;
