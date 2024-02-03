@@ -1,4 +1,3 @@
-#!/usr/bin/env bun
 import "./index";
 
 const scriptFile = argv._.shift();

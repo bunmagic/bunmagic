@@ -1,4 +1,3 @@
-#!/usr/bin/env bun
 import "./index";
 import { getCommands } from './lib/commands';
 import { getSources } from './lib/sources';
