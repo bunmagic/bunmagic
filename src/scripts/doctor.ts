@@ -1,4 +1,4 @@
-import { addSourceDirectory } from './add_source';
+import { addSourceDirectory } from './link';
 import { relinkBins } from './bins';
 import { getSources } from '../lib/sources'
 import { default as os } from 'node:os';
@@ -25,7 +25,7 @@ export default async function setup() {
 		await relinkBins();
 
 		console.log("All done! If you want to add more source directories,")
-		console.log(`run ${ansis.bold("bunshell add_source")}`);
+		console.log(`run ${ansis.bold("bunshell link")}`);
 	}
 
 	if (PATH && !PATH.includes(BIN_PATH)) {

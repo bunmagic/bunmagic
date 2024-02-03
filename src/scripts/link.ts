@@ -1,9 +1,9 @@
-import { PATHS, update } from '../lib/config';
+import { PATHS, update, type NamespacedScripts, type Scripts } from '../lib/config';
 import { getSources } from '../lib/sources';
 import { relinkBins } from './bins';
 
 export const desc = 'Add an additional directory to use as script source.';
-export const usage = 'bunshell add_source';
+export const usage = 'bunshell link';
 
 
 export async function addSourceDirectory(target?: string) {
@@ -37,7 +37,7 @@ export async function addSourceDirectory(target?: string) {
 	});
 	ensureDir(target)
 
-	await update("sources", sources);
+	await update("sources", sources as NamespacedScripts[] | Scripts[]);
 }
 
 export default async function () {
