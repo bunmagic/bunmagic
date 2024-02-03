@@ -19,10 +19,9 @@ export async function getBins(): Promise<string[]> {
 export async function ensureBin(binName: string, targetPath: string, namespace = false) {
 	const exec = namespace ? "bunshell-exec-namespace" : "bunshell-exec";
 	const binPath = path.join(PATHS.bins, binName);
-	console.log(`Ensuring bin: ${binName} -> ${binPath}`);
 
 	if (argv.force === true && (await Bun.file(binPath).exists()) === true) {
-		console.log(`\nRemoving ${ansis.bold(binName)} bin file\n${ansis.gray(`rm ${binPath}`)}`)
+		console.log(`Removing ${ansis.bold(binName)} bin file`);
 		await $`rm ${binPath}`
 	}
 
@@ -35,7 +34,7 @@ export async function ensureBin(binName: string, targetPath: string, namespace =
 	await Bun.write(binPath, template(targetPath, exec));
 	await $`chmod +x ${binPath}`;
 
-	console.log(`Created new bin: ${binName} -> ${binPath}`);
+	console.log(`Created new bin: ${binName} -> ${binPath}\n`);
 	return binPath;
 }
 
@@ -51,7 +50,7 @@ export async function relinkBins() {
 			}
 		} else {
 			for (const script of source.scripts) {
-				if (await ensureBin(script.slug, script.path)) {
+				if (await ensureBin(script.slug, script.file, false)) {
 					count++;
 				}
 			}
