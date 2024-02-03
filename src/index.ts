@@ -21,4 +21,5 @@ declare global {
 	const ack: typeof globals.ack;
 	const isDir: typeof globals.isDir;
 	const ensureDir: typeof globals.ensureDir;
+	const notMinimist: typeof globals.notMinimist;
 }
