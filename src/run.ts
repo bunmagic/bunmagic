@@ -1,5 +1,12 @@
 import "bunshell";
 
+export async function run(scriptFile: string) {
+	const script = await import(scriptFile);
+	if (script.default) {
+		await script.default();
+	}	
+}
+
 export async function runNamespace(namespace: string, sourcePath: string) {
 	const getScripts = await import("./lib/sources").then(m => m.getScripts);
 	const getCommands = await import("./lib/commands").then(m => m.getCommands);
