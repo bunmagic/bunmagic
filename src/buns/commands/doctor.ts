@@ -21,7 +21,7 @@ export default async function setup() {
 		await relinkBins();
 
 		console.log("All done! If you want to add more source directories,")
-		console.log(`run ${chalk.bold("bunshell add_source")}`);
+		console.log(`run ${ansis.bold("bunshell add_source")}`);
 	}
 
 	if (PATH && !PATH.includes(BIN_PATH)) {

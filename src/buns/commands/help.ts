@@ -16,7 +16,7 @@ export default async function run(commands: Map<string, Command>) {
 			return;
 		}
 		help += `\n  `;
-		help += `${chalk.bold(command.name)} `
+		help += `${ansis.bold(command.name)} `
 		if (command.desc) {
 			help += ` - `
 			help += command.desc
@@ -26,11 +26,11 @@ export default async function run(commands: Map<string, Command>) {
 			alias += ` (alias: `
 			alias += command.alias.join(", ")
 			alias += `)`
-			help += chalk.dim(alias)
+			help += ansis.dim(alias)
 
 		}
 		help += `\n  `
-		help += chalk.gray(command.usage)
+		help += ansis.gray(command.usage)
 		help += `\n`
 	})
 

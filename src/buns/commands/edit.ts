@@ -39,10 +39,10 @@ export async function openEditor(path: string) {
 	}
 	console.log(res);
 	console.log("");
-	console.log(chalk.bold("Editor missing!"));
-	console.log(`I tried to use "${chalk.bold(edit)}" to open ${path}`);
+	console.log(ansis.bold("Editor missing!"));
+	console.log(`I tried to use "${ansis.bold(edit)}" to open ${path}`);
 	console.log(
-		`\n 🔗 ${chalk.bold("Read more here: ")}\nhttps://github.com/pyronaur/bunshell/tree/main#code-editor\n`,
+		`\n 🔗 ${ansis.bold("Read more here: ")}\nhttps://github.com/pyronaur/bunshell/tree/main#code-editor\n`,
 	);
 	throw new Error(res.stdout.toString() || res.stderr.toString());
 }

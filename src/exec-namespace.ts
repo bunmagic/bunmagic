@@ -30,5 +30,5 @@ try {
 	}
 
 } catch (e) {
-	console.log(chalk.bold.red("Error: "), e);
+	console.log(ansis.bold.red("Error: "), e);
 }

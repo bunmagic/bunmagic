@@ -34,6 +34,6 @@ export default async function () {
 		console.log("\nDone!");
 	} else {
 		console.log("All executables are already linked.");
-		console.log(chalk.gray("Use the --force if you must"));
+		console.log(ansis.gray("Use the --force if you must"));
 	}
 }

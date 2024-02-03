@@ -1,6 +1,6 @@
 export function selection(options: string[], selectionQuestion: string) {
 	options.forEach((opt, index) => {
-		console.log(`> ${chalk.bold(index + 1)}:  ${opt} `)
+		console.log(`> ${ansis.bold(index + 1)}:  ${opt} `)
 	})
 
 	const result = prompt(selectionQuestion + "(default: 1): \n");

@@ -12,7 +12,7 @@ export async function addSourceDirectory(target?: string) {
 	const defaultSource = `${PATHS.bunshell}/default`;
 
 	if (!target) {
-		const sourcePath = `Enter full path to source directory:\n${chalk.gray(
+		const sourcePath = `Enter full path to source directory:\n${ansis.gray(
 			`Default: ${defaultSource}`
 		)}\n> `;
 		target = (await prompt(sourcePath)) || defaultSource;
@@ -20,13 +20,13 @@ export async function addSourceDirectory(target?: string) {
 
 	const sourceDirectories = sources.map((source) => source.path);
 	if (sourceDirectories.includes(target)) {
-		console.log(`The path "${chalk.bold(target)}" already exists. Please choose another path.`);
+		console.log(`The path "${ansis.bold(target)}" already exists. Please choose another path.`);
 		return await addSourceDirectory();
 	}
 
-	console.log(chalk.dim(`If you namespace this source, all your scripts within that dir will be prefixed with the namespace.`))
-	console.log(chalk.dim(`For example, if you add a source with the namespace "foo", a script called "bar" will be available as "foo bar".`))
-	console.log(chalk.dim(`If you don't want to namespace, just press enter and your scripts will be available globally.`))
+	console.log(ansis.dim(`If you namespace this source, all your scripts within that dir will be prefixed with the namespace.`))
+	console.log(ansis.dim(`For example, if you add a source with the namespace "foo", a script called "bar" will be available as "foo bar".`))
+	console.log(ansis.dim(`If you don't want to namespace, just press enter and your scripts will be available globally.`))
 	const namespace = prompt("Namespace (optional):") || undefined;
 
 	target = path.resolve(target);

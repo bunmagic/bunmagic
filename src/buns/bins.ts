@@ -19,7 +19,7 @@ export async function ensureBin(script: {
 	const binPath = path.join(PATHS.bins, script.slug);
 	console.log(`Ensuring bin: ${script.slug} -> ${binPath}`);
 	if (argv.force === true && (await Bun.file(binPath).exists()) === true) {
-		console.log(`\nRemoving ${chalk.bold(script.slug)} bin file\n${chalk.gray(`rm ${binPath}`)}`)
+		console.log(`\nRemoving ${ansis.bold(script.slug)} bin file\n${ansis.gray(`rm ${binPath}`)}`)
 		await $`rm ${binPath}`
 	}
 	if (false !== await Bun.file(binPath).exists()) {

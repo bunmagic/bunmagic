@@ -19,7 +19,7 @@ export default async function router(cmd: () => Promise<void>, command: undefine
 	try {
 		await cmd();
 	} catch (e) {
-		console.log(chalk.bold.red("Error: "), e);
+		console.log(ansis.bold.red("Error: "), e);
 		if (argv.verbose) {
 			console.log(e);
 		}

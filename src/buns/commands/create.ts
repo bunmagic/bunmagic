@@ -51,7 +51,7 @@ async function scriptPath(slug: string): Promise<PartialScriptPath> {
 	if (commandExists.exitCode !== 1) {
 		const alias = await $`which ${slug}`.text();
 		console.log(
-			`Command "${chalk.bold(slug)}" is already aliased to "${alias.trim()}"\n`,
+			`Command "${ansis.bold(slug)}" is already aliased to "${alias.trim()}"\n`,
 		);
 		process.exit(1);
 	}
@@ -77,10 +77,10 @@ export async function create(command: string) {
 	if (existingScript) {
 		const { file } = existingScript;
 		if (await Bun.file(file).exists()) {
-			console.log(`${chalk.bold(command)} already exists:`, `\n`, `-> ${file}`);
+			console.log(`${ansis.bold(command)} already exists:`, `\n`, `-> ${file}`);
 
 			if (
-				ack(`Would you like to edit ${chalk.bold(command)} ?`, "y")
+				ack(`Would you like to edit ${ansis.bold(command)} ?`, "y")
 			) {
 				return await openEditor(file);
 			}
@@ -99,8 +99,8 @@ export async function create(command: string) {
 		path: `${partialPath}.${extension}`,
 	}
 
-	console.log(chalk.dim("Creating new script:", script.path));
-	if (!ack(`Create new command "${chalk.bold(command)}"?`)) {
+	console.log(ansis.dim("Creating new script:", script.path));
+	if (!ack(`Create new command "${ansis.bold(command)}"?`)) {
 		process.exit(0);
 	}
 
@@ -109,7 +109,7 @@ export async function create(command: string) {
 		if (binFile) {
 			await $`chmod +x ${binFile}`;
 		} else {
-			console.log(`\n${chalk.red("▲")} Could not create a symlink to the script.`);
+			console.log(`\n${ansis.red("▲")} Could not create a symlink to the script.`);
 			return false;
 		}
 	}

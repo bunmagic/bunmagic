@@ -22,7 +22,7 @@ export default async function () {
 	}
 	const { file } = script;
 
-	if (false === (ack(`Delete command "${chalk.bold(input)}"?`))) {
+	if (false === (ack(`Delete command "${ansis.bold(input)}"?`))) {
 		return false;
 	}
 
