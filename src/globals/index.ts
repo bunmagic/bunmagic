@@ -2,7 +2,6 @@
 import { $ } from "bun";
 import { notMinimist } from './not-minimist';
 import ansis from 'ansis';
-export { default as os } from 'node:os';
 export { default as path } from 'path';
 export { notMinimist };
 
