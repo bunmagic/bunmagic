@@ -99,7 +99,7 @@ export async function create(command: string) {
 		path: `${partialPath}.${extension}`,
 	}
 
-	console.log(ansis.dim("Creating new script:", script.path));
+	console.log(ansis.dim(`Creating new script: ${script.path}`));
 	if (!ack(`Create new command "${ansis.bold(command)}"?`)) {
 		process.exit(0);
 	}
