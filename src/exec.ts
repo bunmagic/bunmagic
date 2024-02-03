@@ -1,4 +1,5 @@
-import "./index";
+#!/usr/bin/env bun
+import "bunshell";
 
 const scriptFile = argv._.shift();
 

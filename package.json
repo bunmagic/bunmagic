@@ -11,6 +11,7 @@
 		"bunshell-exec": "src/exec.ts",
 		"bunshell-exec-ns": "src/exec-namespace.ts"
 	},
+	"module": "src/index.ts",
 	"name": "bunshell",
 	"type": "module",
 	"version": "1.0.2"

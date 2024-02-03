@@ -1,4 +1,5 @@
-import "./index";
+#!/usr/bin/env bun
+import "bunshell";
 import { getCommands } from './lib/commands';
 import { getSources } from './lib/sources';
 
