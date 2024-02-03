@@ -97,8 +97,8 @@ export async function create(command: string) {
 	const ext = await get("extension", "ts");
 	const binName = namespace ? namespace : slug;
 	const exec = namespace ? "bunshell-exec-namespace" : "bunshell-exec";
-	const targetPath = namespace ? namespace : `${partialPath}.${ext}`;
-	const editFilePath = namespace ? `${partialPath}.${ext}` : path.resolve(partialPath, `${slug}.${ext}`);
+	const editFilePath = `${partialPath}.${ext}`;
+	const targetPath = namespace ? namespace : editFilePath;	
 
 	console.log(ansis.dim(`Creating new script: ${editFilePath}`));
 	if (!ack(`Create new command "${ansis.bold(command)}" ? `)) {
@@ -108,7 +108,8 @@ export async function create(command: string) {
 	const binFile = await ensureBin(binName, targetPath, exec);
 
 	if (binFile) {
-		await $`chmod + x ${binFile}`;
+		await $`chmod +x ${binFile}`;
+		await $`touch ${editFilePath}`;
 	} else {
 		console.log(`\n${ansis.red("▲")} Could not create a symlink to the script.`);
 		return false;
