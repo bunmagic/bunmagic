@@ -9,14 +9,14 @@
 		"@types/which": "^3.0.3"
 	},
 	"bin": {
-		"bns": "bunshell-exec-ns src/scripts",
 		"bunshell-exec": "src/exec.ts",
-		"bunshell-exec-ns": "src/exec-namespace.ts"
+		"bunshell-exec-ns": "src/exec-namespace.ts",
+		"bns": "bunshell-exec-ns src/scripts"
 	},
 	"name": "bunshell",
 	"module": "src/index.ts",
 	"type": "module",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"peerDependencies": {
 		"typescript": "^5.0.0"
 	}
