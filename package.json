@@ -10,13 +10,12 @@
 	},
 	"bin": {
 		"bunshell-exec": "src/exec.ts",
-		"bunshell-exec-ns": "src/exec-namespace.ts",
-		"bns": "bunshell-exec-ns src/scripts"
+		"bunshell-exec-ns": "src/exec-namespace.ts"
 	},
 	"name": "bunshell",
 	"module": "src/index.ts",
 	"type": "module",
-	"version": "1.0.1",
+	"version": "1.0.0",
 	"peerDependencies": {
 		"typescript": "^5.0.0"
 	}
