@@ -13,7 +13,6 @@ declare global {
 	const BUNS: typeof BUNS_GLOBAL;
 	const $: typeof globals.$;
 	const chalk: typeof globals.chalk;
-	const fs: typeof globals.fs;
 	const globby: typeof globals.globby;
 	const os: typeof globals.os;
 	const path: typeof globals.path;
@@ -21,4 +20,6 @@ declare global {
 	const selection: typeof globals.selection;
 	const cd: typeof globals.cd;
 	const ack: typeof globals.ack;
+	const isDir: typeof globals.isDir;
+	const ensureDir: typeof globals.ensureDir;
 }

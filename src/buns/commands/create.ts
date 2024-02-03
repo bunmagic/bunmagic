@@ -76,7 +76,7 @@ export async function create(command: string) {
 	const existingScript = await search(command);
 	if (existingScript) {
 		const { file } = existingScript;
-		if (await fs.pathExists(file)) {
+		if (await Bun.file(file).exists()) {
 			console.log(`${chalk.bold(command)} already exists:`, `\n`, `-> ${file}`);
 
 			if (

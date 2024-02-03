@@ -18,17 +18,17 @@ export async function ensureBin(script: {
 }) {
 	const binPath = path.join(PATHS.bins, script.slug);
 	console.log(`Ensuring bin: ${script.slug} -> ${binPath}`);
-	if (argv.force === true && (await fs.pathExists(binPath)) === true) {
+	if (argv.force === true && (await Bun.file(binPath).exists()) === true) {
 		console.log(`\nRemoving ${chalk.bold(script.slug)} bin file\n${chalk.gray(`rm ${binPath}`)}`)
 		await $`rm ${binPath}`
 	}
-	if (false !== await fs.pathExists(binPath)) {
+	if (false !== await Bun.file(binPath).exists()) {
 		return false;
 	}
 
 	// Create bin
-	await fs.ensureDir(PATHS.bins);
-	await fs.writeFile(binPath, template(script.path), "utf8");
+	await ensureDir(PATHS.bins);
+	await Bun.write(binPath, template(script.path));
 	await $`chmod +x ${binPath}`;
 
 	console.log(`Created new bin: ${script.slug} -> ${binPath}`);

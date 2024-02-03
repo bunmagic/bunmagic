@@ -35,14 +35,14 @@ export async function addSourceDirectory(target?: string) {
 		path: target,
 		scripts: []
 	});
-	fs.ensureDirSync(target)
+	ensureDir(target)
 
 	await update("sources", sources);
 }
 
 export default async function () {
 	const sourceDir = argv._[0];
-	if (sourceDir && !fs.pathExistsSync(sourceDir)) {
+	if (sourceDir && !await Bun.file(sourceDir).exists() && ! await isDir(sourceDir)) {
 		console.log(
 			`The path you provided doesn't exist. Are you sure it's correct?`,
 		);
