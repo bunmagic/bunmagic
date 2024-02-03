@@ -5,8 +5,7 @@
 	"devDependencies": {
 		"@types/bun": "latest",
 		"@types/fs-extra": "^11.0.4",
-		"@types/minimist": "^1.2.5",
-		"@types/which": "^3.0.3"
+		"@types/minimist": "^1.2.5"
 	},
 	"bin": {
 		"bunshell-exec": "src/exec.ts",
