@@ -1,7 +1,7 @@
 import { addSourceDirectory } from './add_source';
 import { relinkBins } from './bins';
 import { getSources } from '../lib/sources'
-export { default as os } from 'node:os';
+import { default as os } from 'node:os';
 
 export const desc = "Check if bunshell is set up correctly";
 export const usage = "bunshell doctor";
