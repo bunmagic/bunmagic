@@ -1,10 +1,10 @@
 import {
 	getSources,
 	search,
-} from "../sources";
-import { ensureBin } from "../bins";
+} from "../lib/sources";
+import { ensureBin } from "../lib/bins";
 import { openEditor } from "./edit";
-import { get } from '../config';
+import { get } from '../lib/config';
 
 export const desc = `Create a new script`;
 export const usage = `bunshell create <script-name>`;

@@ -1,4 +1,4 @@
-import type { Command } from '../commands';
+import type { Command } from '../lib/commands';
 
 export const name = "help";
 export const desc = "Get the full list of available commands";

@@ -2,7 +2,7 @@ import {
 	getSources,
 	search,
 
-} from "../sources";
+} from "../lib/sources";
 import { create } from './create';
 
 export const desc = `Edit scripts. If no script name is specified, will open all scripts and the ~/.bunshell directory`;

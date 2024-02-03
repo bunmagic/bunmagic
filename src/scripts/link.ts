@@ -1,5 +1,5 @@
-import { ensureBin } from '../bins';
-import { getSources } from '../sources';
+import { ensureBin } from '../lib/bins';
+import { getSources } from '../lib/sources';
 
 export const desc = "Ensure all your script files have an executable in the bin directory.";
 export const usage = `bunshell link [--force]`;

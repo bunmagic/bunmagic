@@ -1,4 +1,4 @@
-import type { Command } from '../commands';
+import type { Command } from '../lib/commands';
 import help from './help';
 import create from './create';
 

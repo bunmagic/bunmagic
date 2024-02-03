@@ -1,5 +1,5 @@
-import { PATHS } from '../config';
-import { search } from "../sources";
+import { PATHS } from '../lib/config';
+import { search } from "../lib/sources";
 import { commandFromStr } from './create';
 
 export const desc = `Remove and unlink a script`;

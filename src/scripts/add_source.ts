@@ -1,5 +1,5 @@
-import { PATHS, update } from '../config';
-import { getSources } from '../sources';
+import { PATHS, update } from '../lib/config';
+import { getSources } from '../lib/sources';
 import { relinkBins } from './link';
 
 export const desc = 'Add an additional directory to use as script source.';

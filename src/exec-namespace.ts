@@ -1,6 +1,6 @@
 import "./index";
-import { getCommands } from './buns/commands';
-import { getSources } from './buns/sources';
+import { getCommands } from './lib/commands';
+import { getSources } from './lib/sources';
 
 const namespace = argv._.shift();
 if (!namespace) {

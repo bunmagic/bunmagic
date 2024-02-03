@@ -1,6 +1,6 @@
 import {
 	getSources
-} from "../sources";
+} from "../lib/sources";
 
 export const desc = `List all known scripts.`;
 export const usage = `bunshell list ${ansis.gray(`| bunshell ls`)}`;

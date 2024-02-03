@@ -1,6 +1,6 @@
 import { addSourceDirectory } from './add_source';
 import { relinkBins } from './link';
-import { getSources } from '../sources'
+import { getSources } from '../lib/sources'
 
 export default async function setup() {
 	const PATH = Bun.env.PATH;
