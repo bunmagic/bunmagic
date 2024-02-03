@@ -2,7 +2,7 @@ import type { Command } from '../lib/commands';
 
 export const name = "help";
 export const desc = "Get the full list of available commands";
-export const usage = "buns help";
+export const usage = "bunshell help";
 
 export default async function run(commands: Map<string, Command>) {
 
