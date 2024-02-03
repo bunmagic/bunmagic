@@ -2,6 +2,9 @@ import { addSourceDirectory } from './add_source';
 import { relinkBins } from './link';
 import { getSources } from '../lib/sources'
 
+export const desc = "Check if bunshell is set up correctly";
+export const usage = "bunshell doctor";
+
 export default async function setup() {
 	const PATH = Bun.env.PATH;
 	const BIN_PATH = `${os.homedir()}/.bunshell/bin`
