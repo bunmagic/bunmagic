@@ -9,11 +9,15 @@ export const usage = 'bunshell link';
 export async function addSourceDirectory(target?: string) {
 
 	const sources = await getSources();
-	const defaultSource = `${PATHS.bunshell}/default`;
+	let defaultSource = `${PATHS.bunshell}/default`;
+
+	if (sources.find(source => source.path === defaultSource)) {
+		defaultSource = process.cwd();
+	}
 
 	if (!target) {
 		const sourcePath = `Enter full path to source directory:\n${ansis.gray(
-			`Default: ${defaultSource}`
+			`Leave empty to use: ${ansis.bold(defaultSource)}`
 		)}\n> `;
 		target = (await prompt(sourcePath)) || defaultSource;
 	}
