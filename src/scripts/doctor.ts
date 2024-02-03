@@ -1,5 +1,5 @@
 import { addSourceDirectory } from './add_source';
-import { relinkBins } from './link';
+import { relinkBins } from './bins';
 import { getSources } from '../lib/sources'
 export { default as os } from 'node:os';
 

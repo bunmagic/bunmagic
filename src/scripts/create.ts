@@ -2,7 +2,7 @@ import {
 	getSources,
 	search,
 } from "../lib/sources";
-import { ensureBin } from "../lib/bins";
+import { ensureBin } from "./bins";
 import { openEditor } from "./edit";
 import { get } from '../lib/config';
 

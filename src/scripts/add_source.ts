@@ -1,6 +1,6 @@
 import { PATHS, update } from '../lib/config';
 import { getSources } from '../lib/sources';
-import { relinkBins } from './link';
+import { relinkBins } from './bins';
 
 export const desc = 'Add an additional directory to use as script source.';
 export const usage = 'bunshell add_source';
