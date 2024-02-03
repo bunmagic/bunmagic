@@ -3,7 +3,7 @@
  * Produces pretty similar output though.
  * Might be all that we need.
  */
-type Flag = string | boolean;
+type Flag = string | boolean | undefined;
 type NmArgv = {
 	flags: Record<string, Flag>;
 	args: string[];
@@ -32,8 +32,9 @@ export function notMinimist(args: string[]) {
 			output.args.push(arg);
 		}
 	}
+	// @TODO: handle false flags --flag-name=false
 	return {
 		...output.flags,
 		_: output.args
-	};
+	} as Record<string, string | boolean | undefined> & { _: string[] };
 }
