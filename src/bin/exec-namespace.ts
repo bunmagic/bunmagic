@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 import "bunshell";
-import { getCommands } from './lib/commands';
-import { getSources } from './lib/sources';
+import { getCommands } from '../lib/commands';
+import { getSources } from '../lib/sources';
 
 const namespace = argv._.shift();
 if (!namespace) {
