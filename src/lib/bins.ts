@@ -12,7 +12,8 @@ export async function getBins(): Promise<string[]> {
 }
 
 
-export async function ensureBin(binName: string, targetPath: string, exec: string) {
+export async function ensureBin(binName: string, targetPath: string, namespace = false) {
+	const exec = namespace ? "bunshell-exec-namespace" : "bunshell-exec";
 	const binPath = path.join(PATHS.bins, binName);
 	console.log(`Ensuring bin: ${binName} -> ${binPath}`);
 

@@ -96,16 +96,15 @@ export async function create(command: string) {
 
 	const ext = await get("extension", "ts");
 	const binName = namespace ? namespace : slug;
-	const exec = namespace ? "bunshell-exec-namespace" : "bunshell-exec";
 	const editFilePath = `${partialPath}.${ext}`;
-	const targetPath = namespace ? namespace : editFilePath;	
+	const targetPath = namespace ? namespace : editFilePath;
 
 	console.log(ansis.dim(`Creating new script: ${editFilePath}`));
 	if (!ack(`Create new command "${ansis.bold(command)}" ? `)) {
 		process.exit(0);
 	}
 
-	const binFile = await ensureBin(binName, targetPath, exec);
+	const binFile = await ensureBin(binName, targetPath, Boolean(namespace));
 
 	if (binFile) {
 		await $`chmod +x ${binFile}`;

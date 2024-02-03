@@ -8,19 +8,13 @@ export async function relinkBins() {
 	let count = 0;
 	for (const source of await getSources()) {
 
-		if ('namespace' in source) {
-			if (await ensureBin({
-				slug: source.namespace,
-				path: source.path
-			})) {
+		if (source.namespace) {
+			if (await ensureBin(source.namespace, source.path, true)) {
 				count++;
 			}
 		} else {
 			for (const script of source.scripts) {
-				if (await ensureBin({
-					slug: script.slug,
-					path: script.path
-				})) {
+				if (await ensureBin(script.slug, script.path)) {
 					count++;
 				}
 			}
