@@ -1,12 +1,17 @@
-import type { Command } from './commands';
+import type { RouterCallback } from './commands';
 
 
-export default async function run(command?: Command) {
+const router: RouterCallback = async (script, command) => {
 	if (!command) {
 		console.log("No command found.");
 		return;
+	} else {
+		try {
+			await script();
+		} catch (e) {
+			console.log("Error running command: ", 'name' in command ? command.name : command.file);
+		}
 	}
-	console.log("Hello World");
-	console.log("Running command: ", command.name);
-	console.log("Command description: ", command.desc);
 }
+
+export default router;

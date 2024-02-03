@@ -1,11 +1,10 @@
-import type { Command } from '../lib/commands';
+import type { Command, NotFound, RawCommand } from '../lib/commands';
 
 export const name = "help";
 export const desc = "Get the full list of available commands";
 export const usage = "bunshell help";
 
-export default async function run(commands: Map<string, Command>) {
-
+export default async function run(commands: Map<string, Command | NotFound | RawCommand>) {
 	let help = ``;
 	commands.forEach((command, name) => {
 		if (
@@ -29,9 +28,12 @@ export default async function run(commands: Map<string, Command>) {
 			help += ansis.dim(alias)
 
 		}
-		help += `\n  `
-		help += ansis.gray(command.usage)
-		help += `\n`
+		if (command.usage) {
+			help += `\n  `
+			help += ansis.gray(command.usage)
+			help += `\n`
+		}
+
 	})
 
 	console.log(help);

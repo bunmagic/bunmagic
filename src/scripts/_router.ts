@@ -1,19 +1,21 @@
-import type { Command } from '../lib/commands';
+import type { RouterCallback } from '../lib/commands';
 import help from './help';
 import create from './create';
 
 export const isRouter = true;
-export default async function router(cmd: () => Promise<void>, command: undefined | Command, commands: Map<string, Command>) {
+const router: RouterCallback = async (cmd, command, commands) => {
 
 	let input = argv._.shift();
 
 	// Offer to create utility if it doesn't exist.
 	if (input && !command) {
-		return create();
+		await create();
+		return;
 	}
 
 	if (argv.h || input === "help" || !command) {
-		return help(commands);
+		await help(commands);
+		return;
 	}
 
 	try {
@@ -25,7 +27,5 @@ export default async function router(cmd: () => Promise<void>, command: undefine
 		}
 	}
 
-
-
-
 }
+export default router;

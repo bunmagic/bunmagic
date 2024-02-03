@@ -22,8 +22,14 @@ export type NotFound = {
 export type RawCommand = {
 	type: "raw-command";
 	file: string;
+	name: string;
 }
 
+export type RouterCallback = (
+	cmd: () => Promise<void>,
+	command: Command | NotFound | RawCommand | undefined,
+	commands: Map<string, Command | NotFound | RawCommand>
+) => Promise<void>;
 
 
 async function importCommand(file: string): Promise<Command | RawCommand | Router | NotFound> {
@@ -53,6 +59,7 @@ async function importCommand(file: string): Promise<Command | RawCommand | Route
 	else {
 		return {
 			type: "raw-command",
+			name: path.parse(file).name,
 			file
 		}
 	}
@@ -65,12 +72,12 @@ async function importCommand(file: string): Promise<Command | RawCommand | Route
 	}
 }
 
-type CommandList<C extends Command> = {
+type CommandList = {
 	router: Router;
-	commands: Map<string, C>;
+	commands: Map<string, Command | NotFound | RawCommand>;
 }
 
-export async function getCommands<C extends Command>(files: string[]): Promise<CommandList<C>> {
+export async function getCommands(files: string[]): Promise<CommandList> {
 	const validFiles = files.filter((file: string) => SUPPORTED_FILES.includes(path.extname(file).replace('.', '') as Config['extension']));
 	const list = await Promise.all(validFiles.map(importCommand));
 
@@ -90,6 +97,9 @@ export async function getCommands<C extends Command>(files: string[]): Promise<C
 					map.set(alias, command);
 				}
 			}
+		}
+		if (command.type === "raw-command") {
+			map.set(command.name, command);
 		}
 		if (router === undefined && command.type === "router") {
 			router = command;
