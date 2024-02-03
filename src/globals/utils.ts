@@ -1,3 +1,5 @@
+import { default as os } from 'node:os';
+
 export function selection(options: string[], selectionQuestion: string) {
 	options.forEach((opt, index) => {
 		console.log(`> ${ansis.bold(`${index + 1}`)}:  ${opt} `)
