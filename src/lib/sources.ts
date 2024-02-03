@@ -24,11 +24,12 @@ async function getScript(file: string, parent?: string): Promise<Script> {
 	};
 }
 
-async function getScripts(source: Scripts | NamespacedScripts): Promise<(Scripts | NamespacedScripts)> {
-	const files = await listScripts(source.path);
-	const scripts = await Promise.all(files.map((file) => getScript(file, source.namespace)));
+export async function getScripts(sourcePath: string, namespace?: string): Promise<(Scripts | NamespacedScripts)> {
+	const files = await listScripts(sourcePath);
+	const scripts = await Promise.all(files.map((file) => getScript(file, namespace)));
 	return {
-		...source,
+		path: sourcePath,
+		namespace,
 		scripts
 	}
 }
@@ -42,7 +43,7 @@ export async function getSource(name: string): Promise<Scripts | NamespacedScrip
 	if (!source) {
 		throw new Error(`No source found with the name: ${name}`);
 	}
-	return await getScripts(source);
+	return await getScripts(source.path, source.namespace);
 }
 
 export async function getSources(): Promise<(Scripts | NamespacedScripts)[]> {
@@ -53,7 +54,7 @@ export async function getSources(): Promise<(Scripts | NamespacedScripts)[]> {
 
 	const output: Promise<(Scripts | NamespacedScripts)>[] = [];
 	for (const source of sources) {
-		output.push(getScripts(source));
+		output.push(getScripts(source.path, source.namespace));
 	}
 
 	return Promise.all(output);

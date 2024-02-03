@@ -1,16 +1,23 @@
 #!/usr/bin/env bun
 import "bunshell";
 import { getCommands } from '../lib/commands';
-import { getSources } from '../lib/sources';
+import { getScripts } from '../lib/sources';
 
+const sourcePath = argv._.shift();
 const namespace = argv._.shift();
+
+if (!sourcePath) {
+	throw new Error(`Missing source path.`);
+}
+
 if (!namespace) {
 	throw new Error(`Missing script namespace.`);
 }
 
-const sources = await getSources();
-const scripts = sources.find(source => 'namespace' in source && source.namespace === namespace)?.scripts;
-const files = scripts!.map(script => script.file);
+
+const source = await getScripts(sourcePath, namespace);
+const files = source.scripts!.map(script => script.file);
+
 const { router: routerInfo, commands } = await getCommands(files);
 const input = argv._[0];
 

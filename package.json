@@ -8,11 +8,15 @@
 		"@types/minimist": "^1.2.5"
 	},
 	"bin": {
-		"bunshell-exec": "src/bin/exec.ts",
-		"bunshell-exec-namespace": "src/bin/exec-namespace.ts"
+		"bunshell": "src/bin/bunshell.ts",
+		"bunshell-exec": "src/bin/bunshell-exec.ts",
+		"bunshell-exec-namespace": "src/bin/bunshell-exec-namespace.ts"
 	},
 	"module": "src/index.ts",
 	"name": "bunshell",
 	"type": "module",
-	"version": "1.0.2"
+	"version": "1.0.2",
+	"exports": {
+		"run": "./src/run.ts"
+	}
 }

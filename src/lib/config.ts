@@ -1,3 +1,4 @@
+import * as os from "node:os";
 export const PATHS: {
 	bunshell: string;
 	bins: string;
