@@ -1,8 +1,8 @@
 import { PATHS } from "./config";
 
-function template(scriptPath: string): string {
+function template(scriptPath: string, exec: string): string {
 	let output = "#!/bin/bash\n";
-	output += `bun run ${PATHS.source} ${scriptPath} $@`;
+	output += `${exec} ${scriptPath} $@`;
 	return output;
 }
 
@@ -12,26 +12,25 @@ export async function getBins(): Promise<string[]> {
 }
 
 
-export async function ensureBin(script: {
-	slug: string;
-	path: string;
-}) {
-	const binPath = path.join(PATHS.bins, script.slug);
-	console.log(`Ensuring bin: ${script.slug} -> ${binPath}`);
+export async function ensureBin(binName: string, targetPath: string, exec: string) {
+	const binPath = path.join(PATHS.bins, binName);
+	console.log(`Ensuring bin: ${binName} -> ${binPath}`);
+
 	if (argv.force === true && (await Bun.file(binPath).exists()) === true) {
-		console.log(`\nRemoving ${ansis.bold(script.slug)} bin file\n${ansis.gray(`rm ${binPath}`)}`)
+		console.log(`\nRemoving ${ansis.bold(binName)} bin file\n${ansis.gray(`rm ${binPath}`)}`)
 		await $`rm ${binPath}`
 	}
+
 	if (false !== await Bun.file(binPath).exists()) {
 		return false;
 	}
 
 	// Create bin
 	await ensureDir(PATHS.bins);
-	await Bun.write(binPath, template(script.path));
+	await Bun.write(binPath, template(targetPath, exec));
 	await $`chmod +x ${binPath}`;
 
-	console.log(`Created new bin: ${script.slug} -> ${binPath}`);
+	console.log(`Created new bin: ${binName} -> ${binPath}`);
 	return binPath;
 }
 

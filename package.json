@@ -9,7 +9,7 @@
 	},
 	"bin": {
 		"bunshell-exec": "src/bin/exec.ts",
-		"bunshell-exec-ns": "src/bin/exec-namespace.ts"
+		"bunshell-exec-namespace": "src/bin/exec-namespace.ts"
 	},
 	"module": "src/index.ts",
 	"name": "bunshell",

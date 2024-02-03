@@ -41,7 +41,7 @@ async function namespacedScriptPath(slug: string, namespace: string): Promise<Pa
 	}
 
 	// `createScript` has already checked that the command exists, there's no need to check again.
-	return `${source.path}/${slug}` as PartialScriptPath;
+	return path.resolve(source.path, slug) as PartialScriptPath;
 }
 
 async function scriptPath(slug: string): Promise<PartialScriptPath> {
@@ -69,11 +69,12 @@ async function scriptPath(slug: string): Promise<PartialScriptPath> {
 		throw new Error("No directory selected");
 	}
 
-	return `${directory}/${slug}` as PartialScriptPath;
+	return path.resolve(directory, slug) as PartialScriptPath;
 }
 
 export async function create(command: string) {
 	const existingScript = await search(command);
+
 	if (existingScript) {
 		const { file } = existingScript;
 		if (await Bun.file(file).exists()) {
@@ -93,27 +94,27 @@ export async function create(command: string) {
 		? await namespacedScriptPath(slug, namespace)
 		: await scriptPath(slug);
 
-	const extension = await get("extension", "ts");
-	const script = {
-		slug: slug,
-		path: `${partialPath}.${extension}`,
-	}
+	const ext = await get("extension", "ts");
+	const binName = namespace ? namespace : slug;
+	const exec = namespace ? "bunshell-exec-namespace" : "bunshell-exec";
+	const targetPath = namespace ? namespace : `${partialPath}.${ext}`;
+	const editFilePath = namespace ? `${partialPath}.${ext}` : path.resolve(partialPath, `${slug}.${ext}`);
 
-	console.log(ansis.dim(`Creating new script: ${script.path}`));
-	if (!ack(`Create new command "${ansis.bold(command)}"?`)) {
+	console.log(ansis.dim(`Creating new script: ${editFilePath}`));
+	if (!ack(`Create new command "${ansis.bold(command)}" ? `)) {
 		process.exit(0);
 	}
 
-	if (!namespace) {
-		const binFile = await ensureBin(script);
-		if (binFile) {
-			await $`chmod +x ${binFile}`;
-		} else {
-			console.log(`\n${ansis.red("▲")} Could not create a symlink to the script.`);
-			return false;
-		}
+	const binFile = await ensureBin(binName, targetPath, exec);
+
+	if (binFile) {
+		await $`chmod + x ${binFile}`;
+	} else {
+		console.log(`\n${ansis.red("▲")} Could not create a symlink to the script.`);
+		return false;
 	}
 
-	await openEditor(script.path);
-	return script.path;
+
+	await openEditor(editFilePath);
+	return editFilePath;
 }
