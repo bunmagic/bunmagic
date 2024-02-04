@@ -34,7 +34,7 @@ export function notMinimist(args: string[]) {
 	}
 	// @TODO: handle false flags --flag-name=false
 	return {
+		_: output.args,
 		...output.flags,
-		_: output.args
 	} as Record<string, string | boolean | undefined> & { _: string[] };
 }
