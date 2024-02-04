@@ -22,7 +22,7 @@ export type Script = {
 	path: string;
 }
 
-export type NamespacedScripts = {
+export type Namespace = {
 	namespace: string;
 	path: string;
 	scripts: Script[];
@@ -35,7 +35,7 @@ export type Scripts = {
 }
 export type Config = {
 	extension: string & typeof SUPPORTED_FILES[number];
-	sources?: Scripts[] | NamespacedScripts[];
+	sources?: Scripts[] | Namespace[];
 }
 
 async function config(): Promise<Config> {

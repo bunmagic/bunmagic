@@ -4,7 +4,7 @@ export const name = "help";
 export const desc = "Get the full list of available commands";
 export const usage = "bunshell help";
 
-export default async function run(commands: Map<string, Command | NotFound | RawCommand>) {
+export default async function (commands: Map<string, Command | NotFound | RawCommand>) {
 	let help = ``;
 	commands.forEach((command, name) => {
 		if (

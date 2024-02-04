@@ -1,4 +1,4 @@
-import { PATHS, update, type NamespacedScripts, type Scripts } from '../lib/config';
+import { PATHS, update, type Namespace, type Scripts } from '../lib/config';
 import { getSources } from '../lib/sources';
 import { relinkBins } from './bins';
 
@@ -41,7 +41,7 @@ export async function addSourceDirectory(target?: string) {
 	});
 	ensureDir(target)
 
-	await update("sources", sources as NamespacedScripts[] | Scripts[]);
+	await update("sources", sources as Namespace[] | Scripts[]);
 }
 
 export default async function () {

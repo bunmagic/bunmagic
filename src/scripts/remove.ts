@@ -1,6 +1,6 @@
 import { PATHS, update, type Config } from '../lib/config';
-import { getSources, search } from "../lib/sources";
-import { commandFromStr } from './create';
+import { commandFromStr, getSources, search } from "../lib/sources";
+
 
 export const desc = `Remove and unlink a script`;
 export const usage = `bunshell remove <script-name>`;

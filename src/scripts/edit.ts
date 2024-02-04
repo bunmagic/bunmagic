@@ -14,6 +14,10 @@ export default async function () {
 	if (!slug) {
 		throw new Error('You must specify a script to edit.');
 	}
+	return await edit(slug);
+}
+
+export async function edit(slug: string) {
 	const target = await getEditTarget(slug);
 	console.log(target);
 	if (target) {

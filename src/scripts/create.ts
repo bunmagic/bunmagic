@@ -1,4 +1,5 @@
 import {
+	commandFromStr,
 	getSources,
 	search,
 } from "../lib/sources";
@@ -18,17 +19,7 @@ export default async function () {
 	return await create(slug);
 }
 
-export function commandFromStr(input: string): [string, string | undefined] {
-	const arr = input.split(" ");
-	if (arr.length === 1) {
-		return [arr[0], undefined];
-	}
-	if (arr.length === 2) {
-		return [arr[1], arr[0]];
-	}
 
-	throw new Error("A command should consist of 1 or 2 words.");
-}
 
 type PartialScriptPath = string & { __partialPath: true };
 async function namespacedScriptPath(slug: string, namespace: string): Promise<PartialScriptPath> {
@@ -73,20 +64,16 @@ async function scriptPath(slug: string): Promise<PartialScriptPath> {
 }
 
 export async function create(command: string) {
-	const existingScript = await search(command);
+	const existing = await search(command);
 
-	if (existingScript) {
-		const { file } = existingScript;
-		if (await Bun.file(file).exists()) {
-			console.log(`${ansis.bold(command)} already exists:`, `\n`, `-> ${file}`);
-
-			if (
-				ack(`Would you like to edit ${ansis.bold(command)} ?`, "y")
-			) {
-				return await openEditor(file);
-			}
-			return true;
+	if (existing) {
+		const target = 'file' in existing ? existing.file : existing.path;
+		const messageExists = `The command "${ansis.bold(command)}" already exists:`;
+		const messageEdit = `Would you like to edit "${ansis.bold(command)}" ?`;
+		if (ack(`${messageExists}\n${messageEdit}`, "y")) {
+			return await openEditor(target);
 		}
+		return true;
 	}
 
 	const [slug, namespace] = commandFromStr(command);
@@ -109,7 +96,7 @@ export async function create(command: string) {
 	if (binFile) {
 		await $`chmod +x ${binFile}`;
 		await $`touch ${editFilePath}`;
-	} else {
+	} else if (!namespace) {
 		console.log(`\n${ansis.red("▲")} Could not create a symlink to the script.`);
 		return false;
 	}
