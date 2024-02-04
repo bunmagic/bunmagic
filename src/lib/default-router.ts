@@ -8,7 +8,11 @@ const router: RouterCallback = async (namespace, name, script, command, commands
 
 	// Offer to create utility if it doesn't exist.
 	if (name && !command) {
-		await create(input);
+		try {
+			await create(input);
+		} catch (e) {
+			die(e);
+		}
 		return;
 	}
 
@@ -27,7 +31,7 @@ const router: RouterCallback = async (namespace, name, script, command, commands
 		try {
 			await script();
 		} catch (e) {
-			console.log(e);
+			die(e);
 		}
 	}
 }
