@@ -1,4 +1,4 @@
-import "bunshell";
+import "./index";
 import type { RouterCallback } from './lib/commands';
 
 

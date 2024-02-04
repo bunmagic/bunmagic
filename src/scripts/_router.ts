@@ -3,13 +3,16 @@ import help from './help';
 import { create } from './create';
 
 export const isRouter = true;
-const router: RouterCallback = async (ns, name, cmd, command, commands) => {
+const router: RouterCallback = async (_, __, cmd, command, commands) => {
 	const input = argv._.join(" ");
 
 	// Offer to create utility if it doesn't exist.
 	if (input && !command) {
-		await create(input);
-		return;
+		try {
+			await create(input);
+		} catch (e) {
+			die(e);
+		}
 	}
 
 	if (argv.h || input === "help" || !command) {
@@ -22,10 +25,7 @@ const router: RouterCallback = async (ns, name, cmd, command, commands) => {
 		argv._.shift();
 		return await cmd();
 	} catch (e) {
-		console.log(ansis.bold.red("Error: "), e);
-		if (argv.verbose) {
-			console.log(e);
-		}
+		die(e);
 	}
 }
 export default router;
