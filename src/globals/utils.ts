@@ -29,7 +29,7 @@ export function ack(q: string, defaultAnswer: "y" | "n" = "y") {
 		answer = defaultAnswer;
 	}
 
-	return "y" === answer;
+	return "y" === answer.toLowerCase();
 }
 
 
