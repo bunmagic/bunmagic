@@ -28,6 +28,8 @@ export type NotFound = {
 
 
 export type RouterCallback = (
+	namespace: string,
+	name: string,
 	cmd: () => Promise<void>,
 	command: Command | NotFound | InstantScript | undefined,
 	commands: Map<string, Command | NotFound | InstantScript>

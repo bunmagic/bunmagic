@@ -1,12 +1,19 @@
+import { create } from '../scripts/create';
 import help from '../scripts/help';
 import type { RouterCallback } from './commands';
 
 
-const router: RouterCallback = async (script, command, commands) => {
-	const input = argv._.join(" ");
+const router: RouterCallback = async (namespace, name, script, command, commands) => {
+	const input = `${namespace} ${name}`;
 
-	if (argv.h || input === "help" || !command) {
-		if (input && input !== "help") {
+	// Offer to create utility if it doesn't exist.
+	if (name && !command) {
+		await create(input);
+		return;
+	}
+
+	if (argv.h || name === "help" || !command) {
+		if (name && name !== "help") {
 			console.log(ansis.yellow(`> Command not found: ${ansis.bold(input)}\n`));
 		}
 		await help(commands);
@@ -17,12 +24,10 @@ const router: RouterCallback = async (script, command, commands) => {
 		console.log("No command found.");
 		return;
 	} else {
-
 		try {
 			await script();
 		} catch (e) {
 			console.log(e);
-			console.log("Error running command: ", (command && 'name' in command) ? command.name : command.file);
 		}
 	}
 }

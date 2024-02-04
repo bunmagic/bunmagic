@@ -3,7 +3,7 @@ import help from './help';
 import { create } from './create';
 
 export const isRouter = true;
-const router: RouterCallback = async (cmd, command, commands) => {
+const router: RouterCallback = async (ns, name, cmd, command, commands) => {
 	const input = argv._.join(" ");
 
 	// Offer to create utility if it doesn't exist.
