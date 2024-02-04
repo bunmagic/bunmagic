@@ -29,10 +29,11 @@ export default async function () {
 
 			let scriptNameWithSymbol = `${symbol} ${slug}`;
 			if ('namespace' in source) {
-				scriptNameWithSymbol = `${symbol} ${source.namespace} ${slug}`;
+				const namespace = source.namespace ? ` ${source.namespace}` : '';
+				scriptNameWithSymbol = `${symbol}${namespace} ${slug}`;
 			}
 			let scriptOutput = scriptNameWithSymbol;
-			let line = `\n ${scriptOutput}`;
+			let line = `${scriptOutput}`;
 			if (!binExists && !inNamespaced) {
 				line += `\n   ${ansis.red("▲ script executable missing")}`;
 			}
