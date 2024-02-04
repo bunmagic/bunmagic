@@ -13,7 +13,9 @@ export default async function () {
 
 		const inNamespaced = 'namespace' in source;
 		console.log(ansis.dim("\n---------------------------------\n"));
-		console.log(" " + ansis.bold(path.basename(source.path)));
+		const basename = path.basename(source.path);
+		const name = basename.charAt(0).toUpperCase() + basename.slice(1);
+		console.log("  " + ansis.bold(name));
 		console.log("  " + ansis.dim(path.dirname(source.path) + "/"));
 
 		let maxScriptNameLength = 0;
