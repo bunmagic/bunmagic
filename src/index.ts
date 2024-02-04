@@ -22,4 +22,11 @@ declare global {
 	const ensureDir: typeof globals.ensureDir;
 	const notMinimist: typeof globals.notMinimist;
 	const die: typeof globals.die;
+	const os: typeof globals.os;
+}
+
+const customGlobalsFile = `${os.homedir()}/.bunshell/custom-globals.ts`;
+if (await Bun.file(customGlobalsFile).exists()) {
+	const customGlobals = await import(customGlobalsFile);
+	Object.assign(globalThis, customGlobals);
 }
