@@ -36,7 +36,7 @@ export async function runNamespace(namespace: string, sourcePath: string) {
 			}, command, commands)
 		}
 		// Prepare the script
-		const script = (command.type === "raw-command")
+		const script = (command.type === "instant-script")
 			? () => import(command.file)
 			: await import(command.file).then(m => m.default);
 		// Let the router execute the command

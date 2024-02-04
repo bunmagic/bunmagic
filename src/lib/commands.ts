@@ -19,20 +19,20 @@ export type NotFound = {
 	file: string;
 }
 
-export type RawCommand = {
-	type: "raw-command";
+export type InstantScript = {
+	type: "instant-script";
 	file: string;
 	name: string;
 }
 
 export type RouterCallback = (
 	cmd: () => Promise<void>,
-	command: Command | NotFound | RawCommand | undefined,
-	commands: Map<string, Command | NotFound | RawCommand>
+	command: Command | NotFound | InstantScript | undefined,
+	commands: Map<string, Command | NotFound | InstantScript>
 ) => Promise<void>;
 
 
-async function importCommand(file: string): Promise<Command | RawCommand | Router | NotFound> {
+async function importCommand(file: string): Promise<Command | InstantScript | Router | NotFound> {
 	const lines = (await Bun.file(file).text()).split("\n");
 
 	if (lines.find(line => line.trim().startsWith("export default"))) {
@@ -58,7 +58,7 @@ async function importCommand(file: string): Promise<Command | RawCommand | Route
 
 	else {
 		return {
-			type: "raw-command",
+			type: "instant-script",
 			name: path.parse(file).name,
 			file
 		}
@@ -74,7 +74,7 @@ async function importCommand(file: string): Promise<Command | RawCommand | Route
 
 type CommandList = {
 	router: Router;
-	commands: Map<string, Command | NotFound | RawCommand>;
+	commands: Map<string, Command | NotFound | InstantScript>;
 }
 
 export async function getCommands(files: string[]): Promise<CommandList> {
@@ -98,7 +98,7 @@ export async function getCommands(files: string[]): Promise<CommandList> {
 				}
 			}
 		}
-		if (command.type === "raw-command") {
+		if (command.type === "instant-script") {
 			map.set(command.name, command);
 		}
 		if (router === undefined && command.type === "router") {
