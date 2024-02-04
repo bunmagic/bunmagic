@@ -3,9 +3,12 @@ import type { RouterCallback } from './commands';
 
 
 const router: RouterCallback = async (script, command, commands) => {
-
 	const input = argv._.join(" ");
+
 	if (argv.h || input === "help" || !command) {
+		if (input && input !== "help") {
+			console.log(ansis.yellow(`> Command not found: ${ansis.bold(input)}\n`));
+		}
 		await help(commands);
 		return;
 	}

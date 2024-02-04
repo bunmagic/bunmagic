@@ -1,12 +1,19 @@
 import { SUPPORTED_FILES, type Config } from './config';
 
-export type Command = {
-	type: "command";
+export type CMD = {
 	file: string;
 	name: string;
 	desc?: string;
 	usage?: string;
 	alias?: string[];
+}
+
+export type InstantScript = CMD & {
+	type: "instant-script";
+}
+
+export type Command = CMD & {
+	type: "command";
 }
 
 export type Router = {
@@ -19,11 +26,6 @@ export type NotFound = {
 	file: string;
 }
 
-export type InstantScript = {
-	type: "instant-script";
-	file: string;
-	name: string;
-}
 
 export type RouterCallback = (
 	cmd: () => Promise<void>,
@@ -31,6 +33,45 @@ export type RouterCallback = (
 	commands: Map<string, Command | NotFound | InstantScript>
 ) => Promise<void>;
 
+
+function commentToString(needle: string, haystack: string[]) {
+	const str = `// ${needle}`;
+	const line = haystack.find((line) => line.trim().startsWith(str));
+	if (!line) {
+		return;
+	}
+	// Remove ` - ` and `:` between needle and the content.
+	let value = line.replace(str, "").trim();
+	while (value.length > 0 && (value.startsWith(":") || value.startsWith("-") || value.startsWith(" "))) {
+		value = value.slice(1);
+	}
+	if (value.length === 0) {
+		return;
+	}
+	return value;
+}
+function parseInstantScript(filePath: string, allLines: string[]): InstantScript {
+	// Only search first 20 lines.
+	const lines = allLines.slice(0, 20);
+
+	const name = commentToString("name", lines) ?? path.basename(filePath, path.extname(filePath))
+	const desc = commentToString("desc", lines);
+	const usage = commentToString("usage", lines);
+	const alias = commentToString("alias", lines)?.split(",").map((alias) => alias.trim());
+
+	if (!name) {
+		throw new Error(`Instant script at ${filePath} must have a name.`);
+	}
+
+	return {
+		type: "instant-script",
+		file: filePath,
+		name,
+		desc,
+		usage,
+		alias: alias
+	}
+}
 
 async function importCommand(file: string): Promise<Command | InstantScript | Router | NotFound> {
 	const lines = (await Bun.file(file).text()).split("\n");
@@ -48,20 +89,16 @@ async function importCommand(file: string): Promise<Command | InstantScript | Ro
 		if ("default" in handle) {
 			const meta = { ...handle, default: undefined };
 			return {
+				name: path.parse(file).name,
 				type: "command",
 				file,
-				name: path.parse(file).name,
 				...meta,
 			}
 		}
 	}
 
 	else {
-		return {
-			type: "instant-script",
-			name: path.parse(file).name,
-			file
-		}
+		return parseInstantScript(file, lines);
 	}
 
 
@@ -89,7 +126,7 @@ export async function getCommands(files: string[]): Promise<CommandList> {
 			console.log(`Found a file, but it's not a command: ${command.file}`);
 			continue;
 		}
-		if (command.type === "command") {
+		if (command.type === "command" || command.type === "instant-script") {
 			map.set(command.name, command);
 
 			if (command.alias) {
@@ -97,9 +134,6 @@ export async function getCommands(files: string[]): Promise<CommandList> {
 					map.set(alias, command);
 				}
 			}
-		}
-		if (command.type === "instant-script") {
-			map.set(command.name, command);
 		}
 		if (router === undefined && command.type === "router") {
 			router = command;

@@ -1,12 +1,12 @@
-import type { Command, NotFound, InstantScript } from '../lib/commands';
+import type { Command, NotFound, InstantScript, CMD } from '../lib/commands';
 
 export const name = "help";
 export const desc = "Get the full list of available commands";
 export const usage = "bunshell help";
 
 
-function describeCommand(command: Command) {
-	let desc = `\n${ansis.bold(command.name)} `;
+function describeCommand(command: CMD) {
+	let desc = `  • ${ansis.bold(command.name)} `;
 	if (command.desc) {
 		desc += ` - `;
 		desc += command.desc;
@@ -20,18 +20,14 @@ function describeCommand(command: Command) {
 
 	}
 	if (command.usage) {
-		desc += `\n`;
+		desc += `\n  `;
 		desc += ansis.gray(command.usage);
 	}
 	return desc.split("\n").join("\n  ");
 }
 
-async function describeRawCommand(command: InstantScript) {
-	let desc = `\n${ansis.bold(command.name)}`;
-	return desc.split("\n").join("\n  ");
-}
-
 export default async function (commands: Map<string, Command | NotFound | InstantScript>) {
+	console.log(`  ${ansis.dim(`# Available commands:`)}`)
 	for (const [name, command] of commands.entries()) {
 		if (('alias' in command && command.alias && command.alias.includes(name))) {
 			continue;
@@ -44,7 +40,7 @@ export default async function (commands: Map<string, Command | NotFound | Instan
 		}
 
 		if (command.type === "instant-script") {
-			console.log(await describeRawCommand(command));
+			console.log(describeCommand(command));
 		}
 
 	}

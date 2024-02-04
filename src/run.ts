@@ -18,6 +18,7 @@ export async function runNamespace(namespace: string, sourcePath: string) {
 
 	const { router: routerInfo, commands } = await getCommands(files);
 	const input = argv._[0];
+
 	try {
 
 		if (!routerInfo) {
@@ -30,6 +31,7 @@ export async function runNamespace(namespace: string, sourcePath: string) {
 		}
 
 		const command = commands.get(input);
+
 		if (!command || command.type === "not-found") {
 			return await router(() => {
 				throw new Error(`Command not found: ${input}`);
