@@ -11,16 +11,17 @@ export default async function () {
 	const separator = ansis.dim.gray("╌".repeat(64));
 	for (const source of sources) {
 
-		const inNamespaced = 'namespace' in source;
+		let maxScriptNameLength = 0;
+		const inNamespaced = Boolean(source.namespace);
+		const basename = path.basename(source.path);
+		const name = basename.charAt(0).toUpperCase() + basename.slice(1);
+
 
 		console.log();
 		console.log(separator);
-		const basename = path.basename(source.path);
-		const name = basename.charAt(0).toUpperCase() + basename.slice(1);
 		console.log("  " + ansis.bold(name));
 		console.log("  " + ansis.dim(source.path));
 		console.log(separator);
-		let maxScriptNameLength = 0;
 
 		for (const { slug, bin } of source.scripts) {
 			if (slug.startsWith("_")) {
