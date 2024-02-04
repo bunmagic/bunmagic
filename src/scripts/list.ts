@@ -12,8 +12,9 @@ export default async function () {
 	for (const source of sources) {
 
 		const inNamespaced = 'namespace' in source;
-		console.log(ansis.gray(path.dirname(source.path) + "/"));
-		console.log(ansis.bold.gray(path.basename(source.path)));
+		console.log(ansis.dim("\n---------------------------------\n"));
+		console.log(" " + ansis.bold(path.basename(source.path)));
+		console.log("  " + ansis.dim(path.dirname(source.path) + "/"));
 
 		let maxScriptNameLength = 0;
 
