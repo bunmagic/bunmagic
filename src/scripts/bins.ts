@@ -4,9 +4,9 @@ import { getSources } from '../lib/sources';
 export const desc = "Ensure all your script files have an executable in the bin directory.";
 export const usage = `bunshell bins [--force]`;
 
-function template(scriptPath: string, exec: string): string {
+function template(name: string, scriptPath: string, exec: string): string {
 	let output = "#!/bin/bash\n";
-	output += `${exec} ${scriptPath} $@`;
+	output += `${exec} ${scriptPath} ${name} $@`;
 	return output;
 }
 
@@ -31,7 +31,7 @@ export async function ensureBin(binName: string, targetPath: string, namespace =
 
 	// Create bin
 	await ensureDir(PATHS.bins);
-	await Bun.write(binPath, template(targetPath, exec));
+	await Bun.write(binPath, template(binName, targetPath, exec));
 	await $`chmod +x ${binPath}`;
 
 	console.log(`Created new bin: ${binName} -> ${binPath}\n`);
