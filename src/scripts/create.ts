@@ -64,6 +64,12 @@ async function scriptPath(slug: string): Promise<PartialScriptPath> {
 }
 
 export async function create(command: string) {
+
+	// Exception: don't create new bunshell scripts via "bunshell create bunshell <command>" or "bunshell <command>".
+	if (command.startsWith("bunshell ")) {
+		command = command.replace("bunshell ", "");
+	}
+
 	const existing = await search(command);
 
 	if (existing) {
