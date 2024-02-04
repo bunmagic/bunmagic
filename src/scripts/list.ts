@@ -8,20 +8,22 @@ export const alias = ["ls"];
 
 export default async function () {
 	const sources = await getSources();
-
+	const separator = ansis.dim.gray("╌".repeat(64));
 	for (const source of sources) {
 
 		const inNamespaced = 'namespace' in source;
-		console.log(ansis.dim("\n---------------------------------\n"));
+
+		console.log();
+		console.log(separator);
 		const basename = path.basename(source.path);
 		const name = basename.charAt(0).toUpperCase() + basename.slice(1);
 		console.log("  " + ansis.bold(name));
-		console.log("  " + ansis.dim(path.dirname(source.path) + "/"));
-
+		console.log("  " + ansis.dim(source.path));
+		console.log(separator);
 		let maxScriptNameLength = 0;
 
 		for (const { slug, bin } of source.scripts) {
-			const binExists = await Bun.file(bin).exists();
+			const binExists = Bun.which(bin) !== null;
 			const symbol = binExists || inNamespaced
 				? ansis.bold.green("·")
 				: ansis.bold.red("x");
