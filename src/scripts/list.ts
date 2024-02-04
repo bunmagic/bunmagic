@@ -23,6 +23,9 @@ export default async function () {
 		let maxScriptNameLength = 0;
 
 		for (const { slug, bin } of source.scripts) {
+			if (slug.startsWith("_")) {
+				continue;
+			}
 			const binExists = Bun.which(bin) !== null;
 			const symbol = binExists || inNamespaced
 				? ansis.bold.green("·")
