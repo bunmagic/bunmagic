@@ -1,4 +1,4 @@
-import * as globals from "./globals";
+import * as globals from "./globals/index";
 
 const BUNS_GLOBAL = {
 	verbose: true
@@ -21,4 +21,5 @@ declare global {
 	const isDir: typeof globals.isDir;
 	const ensureDir: typeof globals.ensureDir;
 	const notMinimist: typeof globals.notMinimist;
+	const die: typeof globals.die;
 }

@@ -31,3 +31,17 @@ export function ack(q: string, defaultAnswer: "y" | "n" = "y") {
 
 	return "y" === answer;
 }
+
+
+export function die(error?: unknown) {
+	if (error === 0) {
+		process.exit(0);
+	}
+	if (!error) {
+		console.warn("Exiting without error.")
+		process.exit(1);
+	}
+	const message = error instanceof Error ? error.message : error.toString();
+	console.log(`\n${ansis.red.bold("(!)")} ${message}`)
+	process.exit(1);
+}
