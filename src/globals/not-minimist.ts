@@ -3,7 +3,7 @@
  * Produces pretty similar output though.
  * Might be all that we need.
  */
-type Flag = string | boolean | undefined;
+type Flag = string | number | boolean | undefined;
 type NmArgv = {
 	flags: Record<string, Flag>;
 	args: string[];
@@ -15,24 +15,30 @@ export function notMinimist(args: string[]) {
 	};
 
 	for (let i = 0; i < args.length; i++) {
+		let value: string | number | boolean | undefined;
 		const arg = args[i];
 		if (arg.startsWith("--")) {
-			const [key, value] = arg.slice(2).split("=");
-			if (!value) {
+			let [key, rawValue] = arg.slice(2).split("=");
+			value = rawValue;
+			if (value === undefined) {
 				const nextArg = args[i + 1];
 				if (nextArg && !nextArg.startsWith("--")) {
-					output.flags[key] = nextArg;
+					value = nextArg;
 					i++;
-					continue;
 				} else {
-					output.flags[key] = true;
+					value = true;
 				}
 			}
+
+			if (typeof value !== 'boolean' && !isNaN(value as any)) {
+				value = parseInt(value);
+			}
+			output.flags[key] = value;
 		} else {
 			output.args.push(arg);
 		}
 	}
-	// @TODO: handle false flags --flag-name=false
+
 	return {
 		_: output.args,
 		...output.flags,
