@@ -107,10 +107,13 @@ export default async function setup() {
 		await addSourceDirectory();
 	}
 
-	if (ack(`\n- Do you want to setup ${ansis.bold("bs")} as a shortcut for ${ansis.bold("bunshell")}?`)) {
-		await Bun.write(`${binPath}/bs`, `#!/bin/bash\nbunshell $@`);
-		await $`chmod +x ${binPath}/bs`;
-		console.log(`\n- Created a new bin: ${ansis.bold("bs")} -> ${binPath}/bs`);
+	const bsAliasBin = `${binPath}/bs`;
+	const bsAliasQuestion = `\n- Do you want to setup ${ansis.bold("bs")} as a shortcut for ${ansis.bold("bunshell")}?`;
+	if (!await Bun.file(bsAliasBin).exists() && Bun.which("bs") === undefined && ack(bsAliasQuestion)) {
+		await Bun.write(`${bsAliasBin}`, `#!/bin/bash\nbunshell $@`);
+		await $`chmod +x ${bsAliasBin}`;
+		console.log(`\n- Created a new bin: ${ansis.bold("bs")} -> ${bsAliasBin} \n`);
+
 	}
 
 
