@@ -103,7 +103,7 @@ export default async function setup() {
 	await setupConfig(bsPath);
 
 	console.log(`\n- Setting up the script source directory.`);
-	if (config.get("sources") === undefined) {
+	if (await config.get("sources") === undefined) {
 		await addSourceDirectory();
 	}
 
