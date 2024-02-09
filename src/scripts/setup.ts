@@ -111,10 +111,18 @@ export default async function setup() {
 	if (argv.remove || argv.uninstall || argv._[0] === "remove" || argv._[0] === "uninstall") {
 		return await uninstall();
 	}
+
 	console.log(`\nInstalling ${ansis.bold("bunshell")}...\n`);
 	if (!Bun.env.PATH) {
 		throw die("Can't find $PATH variable. Exiting.");
 	}
+
+
+	if (Bun.which("bunshell") === null) {
+		console.log("Installing bunshell globally...");
+		await $`bun install -g bunshell/bunshell`;
+	}
+
 
 	console.log(`\n- Setting up the necessary paths for bunshell scripts to run.`);
 	const bsPath = `${$HOME}/.bunshell`;
