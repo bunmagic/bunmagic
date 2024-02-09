@@ -12,4 +12,5 @@ export * from './fs';
 
 
 export const argv = notMinimist(Bun.argv.slice(2) || []);
+export const $HOME = os.homedir();
 export { $, ansis, ansis as chalk, os };

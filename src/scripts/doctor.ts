@@ -1,14 +1,13 @@
 import { addSourceDirectory } from './link';
 import { relinkBins } from './bins';
 import { getSources } from '../lib/sources'
-import { default as os } from 'node:os';
 
 export const desc = "Check if bunshell is set up correctly";
 export const usage = "bunshell doctor";
 
 export default async function setup() {
 	const PATH = Bun.env.PATH;
-	const BIN_PATH = `${os.homedir()}/.bunshell/bin`
+	const BIN_PATH = `${$HOME}/.bunshell/bin`
 
 	let issues = 0;
 
