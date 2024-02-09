@@ -23,7 +23,7 @@ async function require<T>(callback: () => Promise<T>, attempts = 3): Promise<T> 
 }
 
 function availableRcFiles() {
-	const rcFiles = [`${$HOME}/.bashrc`, `${$HOME}/.zshrc`, `${$HOME}/.profile`, `${$HOME}/.bash_profile`];
+	const rcFiles = [`${$HOME}/.zshrc`, `${$HOME}/.bashrc`, `${$HOME}/.profile`, `${$HOME}/.bash_profile`];
 	return Promise.all(rcFiles.filter(f => Bun.file(f).exists()));
 }
 async function setupBinPath(binPath: string) {
