@@ -8,7 +8,7 @@ export const usage = 'bunshell link';
 
 export async function addSourceDirectory(target?: string) {
 
-	const sources = await getSources();
+	const sources = await getSources().catch(() => [] as (Namespace | Scripts)[]);
 	let defaultSource = `${PATHS.bunshell}/default`;
 
 	if (sources.find(source => source.path === defaultSource)) {
