@@ -107,7 +107,6 @@ export async function uninstall() {
 }
 
 export default async function setup() {
-	die(Bun.which('bunshell'));
 	if (argv.remove || argv.uninstall || argv._[0] === "remove" || argv._[0] === "uninstall") {
 		return await uninstall();
 	}
@@ -118,7 +117,8 @@ export default async function setup() {
 	}
 
 
-	if (Bun.which("bunshell") === null) {
+	const bunshell = await $`which bunshell`.quiet().text();
+	if (bunshell.trim() !== "") {
 		console.log("Installing bunshell globally...");
 		await $`bun install -g bunshell/bunshell`;
 	} else {
