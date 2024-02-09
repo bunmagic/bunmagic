@@ -107,7 +107,7 @@ export async function uninstall() {
 }
 
 export default async function setup() {
-
+	die(Bun.which('bunshell'));
 	if (argv.remove || argv.uninstall || argv._[0] === "remove" || argv._[0] === "uninstall") {
 		return await uninstall();
 	}
