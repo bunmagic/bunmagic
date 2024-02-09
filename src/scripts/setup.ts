@@ -121,6 +121,8 @@ export default async function setup() {
 	if (Bun.which("bunshell") === null) {
 		console.log("Installing bunshell globally...");
 		await $`bun install -g bunshell/bunshell`;
+	} else {
+		console.log("Bunshell is already installed globally.");
 	}
 
 
