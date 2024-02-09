@@ -34,6 +34,9 @@ export function ack(q: string, defaultAnswer: "y" | "n" = "y") {
 
 
 export function die(error?: unknown) {
+	if (argv.debug) {
+		console.error(error);
+	}
 	if (error === 0) {
 		process.exit(0);
 	}
