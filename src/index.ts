@@ -23,6 +23,7 @@ declare global {
 	const notMinimist: typeof globals.notMinimist;
 	const die: typeof globals.die;
 	const os: typeof globals.os;
+	const $HOME: typeof globals.$HOME;
 }
 
 const customGlobalsFile = `${os.homedir()}/.bunshell/custom-globals.ts`;
