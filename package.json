@@ -15,7 +15,7 @@
 	"module": "src/index.ts",
 	"name": "bunshell",
 	"type": "module",
-	"version": "1.0.0-beta.1",
+	"version": "1.0.0-beta.2",
 	"exports": {
 		"run": "./src/run.ts"
 	}
