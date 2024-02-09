@@ -1,18 +1,17 @@
-import { default as os } from 'node:os';
 export const PATHS: {
 	bunshell: string;
 	bins: string;
 	config: string;
 	source: string;
 } = {
-	bunshell: `${os.homedir()}/.bunshell`,
-	bins: `${os.homedir()}/.bunshell/bin`,
-	config: `${os.homedir()}/.bunshell/config.json`,
+	bunshell: `${$HOME}/.bunshell`,
+	bins: `${$HOME}/.bunshell/bin`,
+	config: `${$HOME}/.bunshell/config.json`,
 	source: Bun.env.BUNS_PATH ?? `${os.homedir()}/.buns`
 }
 
-export const SUPPORTED_FILES = ["mjs", "js", "ts"] as const;
-
+export const SUPPORTED_FILES = ["ts", "mjs", "js"] as const;
+export type SupportedFiles = typeof SUPPORTED_FILES[number];
 export type Script = {
 	slug: string;
 	bin: string;
@@ -53,5 +52,9 @@ export async function get<K extends keyof Config>(key: K, fallback?: Config[K] |
 export async function update<K extends keyof Config>(key: K, value: Config[K]) {
 	const json = await config();
 	json[key] = value;
-	return await Bun.write(PATHS.config, JSON.stringify(json, null, 4));
+	return set(json);
+}
+
+export function set(config: Config) {
+	return Bun.write(PATHS.config, JSON.stringify(config, null, 4));
 }
