@@ -17,10 +17,10 @@ async function getScript(file: string, parent?: string): Promise<Script> {
 	return {
 		slug,
 		bin,
-		file,
+		source: file,
 		filename,
 		command,
-		path: directory
+		dir: directory
 	};
 }
 
@@ -28,7 +28,7 @@ export async function getScripts(sourcePath: string, namespace?: string): Promis
 	const files = await listScripts(sourcePath);
 	const scripts = await Promise.all(files.map((file) => getScript(file, namespace)));
 	return {
-		path: sourcePath,
+		dir: sourcePath,
 		namespace,
 		scripts
 	}
@@ -39,11 +39,11 @@ export async function getSource(name: string): Promise<ScriptCollection | Namesp
 	if (!sources) {
 		throw new Error("No sources defined.");
 	}
-	const source = sources.find(source => path.basename(source.path) === name);
+	const source = sources.find(source => path.basename(source.dir) === name);
 	if (!source) {
 		throw new Error(`No source found with the name: ${name}`);
 	}
-	return await getScripts(source.path, source.namespace);
+	return await getScripts(source.dir, source.namespace);
 }
 
 export async function getSources(): Promise<(ScriptCollection | Namespace)[]> {
@@ -54,7 +54,7 @@ export async function getSources(): Promise<(ScriptCollection | Namespace)[]> {
 
 	const output: Promise<(ScriptCollection | Namespace)>[] = [];
 	for (const source of sources) {
-		output.push(getScripts(source.path, source.namespace));
+		output.push(getScripts(source.dir, source.namespace));
 	}
 
 	return Promise.all(output);

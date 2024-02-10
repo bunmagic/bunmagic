@@ -13,14 +13,14 @@ export default async function () {
 
 		let maxScriptNameLength = 0;
 		const inNamespaced = Boolean(source.namespace);
-		const basename = path.basename(source.path);
+		const basename = path.basename(source.dir);
 		const name = basename.charAt(0).toUpperCase() + basename.slice(1);
 
 
 		console.log();
 		console.log(separator);
 		console.log("  " + ansis.bold(name));
-		console.log("  " + ansis.dim(source.path));
+		console.log("  " + ansis.dim(source.dir));
 		console.log(separator);
 
 		for (const { slug, bin } of source.scripts) {

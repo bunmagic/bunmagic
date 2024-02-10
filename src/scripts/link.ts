@@ -11,7 +11,7 @@ export async function addSourceDirectory(target?: string) {
 	const sources = await getSources().catch(() => [] as (Namespace | ScriptCollection)[]);
 	let defaultSource = `${PATHS.bunism}/default`;
 
-	if (sources.find(source => source.path === defaultSource)) {
+	if (sources.find(source => source.dir === defaultSource)) {
 		defaultSource = process.cwd();
 	}
 
@@ -22,7 +22,7 @@ export async function addSourceDirectory(target?: string) {
 		target = (await prompt(sourcePath)) || defaultSource;
 	}
 
-	const sourceDirectories = sources.map((source) => source.path);
+	const sourceDirectories = sources.map((source) => source.dir);
 	if (sourceDirectories.includes(target)) {
 		console.log(`The path "${ansis.bold(target)}" already exists. Please choose another path.`);
 		return await addSourceDirectory();
@@ -36,7 +36,7 @@ export async function addSourceDirectory(target?: string) {
 	target = path.resolve(target);
 	sources.push({
 		namespace,
-		path: target,
+		dir: target,
 		scripts: []
 	});
 	ensureDir(target)

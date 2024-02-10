@@ -32,7 +32,7 @@ async function namespacedScriptPath(slug: string, namespace: string): Promise<Pa
 	}
 
 	// `createScript` has already checked that the command exists, there's no need to check again.
-	return path.resolve(source.path, slug) as PartialScriptPath;
+	return path.resolve(source.dir, slug) as PartialScriptPath;
 }
 
 async function scriptPath(slug: string): Promise<PartialScriptPath> {
@@ -49,7 +49,7 @@ async function scriptPath(slug: string): Promise<PartialScriptPath> {
 
 	// Where to place the script?
 	console.log("Creating a new command: " + slug);
-	const directories = await getSources().then((sources) => sources.map((source) => source.path));
+	const directories = await getSources().then((sources) => sources.map((source) => source.dir));
 	let directory = directories[0];
 
 	if (directories.length > 1) {
@@ -73,7 +73,7 @@ export async function create(command: string) {
 	const existing = await findAny(command);
 
 	if (existing) {
-		const target = 'file' in existing ? existing.file : existing.path;
+		const target = 'file' in existing ? existing.source : existing.dir;
 		const messageExists = `The command "${ansis.bold(command)}" already exists:`;
 		const messageEdit = `Would you like to edit "${ansis.bold(command)}" ?`;
 		if (ack(`${messageExists}\n${messageEdit}`, "y")) {

@@ -45,10 +45,9 @@ export default async function () {
 	}
 
 
-	const binFile = path.join(PATHS.bins, script.file);
-	console.log(script);
-	const binFileExists = await Bun.file(binFile).exists();
-	const sourceFileExists = await Bun.file(script.file).exists();
+	const binFile = path.join(PATHS.bins, script.source);
+	const binFileExists = await Bun.file(script.bin).exists();
+	const sourceFileExists = await Bun.file(script.source).exists();
 
 	if (binFileExists) {
 		await $`rm ${binFile}`;
@@ -56,7 +55,7 @@ export default async function () {
 	}
 
 	if (sourceFileExists && ack(`Remove the source file?`)) {
-		await $`rm ${script.file}`;
+		await $`rm ${script.source}`;
 	}
 
 	if (!binFileExists && !sourceFileExists) {

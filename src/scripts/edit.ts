@@ -53,12 +53,12 @@ export async function openEditor(path: string) {
 
 async function getEditTarget(input: string) {
 	const script = await findScript(input);
-	if (script && script.file && (await Bun.file(script.file).exists())) {
-		return script.file;
+	if (script && script.source && (await Bun.file(script.source).exists())) {
+		return script.source;
 	}
 	const namespace = await findNamespace(input);
 	if (namespace) {
-		return namespace.path;
+		return namespace.dir;
 	}
 
 	return false;

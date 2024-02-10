@@ -15,7 +15,7 @@ export async function runNamespace(namespace: string, sourcePath: string) {
 	const getCommands = await import("./lib/commands").then(m => m.getCommands);
 
 	const source = await getScripts(sourcePath, namespace);
-	const files = source.scripts!.map(script => script.file);
+	const files = source.scripts!.map(script => script.source);
 
 	const { router: routerInfo, commands } = await getCommands(files);
 	const input = slugify(argv._[0] ?? "");

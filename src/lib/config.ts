@@ -14,18 +14,42 @@ export const SUPPORTED_FILES = ["ts", "mjs", "js"] as const;
 export type SupportedFiles = typeof SUPPORTED_FILES[number];
 
 export type Script = {
+	/**
+	 * The command name, for example:
+	 * `my-command`
+	 */
 	slug: string;
-	bin: string;
-	file: string;
-	filename: string;
+	/** 
+	 * The full command name, for example:
+	 * `my-namespace my-command`
+	 */
 	command: string;
-	path: string;
+	/**
+	 * The full path to the bin file, for example
+	 * `~/.bunism/bins/my-command`
+	 */
+	bin: string;
+	/** 
+	 * The directory path, for example:
+	 * `/path/to/dir `
+	 */
+	dir: string;
+	/** 
+	 * The filename, for example:
+	 * `my-command.js`
+	 */
+	filename: string;
+	/** 
+	 * The full source path, for example:
+	 * `/path/to/dir/my-command.js`
+	 */
+	source: string;
 }
 
 export type Namespace = {
 	type: "namespace";
 	namespace: string;
-	path: string;
+	dir: string;
 	scripts: Script[];
 }
 
