@@ -12,6 +12,7 @@ export const PATHS: {
 
 export const SUPPORTED_FILES = ["ts", "mjs", "js"] as const;
 export type SupportedFiles = typeof SUPPORTED_FILES[number];
+
 export type Script = {
 	slug: string;
 	bin: string;
@@ -22,19 +23,21 @@ export type Script = {
 }
 
 export type Namespace = {
+	type: "namespace";
 	namespace: string;
 	path: string;
 	scripts: Script[];
 }
 
-export type Scripts = {
+export type ScriptCollection = {
+	type: "scripts";
 	namespace: undefined;
 	path: string;
 	scripts: Script[];
 }
 export type Config = {
 	extension: string & typeof SUPPORTED_FILES[number];
-	sources?: Scripts[] | Namespace[];
+	sources?: ScriptCollection[] | Namespace[];
 }
 
 async function config(): Promise<Config> {

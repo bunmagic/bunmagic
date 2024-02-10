@@ -1,6 +1,6 @@
 import {
-	getSources,
-	search,
+	findNamespace,
+	findScript,
 
 } from "../lib/sources";
 import { create } from './create';
@@ -52,14 +52,13 @@ export async function openEditor(path: string) {
 }
 
 async function getEditTarget(input: string) {
-	const script = await search(input);
+	const script = await findScript(input);
 	if (script && script.file && (await Bun.file(script.file).exists())) {
 		return script.file;
 	}
-	const sources = await getSources();
-	const source = sources.find((dir) => 'namespace' in dir && dir.namespace === input);
-	if (source) {
-		return source.path;
+	const namespace = await findNamespace(input);
+	if (namespace) {
+		return namespace.path;
 	}
 
 	return false;

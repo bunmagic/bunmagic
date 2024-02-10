@@ -1,4 +1,4 @@
-import { PATHS, update, type Namespace, type Scripts } from '../lib/config';
+import { PATHS, update, type Namespace, type ScriptCollection } from '../lib/config';
 import { getSources } from '../lib/sources';
 import { relinkBins } from './bins';
 
@@ -8,7 +8,7 @@ export const usage = 'bunism link';
 
 export async function addSourceDirectory(target?: string) {
 
-	const sources = await getSources().catch(() => [] as (Namespace | Scripts)[]);
+	const sources = await getSources().catch(() => [] as (Namespace | ScriptCollection)[]);
 	let defaultSource = `${PATHS.bunism}/default`;
 
 	if (sources.find(source => source.path === defaultSource)) {
@@ -41,7 +41,7 @@ export async function addSourceDirectory(target?: string) {
 	});
 	ensureDir(target)
 
-	await update("sources", sources as Namespace[] | Scripts[]);
+	await update("sources", sources as Namespace[] | ScriptCollection[]);
 }
 
 export default async function () {

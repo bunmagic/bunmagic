@@ -1,4 +1,4 @@
-import { PATHS, SUPPORTED_FILES, get, type Script, type Namespace, type Scripts } from "./config";
+import { PATHS, SUPPORTED_FILES, get, type Script, type Namespace, type ScriptCollection } from "./config";
 
 
 export async function listScripts(target: string): Promise<string[]> {
@@ -24,7 +24,7 @@ async function getScript(file: string, parent?: string): Promise<Script> {
 	};
 }
 
-export async function getScripts(sourcePath: string, namespace?: string): Promise<(Scripts | Namespace)> {
+export async function getScripts(sourcePath: string, namespace?: string): Promise<(ScriptCollection | Namespace)> {
 	const files = await listScripts(sourcePath);
 	const scripts = await Promise.all(files.map((file) => getScript(file, namespace)));
 	return {
@@ -34,7 +34,7 @@ export async function getScripts(sourcePath: string, namespace?: string): Promis
 	}
 }
 
-export async function getSource(name: string): Promise<Scripts | Namespace> {
+export async function getSource(name: string): Promise<ScriptCollection | Namespace> {
 	const sources = await get("sources");
 	if (!sources) {
 		throw new Error("No sources defined.");
@@ -46,13 +46,13 @@ export async function getSource(name: string): Promise<Scripts | Namespace> {
 	return await getScripts(source.path, source.namespace);
 }
 
-export async function getSources(): Promise<(Scripts | Namespace)[]> {
+export async function getSources(): Promise<(ScriptCollection | Namespace)[]> {
 	const sources = await get("sources");
 	if (!sources) {
 		throw new Error("No sources defined.");
 	}
 
-	const output: Promise<(Scripts | Namespace)>[] = [];
+	const output: Promise<(ScriptCollection | Namespace)>[] = [];
 	for (const source of sources) {
 		output.push(getScripts(source.path, source.namespace));
 	}
@@ -72,10 +72,9 @@ export function commandFromStr(input: string): [string, string | undefined] {
 	throw new Error("A command should consist of 1 or 2 words.");
 }
 
-export async function search(input: string): Promise<Namespace | Script | undefined> {
+export async function findScript(query: string): Promise<Script | undefined> {
 	const sources = await getSources();
-	const [script, namespace] = commandFromStr(input);
-
+	const [script, namespace] = commandFromStr(query);
 
 	if (namespace) {
 		const source = sources.find(source => source.namespace === namespace);
@@ -86,16 +85,35 @@ export async function search(input: string): Promise<Namespace | Script | undefi
 			}
 		}
 	} else if (!namespace && script) {
+		// No namespace found. Maybe the source exists globally.
+		const noNsSources = sources.filter(source => !source.namespace);
+		const scripts = noNsSources.flatMap(source => source.scripts);
+		return scripts.find(s => s.command === script);
+	}
+}
+
+export async function findNamespace(query: string): Promise<Namespace | undefined> {
+	const sources = await getSources();
+	const [script, namespace] = commandFromStr(query);
+
+	if (!namespace && script) {
 		// Check if maybe only the namespace was passed in
 		const source = sources.find(source => source.namespace === script);
 		if (source) {
 			return source as Namespace;
 		}
 	}
+}
 
-	// No namespace found. Maybe the source exists globally.
-	const noNsSources = sources.filter(source => !source.namespace);
-	const scripts = noNsSources.flatMap(source => source.scripts);
-	return scripts.find(s => s.command === script);
+export async function findAny(query: string): Promise<Script | Namespace | undefined> {
+	const script = await findScript(query);
+	if (script) {
+		return script;
+	}
+
+	const namespace = await findNamespace(query);
+	if (namespace) {
+		return namespace;
+	}
 }
 

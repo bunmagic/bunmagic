@@ -1,33 +1,36 @@
-import { PATHS, update, type Config } from '../lib/config';
-import { commandFromStr, getSources, search } from "../lib/sources";
+import { PATHS, update, type Config, type Namespace } from '../lib/config';
+import { commandFromStr, getSources, findNamespace, findScript } from "../lib/sources";
 
 
 export const desc = `Remove and unlink a script`;
 export const usage = `bunism remove <script-name>`;
 export const alias = ["rm"];
 
-async function removeNamespace(namespace: string) {
-	const sources = await getSources();
-	const source = sources.find((dir) => dir.namespace === namespace);
+async function removeNamespace(query: string) {
+	const source = await findNamespace(query);
 	if (!source) {
-		throw new Error(`Namespace "${namespace}" not found`);
+		throw new Error(`Namespace "${query}" not found`);
 	}
-	if (false === (ack(`Unlink namespace "${ansis.bold(namespace)}"?`))) {
+	if (true !== ack(`Unlink namespace "${ansis.bold(query)}"?`)) {
 		return false;
 	}
-	await update("sources", sources.filter((dir) => dir.namespace !== namespace) as (Config["sources"]));
+	const sources = await getSources();
+	const updatedSources = sources.filter((dir): dir is Namespace => 'namespace' in dir && dir.namespace !== source.namespace);
+	// @TODO: The type doesn't complain, but the type is incorrect. I'm updating both scripts and namespaces.
+	await update("sources", updatedSources);
 }
 
 export default async function () {
-	const input = argv._.join(" ");
-	const [command, namespace] = commandFromStr(input);
-	if (!command) {
+
+	if (argv._.length === 0) {
 		throw new Error(
 			`You must specify which script to remove.\n${usage}`,
 		);
 	}
 
-	const script = await search(input);
+	const input = argv._.join(" ");
+	const script = await findScript(input);
+
 	if (!script) {
 		try {
 			await removeNamespace(input)
@@ -36,20 +39,27 @@ export default async function () {
 		}
 		return;
 	}
-	const { file } = script;
 
 	if (false === (ack(`Delete command "${ansis.bold(input)}"?`))) {
 		return false;
 	}
 
-	if (!namespace) {
-		const binFile = path.join(PATHS.bins, input);
-		if (!file && !binFile) {
-			console.log(`🍀 You're in luck! ${input} doesn't exist already!`);
-			return;
-		}
+
+	const binFile = path.join(PATHS.bins, script.file);
+
+	const binFileExists = await Bun.file(binFile).exists();
+	const sourceFileExists = await Bun.file(script.path).exists();
+
+	if (binFileExists) {
 		await $`rm ${binFile}`;
+		return;
 	}
 
-	await $`rm ${file}`;
+	if (sourceFileExists && ack(`Remove the source file?`)) {
+		await $`rm ${script.path}`;
+	}
+
+	if (!binFileExists && !sourceFileExists) {
+		console.log(`🍀 You're in luck! "${input}" doesn't exist already!`);
+	}
 }

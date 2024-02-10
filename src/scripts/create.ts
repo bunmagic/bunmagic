@@ -1,7 +1,7 @@
 import {
 	commandFromStr,
 	getSources,
-	search,
+	findAny,
 } from "../lib/sources";
 import { ensureBin } from "./bins";
 import { openEditor } from "./edit";
@@ -70,7 +70,7 @@ export async function create(command: string) {
 		command = command.replace("bunism ", "");
 	}
 
-	const existing = await search(command);
+	const existing = await findAny(command);
 
 	if (existing) {
 		const target = 'file' in existing ? existing.file : existing.path;
