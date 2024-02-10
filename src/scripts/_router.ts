@@ -7,24 +7,30 @@ export const isRouter = true;
 const router: RouterCallback = async (_, __, cmd, command, commands) => {
 	const input = argv._.join(" ");
 
+	if (argv.v || input === "version") {
+		await version();
+		return;
+	}
+
+	if (argv.h || input === "help") {
+		await help(commands);
+		return;
+	}
+
 	// Offer to create utility if it doesn't exist.
 	if (input && !command) {
 		try {
-			await create(input);
+			return await create(input);
 		} catch (e) {
 			die(e);
 		}
 	}
 
-	if (argv.h || input === "help" || !command) {
+	if (!command) {
 		await help(commands);
 		return;
 	}
 
-	if (argv.v || input === "version") {
-		await version();
-		return;
-	}
 
 	try {
 		// Shift the first argument off the list and run the command.
