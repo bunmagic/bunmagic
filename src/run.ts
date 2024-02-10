@@ -1,5 +1,6 @@
 import "./index";
 import type { RouterCallback } from './lib/commands';
+import { slugify } from './lib/utils';
 
 
 export async function run(scriptFile: string) {
@@ -17,7 +18,7 @@ export async function runNamespace(namespace: string, sourcePath: string) {
 	const files = source.scripts!.map(script => script.file);
 
 	const { router: routerInfo, commands } = await getCommands(files);
-	const input = argv._[0];
+	const input = slugify(argv._[0]);
 
 	try {
 

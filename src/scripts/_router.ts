@@ -2,11 +2,12 @@ import type { RouterCallback } from '../lib/commands';
 import help from './help';
 import { create } from './create';
 import version from './version';
+import { slugify } from '../lib/utils';
 
 export const isRouter = true;
 const router: RouterCallback = async (_, __, cmd, command, commands) => {
-	const input = argv._.join(" ");
-
+	const input = argv._.map(slugify).join(" ");
+	console.log('input', input);
 	if (argv.v || input === "version") {
 		await version();
 		return;
