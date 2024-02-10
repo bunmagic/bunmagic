@@ -7,10 +7,8 @@
 		"@types/fs-extra": "^11.0.4",
 		"@types/minimist": "^1.2.5"
 	},
-	"bin": {
-		"bunism": "src/bin/bunism.ts",
-		"bunism-exec": "src/bin/bunism-exec.ts",
-		"bunism-exec-namespace": "src/bin/bunism-exec-namespace.ts"
+	"directories": {
+		"bin": "src/bin"
 	},
 	"module": "src/index.ts",
 	"name": "bunism",
