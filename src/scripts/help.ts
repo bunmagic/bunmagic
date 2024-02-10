@@ -2,7 +2,7 @@ import type { Command, NotFound, InstantScript, CMD } from '../lib/commands';
 
 export const name = "help";
 export const desc = "Get the full list of available commands";
-export const usage = "bunshell help";
+export const usage = "bunism help";
 
 
 function describeCommand(command: CMD) {

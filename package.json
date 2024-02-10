@@ -8,14 +8,14 @@
 		"@types/minimist": "^1.2.5"
 	},
 	"bin": {
-		"bunshell": "src/bin/bunshell.ts",
-		"bunshell-exec": "src/bin/bunshell-exec.ts",
-		"bunshell-exec-namespace": "src/bin/bunshell-exec-namespace.ts"
+		"bunism": "src/bin/bunism.ts",
+		"bunism-exec": "src/bin/bunism-exec.ts",
+		"bunism-exec-namespace": "src/bin/bunism-exec-namespace.ts"
 	},
 	"module": "src/index.ts",
-	"name": "bunshell",
+	"name": "bunism",
 	"type": "module",
-	"version": "1.0.0-beta.3",
+	"version": "1.0.0-beta.4",
 	"exports": {
 		"run": "./src/run.ts"
 	}

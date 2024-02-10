@@ -3,13 +3,13 @@ import { getSources } from '../lib/sources';
 import { relinkBins } from './bins';
 
 export const desc = 'Add an additional directory to use as script source.';
-export const usage = 'bunshell link';
+export const usage = 'bunism link';
 
 
 export async function addSourceDirectory(target?: string) {
 
 	const sources = await getSources().catch(() => [] as (Namespace | Scripts)[]);
-	let defaultSource = `${PATHS.bunshell}/default`;
+	let defaultSource = `${PATHS.bunism}/default`;
 
 	if (sources.find(source => source.path === defaultSource)) {
 		defaultSource = process.cwd();

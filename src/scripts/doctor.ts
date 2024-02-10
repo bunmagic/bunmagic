@@ -2,12 +2,12 @@ import { addSourceDirectory } from './link';
 import { relinkBins } from './bins';
 import { getSources } from '../lib/sources'
 
-export const desc = "Check if bunshell is set up correctly";
-export const usage = "bunshell doctor";
+export const desc = "Check if bunism is set up correctly";
+export const usage = "bunism doctor";
 
 export default async function setup() {
 	const PATH = Bun.env.PATH;
-	const BIN_PATH = `${$HOME}/.bunshell/bin`
+	const BIN_PATH = `${$HOME}/.bunism/bin`
 
 	let issues = 0;
 
@@ -19,12 +19,12 @@ export default async function setup() {
 	}
 
 	if ((await getSources()).length === 0) {
-		console.log("Welcome! Where should bunshell store your scripts?")
+		console.log("Welcome! Where should bunism store your scripts?")
 		await addSourceDirectory();
 		await relinkBins();
 
 		console.log("All done! If you want to add more source directories,")
-		console.log(`run ${ansis.bold("bunshell link")}`);
+		console.log(`run ${ansis.bold("bunism link")}`);
 	}
 
 	if (PATH && !PATH.includes(BIN_PATH)) {

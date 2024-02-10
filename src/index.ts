@@ -26,7 +26,7 @@ declare global {
 	const $HOME: typeof globals.$HOME;
 }
 
-const customGlobalsFile = `${os.homedir()}/.bunshell/custom-globals.ts`;
+const customGlobalsFile = `${os.homedir()}/.bunism/custom-globals.ts`;
 if (await Bun.file(customGlobalsFile).exists()) {
 	const customGlobals = await import(customGlobalsFile);
 	Object.assign(globalThis, customGlobals);

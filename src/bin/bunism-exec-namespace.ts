@@ -1,5 +1,5 @@
 #!/usr/bin/env bun
-import { runNamespace } from 'bunshell/run';
+import { runNamespace } from 'bunism/run';
 
 const sourcePath = argv._.shift();
 const namespace = argv._.shift();

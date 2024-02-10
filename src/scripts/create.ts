@@ -8,7 +8,7 @@ import { openEditor } from "./edit";
 import { get } from '../lib/config';
 
 export const desc = `Create a new script`;
-export const usage = `bunshell create <script-name>`;
+export const usage = `bunism create <script-name>`;
 export const alias = ["new"];
 
 export default async function () {
@@ -65,9 +65,9 @@ async function scriptPath(slug: string): Promise<PartialScriptPath> {
 
 export async function create(command: string) {
 
-	// Exception: don't create new bunshell scripts via "bunshell create bunshell <command>" or "bunshell <command>".
-	if (command.startsWith("bunshell ")) {
-		command = command.replace("bunshell ", "");
+	// Exception: don't create new bunism scripts via "bunism create bunism <command>" or "bunism <command>".
+	if (command.startsWith("bunism ")) {
+		command = command.replace("bunism ", "");
 	}
 
 	const existing = await search(command);

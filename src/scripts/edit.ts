@@ -5,8 +5,8 @@ import {
 } from "../lib/sources";
 import { create } from './create';
 
-export const desc = `Edit scripts. If no script name is specified, will open all scripts and the ~/.bunshell directory`;
-export const usage = `bunshell edit [script-name]`;
+export const desc = `Edit scripts. If no script name is specified, will open all scripts and the ~/.bunism directory`;
+export const usage = `bunism edit [script-name]`;
 
 
 export default async function () {
@@ -46,7 +46,7 @@ export async function openEditor(path: string) {
 	console.log(ansis.bold("Editor missing!"));
 	console.log(`I tried to use "${ansis.bold(edit)}" to open ${path}`);
 	console.log(
-		`\n 🔗 ${ansis.bold("Read more here: ")}\nhttps://github.com/pyronaur/bunshell/tree/main#code-editor\n`,
+		`\n 🔗 ${ansis.bold("Read more here: ")}\nhttps://github.com/pyronaur/bunism/tree/main#code-editor\n`,
 	);
 	throw new Error(res.stdout.toString() || res.stderr.toString());
 }

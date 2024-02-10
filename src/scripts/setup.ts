@@ -1,8 +1,8 @@
 import * as config from '../lib/config';
 import { addSourceDirectory } from './link';
 
-export const desc = "Install bunshell and set up your environment";
-export const usage = "bunshell install";
+export const desc = "Install bunism and set up your environment";
+export const usage = "bunism install";
 
 
 
@@ -30,11 +30,11 @@ async function setupBinPath(binPath: string) {
 	const rcFiles = await availableRcFiles();
 
 	const select = [...rcFiles, "Custom"];
-	let rcFile = selection(select, `Which file would you like to add bunshell to?`);
+	let rcFile = selection(select, `Which file would you like to add bunism to?`);
 
 	if (rcFile === "Custom") {
 		const customFile = await require(async () => {
-			const file = prompt("Enter the path to the file you'd like to add bunshell to:")
+			const file = prompt("Enter the path to the file you'd like to add bunism to:")
 			if (!file) {
 				throw "No file path provided";
 			}
@@ -57,15 +57,15 @@ async function displayWelcomeMessage() {
 	const dimLine = ansis.dim("===============================================================");
 	const message = `
 	${dimLine}
-	 Welcome to ${ansis.bold("bunshell")}!
+	 Welcome to ${ansis.bold("bunism")}!
 	${dimLine}
 	
-	 Reload the terminal and run ${ansis.bold("bunshell")} to finish the setup process.
+	 Reload the terminal and run ${ansis.bold("bunism")} to finish the setup process.
 	
 	 Some useful commands to get you started:
-	 • ${ansis.bold("bunshell help")} 			get the full list of available commands
-	 • ${ansis.bold("bunshell new my-script")} 	create your first script
-	 • ${ansis.bold("bunshell list")} 			see a list of scripts you've defined.
+	 • ${ansis.bold("bunism help")} 			get the full list of available commands
+	 • ${ansis.bold("bunism new my-script")} 	create your first script
+	 • ${ansis.bold("bunism list")} 			see a list of scripts you've defined.
 
 	 ${dimLine}`
 
@@ -85,12 +85,12 @@ async function setupConfig(bsPath: string) {
 }
 
 export async function uninstall() {
-	const confirm = ack("Are you sure you want to uninstall bunshell?");
+	const confirm = ack("Are you sure you want to uninstall bunism?");
 	if (!confirm) {
 		return;
 	}
 	const rcFiles = await availableRcFiles();
-	const binPath = `${$HOME}/.bunshell/bin`;
+	const binPath = `${$HOME}/.bunism/bin`;
 
 	for (const file of rcFiles) {
 		const content = await Bun.file(file).text();
@@ -102,8 +102,8 @@ export async function uninstall() {
 
 
 	cd($HOME);
-	await $`rm -rf ${$HOME}/.bunshell`;
-	die(`Uninstalled bunshell.`);
+	await $`rm -rf ${$HOME}/.bunism`;
+	die(`Uninstalled bunism.`);
 }
 
 export default async function setup() {
@@ -111,29 +111,29 @@ export default async function setup() {
 		return await uninstall();
 	}
 
-	console.log(`\nInstalling ${ansis.bold("bunshell")}...\n`);
+	console.log(`\nInstalling ${ansis.bold("bunism")}...\n`);
 	if (!Bun.env.PATH) {
 		throw die("Can't find $PATH variable. Exiting.");
 	}
 
 
-	const bunshell = await $`which bunshell`.quiet().text();
-	if (bunshell.trim() !== "") {
-		console.log("Installing bunshell globally...");
-		await $`bun install -g bunshell/bunshell`;
+	const bunism = await $`which bunism`.quiet().text();
+	if (bunism.trim() !== "") {
+		console.log("Installing bunism globally...");
+		await $`bun install -g bunism/bunism`;
 	} else {
-		console.log("Bunshell is already installed globally.");
+		console.log("bunism is already installed globally.");
 	}
 
 
-	console.log(`\n- Setting up the necessary paths for bunshell scripts to run.`);
-	const bsPath = `${$HOME}/.bunshell`;
+	console.log(`\n- Setting up the necessary paths for bunism scripts to run.`);
+	const bsPath = `${$HOME}/.bunism`;
 	const binPath = path.join(bsPath, "bin");
 	if (!Bun.env.PATH.includes(bsPath)) {
 		await setupBinPath(binPath);
 	}
 
-	console.log(`\n- Setting up the bunshell config file.`);
+	console.log(`\n- Setting up the bunism config file.`);
 	await ensureDir(binPath);
 	await setupConfig(bsPath);
 
@@ -143,9 +143,9 @@ export default async function setup() {
 	}
 
 	const bsAliasBin = `${binPath}/bs`;
-	const bsAliasQuestion = `\n- Do you want to setup ${ansis.bold("bs")} as a shortcut for ${ansis.bold("bunshell")}?`;
+	const bsAliasQuestion = `\n- Do you want to setup ${ansis.bold("bs")} as a shortcut for ${ansis.bold("bunism")}?`;
 	if (!await Bun.file(bsAliasBin).exists() && Bun.which("bs") === null && ack(bsAliasQuestion)) {
-		await Bun.write(`${bsAliasBin}`, `#!/bin/bash\nbunshell $@`);
+		await Bun.write(`${bsAliasBin}`, `#!/bin/bash\nbunism $@`);
 		await $`chmod +x ${bsAliasBin}`;
 		console.log(`\n- Created a new bin: ${ansis.bold("bs")} -> ${bsAliasBin} \n`);
 

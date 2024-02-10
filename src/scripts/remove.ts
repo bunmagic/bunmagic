@@ -3,7 +3,7 @@ import { commandFromStr, getSources, search } from "../lib/sources";
 
 
 export const desc = `Remove and unlink a script`;
-export const usage = `bunshell remove <script-name>`;
+export const usage = `bunism remove <script-name>`;
 export const alias = ["rm"];
 
 async function removeNamespace(namespace: string) {

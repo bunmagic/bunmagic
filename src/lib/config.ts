@@ -1,12 +1,12 @@
 export const PATHS: {
-	bunshell: string;
+	bunism: string;
 	bins: string;
 	config: string;
 	source: string;
 } = {
-	bunshell: `${$HOME}/.bunshell`,
-	bins: `${$HOME}/.bunshell/bin`,
-	config: `${$HOME}/.bunshell/config.json`,
+	bunism: `${$HOME}/.bunism`,
+	bins: `${$HOME}/.bunism/bin`,
+	config: `${$HOME}/.bunism/config.json`,
 	source: Bun.env.BUNS_PATH ?? `${os.homedir()}/.buns`
 }
 
