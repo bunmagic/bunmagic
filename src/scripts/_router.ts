@@ -20,7 +20,8 @@ const router: RouterCallback = async (_, __, cmd, command, commands) => {
 	// Offer to create utility if it doesn't exist.
 	if (input && !command) {
 		try {
-			return await create(input);
+			await create(input);
+			return;
 		} catch (e) {
 			die(e);
 		}
