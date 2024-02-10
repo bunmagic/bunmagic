@@ -17,12 +17,12 @@ export function notMinimist(args: string[]) {
 	for (let i = 0; i < args.length; i++) {
 		let value: string | number | boolean | undefined;
 		const arg = args[i];
-		if (arg.startsWith("--")) {
-			let [key, rawValue] = arg.slice(2).split("=");
+		if (arg.startsWith("--") || arg.startsWith("-")) {
+			let [key, rawValue] = arg.replace(/^--?/, '').split("=");
 			value = rawValue;
 			if (value === undefined) {
 				const nextArg = args[i + 1];
-				if (nextArg && !nextArg.startsWith("--")) {
+				if (nextArg && !nextArg.startsWith("-")) {
 					value = nextArg;
 					i++;
 				} else {
