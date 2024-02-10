@@ -8,8 +8,10 @@
 		"@types/fs-extra": "^11.0.4",
 		"@types/minimist": "^1.2.5"
 	},
-	"directories": {
-		"bin": "src/bin"
+	"bin": {
+		"bunism": "src/bin/bunism.ts",
+		"bunism-exec": "src/bin/bunism-exec.ts",
+		"bunism-exec-namespace": "src/bin/bunism-exec-namespace.ts"
 	},
 	"module": "src/index.ts",
 	"type": "module",
