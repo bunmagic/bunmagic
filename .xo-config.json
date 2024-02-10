@@ -1,0 +1,41 @@
+{
+	"rules": {
+		"import/extensions": 0,
+		"@typescript-eslint/no-require-imports": 0,
+		"@typescript-eslint/naming-convention": [
+			"error",
+			{
+				"selector": "variable",
+				"format": [
+					"camelCase",
+					"UPPER_CASE"
+				],
+				"leadingUnderscore": "allow",
+				"trailingUnderscore": "allow"
+			},
+			{
+				"selector": "variable",
+				"types": [
+					"boolean"
+				],
+				"format": [
+					"PascalCase"
+				],
+				"prefix": [
+					"is",
+					"should",
+					"has",
+					"can",
+					"did",
+					"will"
+				]
+			},
+			{
+				"selector": "typeLike",
+				"format": [
+					"PascalCase"
+				]
+			}
+		]
+	}
+}
