@@ -72,8 +72,8 @@ async function displayWelcomeMessage() {
 	console.log(message.replace(/^\t/gm, '|'));
 }
 
-async function setupConfig(bsPath: string) {
-	const configFile = `${bsPath}/config.json`;
+async function setupConfig(bmPath: string) {
+	const configFile = `${bmPath}/config.json`;
 	if (await Bun.file(configFile).exists()) {
 		return;
 	}
@@ -127,27 +127,27 @@ export default async function setup() {
 
 
 	console.log(`\n- Setting up the necessary paths for bunism scripts to run.`);
-	const bsPath = `${$HOME}/.bunism`;
-	const binPath = path.join(bsPath, "bin");
-	if (!Bun.env.PATH.includes(bsPath)) {
+	const bmPath = `${$HOME}/.bunism`;
+	const binPath = path.join(bmPath, "bin");
+	if (!Bun.env.PATH.includes(bmPath)) {
 		await setupBinPath(binPath);
 	}
 
 	console.log(`\n- Setting up the bunism config file.`);
 	await ensureDir(binPath);
-	await setupConfig(bsPath);
+	await setupConfig(bmPath);
 
 	console.log(`\n- Setting up the script source directory.`);
 	if (await config.get("sources") === undefined) {
 		await addSourceDirectory();
 	}
 
-	const bsAliasBin = `${binPath}/bs`;
-	const bsAliasQuestion = `\n- Do you want to setup ${ansis.bold("bs")} as a shortcut for ${ansis.bold("bunism")}?`;
-	if (!await Bun.file(bsAliasBin).exists() && Bun.which("bs") === null && ack(bsAliasQuestion)) {
-		await Bun.write(`${bsAliasBin}`, `#!/bin/bash\nbunism $@`);
-		await $`chmod +x ${bsAliasBin}`;
-		console.log(`\n- Created a new bin: ${ansis.bold("bs")} -> ${bsAliasBin} \n`);
+	const bmAliasBin = `${binPath}/bm`;
+	const bmAliasQuestion = `\n- Do you want to setup ${ansis.bold("bm")} as a shortcut for ${ansis.bold("bunism")}?`;
+	if (!await Bun.file(bmAliasBin).exists() && Bun.which("bm") === null && ack(bmAliasQuestion)) {
+		await Bun.write(`${bmAliasBin}`, `#!/bin/bash\nbunism $@`);
+		await $`chmod +x ${bmAliasBin}`;
+		console.log(`\n- Created a new bin: ${ansis.bold("bm")} -> ${bmAliasBin} \n`);
 
 	}
 
