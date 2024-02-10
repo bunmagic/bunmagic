@@ -47,14 +47,12 @@ export type Script = {
 }
 
 export type Namespace = {
-	type: "namespace";
 	namespace: string;
 	dir: string;
 	scripts: Script[];
 }
 
 export type ScriptCollection = {
-	type: "scripts";
 	namespace: undefined;
 	path: string;
 	scripts: Script[];
