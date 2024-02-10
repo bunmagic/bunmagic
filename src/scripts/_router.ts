@@ -6,14 +6,13 @@ import { slugify } from '../lib/utils';
 
 export const isRouter = true;
 const router: RouterCallback = async (_, __, cmd, command, commands) => {
-	const input = argv._.map(slugify).join(" ");
-	console.log('input', input);
-	if (argv.v || input === "version") {
+	const input = argv._.map(t => slugify(t)).join(" ");
+	if (argv.v || argv.version || input === "version") {
 		await version();
 		return;
 	}
 
-	if (argv.h || input === "help") {
+	if (argv.h || argv.help || input === "help") {
 		await help(commands);
 		return;
 	}
