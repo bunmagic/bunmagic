@@ -1,6 +1,7 @@
 import type { RouterCallback } from '../lib/commands';
 import help from './help';
 import { create } from './create';
+import version from './version';
 
 export const isRouter = true;
 const router: RouterCallback = async (_, __, cmd, command, commands) => {
@@ -17,6 +18,11 @@ const router: RouterCallback = async (_, __, cmd, command, commands) => {
 
 	if (argv.h || input === "help" || !command) {
 		await help(commands);
+		return;
+	}
+
+	if (argv.v || input === "version") {
+		await version();
 		return;
 	}
 
