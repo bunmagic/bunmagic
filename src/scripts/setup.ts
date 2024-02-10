@@ -120,7 +120,7 @@ export default async function setup() {
 	const bunism = await $`which bunism`.quiet().text();
 	if (bunism.trim() !== "") {
 		console.log("Installing bunism globally...");
-		await $`bun install -g bunism/bunism`;
+		await $`bun install -g bunism`;
 	} else {
 		console.log("bunism is already installed globally.");
 	}

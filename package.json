@@ -15,7 +15,9 @@
 	"module": "src/index.ts",
 	"name": "bunism",
 	"type": "module",
-	"version": "1.0.0-beta.4",
+	"author": "pyronaur",
+	"license": "MIT",
+	"version": "1.0.0-beta.5",
 	"exports": {
 		"run": "./src/run.ts"
 	}
