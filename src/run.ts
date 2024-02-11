@@ -1,5 +1,5 @@
 import './index'; // eslint-disable-line import/no-unassigned-import, import/order
-import type {RouterCallback} from './lib/commands';
+import type {RouterCallback} from './lib/router';
 import {slugify} from './lib/utils';
 
 export async function run(scriptFile: string) {

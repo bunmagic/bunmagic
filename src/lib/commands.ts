@@ -26,14 +26,6 @@ export type NotFound = {
 	file: string;
 };
 
-export type RouterCallback = (
-	namespace: string,
-	name: string,
-	cmd: () => Promise<void>,
-	command: Command | NotFound | InstantScript | undefined,
-	commands: Map<string, Command | NotFound | InstantScript>
-) => Promise<void>;
-
 function commentToString(needle: string, haystack: string[]) {
 	const string_ = `// ${needle}`;
 	const line = haystack.find(line => line.trim().startsWith(string_));

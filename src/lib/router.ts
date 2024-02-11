@@ -1,6 +1,15 @@
 import {create} from '../scripts/create';
 import help from '../scripts/help';
-import type {RouterCallback} from './commands';
+import type {Command, NotFound, InstantScript} from './commands';
+
+export type RouterCallback = (
+	namespace: string,
+	name: string,
+	cmd: () => Promise<void>,
+	command: Command | NotFound | InstantScript | undefined,
+	commands: Map<string, Command | NotFound | InstantScript>
+) => Promise<void>;
+
 
 const router: RouterCallback = async (namespace, name, script, command, commands) => {
 	const input = `${namespace} ${name}`;
