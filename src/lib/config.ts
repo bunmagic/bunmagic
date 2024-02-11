@@ -1,10 +1,10 @@
 export const PATHS: {
-	bun-magic: string;
+	'bun-magic': string;
 	bins: string;
 	config: string;
 	source: string;
 } = {
-	bun-magic: `${$HOME}/.bun-magic`,
+	'bun-magic': `${$HOME}/.bun-magic`,
 	bins: `${$HOME}/.bun-magic/bin`,
 	config: `${$HOME}/.bun-magic/config.json`,
 	source: Bun.env.BUNS_PATH ?? `${os.homedir()}/.buns`,

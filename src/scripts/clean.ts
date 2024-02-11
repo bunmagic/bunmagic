@@ -1,4 +1,4 @@
-import {getSources} from '../lib/sources';
+import {getSources} from '@lib/sources';
 import {getBins} from './bins';
 
 export const desc = 'Remove bin files from the bin directory that don\'t have a matching script.';

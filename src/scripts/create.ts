@@ -2,9 +2,9 @@ import {
 	commandFromString,
 	getSources,
 	findAny,
-} from '../lib/sources';
-import {get} from '../lib/config';
-import {openEditor} from '../lib/utils';
+} from '@lib/sources';
+import {get} from '@lib/config';
+import {openEditor} from '@lib/utils';
 import {ensureBin} from './bins';
 
 export const desc = 'Create a new script';

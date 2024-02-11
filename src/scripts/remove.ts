@@ -1,9 +1,9 @@
 import {
 	PATHS, update, type Namespace,
-} from '../lib/config';
+} from '@lib/config';
 import {
 	getSources, findNamespace, findScript,
-} from '../lib/sources';
+} from '@lib/sources';
 
 export const desc = 'Remove and unlink a script';
 export const usage = 'bun-magic remove <script-name>';

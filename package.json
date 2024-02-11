@@ -11,9 +11,9 @@
 		"xo": "^0.57.0"
 	},
 	"bin": {
-		"bun-magic": "src/bin/bunmagic.ts",
-		"bun-magic-exec": "src/bin/bunmagic-exec.ts",
-		"bun-magic-exec-namespace": "src/bin/bunmagic-exec-namespace.ts"
+		"bun-magic": "src/bin/bun-magic.ts",
+		"bun-magic-exec": "src/bin/bun-magic-exec.ts",
+		"bun-magic-exec-namespace": "src/bin/bun-magic-exec-namespace.ts"
 	},
 	"scripts": {
 		"fix": "xo --fix",

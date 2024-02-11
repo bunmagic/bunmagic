@@ -1,6 +1,6 @@
 import {
 	getSources,
-} from '../lib/sources';
+} from '@lib/sources';
 
 export const desc = 'List all known scripts.';
 export const usage = `bun-magic list ${ansis.gray('| bun-magic ls')}`;

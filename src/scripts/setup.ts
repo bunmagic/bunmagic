@@ -1,4 +1,4 @@
-import * as config from '../lib/config';
+import * as config from '@lib/config';
 import {addSourceDirectory} from './link';
 
 export const desc = 'Install bun-magic and set up your environment';
@@ -121,8 +121,8 @@ export default async function setup() {
 		throw new Exit('Can\'t find $PATH variable. Exiting.');
 	}
 
-	const bun-magic = await $`which bun-magic`.quiet().text();
-	if (bun-magic.trim() === '') {
+	const existingMagic = await $`which bun-magic`.quiet().text();
+	if (existingMagic.trim() === '') {
 		console.log('bun-magic is already installed globally.');
 	} else {
 		console.log('Installing bun-magic globally...');

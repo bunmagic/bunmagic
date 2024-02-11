@@ -1,5 +1,5 @@
-import {PATHS} from '../lib/config';
-import {getSources} from '../lib/sources';
+import {PATHS} from '@lib/config';
+import {getSources} from '@lib/sources';
 
 export const desc = 'Ensure all your script files have an executable in the bin directory.';
 export const usage = 'bun-magic bins [--force]';

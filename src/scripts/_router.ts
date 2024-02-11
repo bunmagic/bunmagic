@@ -1,5 +1,5 @@
-import {slugify} from '../lib/utils';
-import type {RouterCallback} from '../lib/router';
+import {slugify} from '@lib/utils';
+import type {RouterCallback} from '@lib/router';
 import help from './help';
 import {create} from './create';
 import version from './version';

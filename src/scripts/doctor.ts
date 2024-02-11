@@ -1,4 +1,4 @@
-import {getSources} from '../lib/sources';
+import {getSources} from '@lib/sources';
 import {addSourceDirectory} from './link';
 import {relinkBins} from './bins';
 
