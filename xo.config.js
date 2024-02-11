@@ -3,11 +3,16 @@ export default {
 		'plugin:@typescript-eslint/recommended',
 	],
 	rules: {
-		'no-await-in-loop': 0,
+		// Allow importing files without extensions
 		'import/extensions': 0,
+		// There's a lot of async loops here - allow await in loops.
+		'no-await-in-loop': 0,
 		'@typescript-eslint/no-require-imports': 0,
+		// Allow exporting anonymous functions
 		'import/no-anonymous-default-export': 0,
+		// I'm not sure I agree that everything should be a nullish coalescing operator
 		'@typescript-eslint/prefer-nullish-coalescing': 0,
+		// Allow UPPER_CASE_CONSTANTS
 		'@typescript-eslint/naming-convention': [
 			'error',
 			{
@@ -35,6 +40,7 @@ export default {
 				],
 			},
 		],
+		// It's a CLI application, `bin` is a common abbreviation for `binary`
 		'unicorn/prevent-abbreviations': [
 			'error',
 			{
@@ -43,8 +49,11 @@ export default {
 				},
 			},
 		],
+		// `prompt` and `confirm` are useful for CLI applications
 		'no-alert': 0,
+		// Allow `process.exit()`
 		'n/prefer-global/process': 0,
+		// Adding multiple lines can be useful for readability
 		'no-multiple-empty-lines': 0,
 	},
 };
