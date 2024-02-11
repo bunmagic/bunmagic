@@ -1,3 +1,3 @@
-# bunism
+# bun-magic
 
 WIP

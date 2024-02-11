@@ -19,7 +19,7 @@
 		"noFallthroughCasesInSwitch": true,
 		"forceConsistentCasingInFileNames": true,
 		"paths": {
-			"bunism/run": [
+			"bun-magic/run": [
 				"./src/run.ts"
 			],
 		}

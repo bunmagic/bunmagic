@@ -6,7 +6,7 @@ import {
 } from '../lib/sources';
 
 export const desc = 'Remove and unlink a script';
-export const usage = 'bunism remove <script-name>';
+export const usage = 'bun-magic remove <script-name>';
 export const alias = ['rm'];
 
 async function removeNamespace(query: string) {

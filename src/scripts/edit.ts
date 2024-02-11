@@ -5,8 +5,8 @@ import {
 import {openEditor} from '../lib/utils';
 import {create} from './create';
 
-export const desc = 'Edit scripts. If no script name is specified, will open all scripts and the ~/.bunism directory';
-export const usage = 'bunism edit [script-name]';
+export const desc = 'Edit scripts. If no script name is specified, will open all scripts and the ~/.bun-magic directory';
+export const usage = 'bun-magic edit [script-name]';
 
 export default async function () {
 	const slug = argv._.join(' ');

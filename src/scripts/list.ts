@@ -3,7 +3,7 @@ import {
 } from '../lib/sources';
 
 export const desc = 'List all known scripts.';
-export const usage = `bunism list ${ansis.gray('| bunism ls')}`;
+export const usage = `bun-magic list ${ansis.gray('| bun-magic ls')}`;
 export const alias = ['ls'];
 
 export default async function () {

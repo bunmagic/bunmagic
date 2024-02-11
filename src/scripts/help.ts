@@ -4,7 +4,7 @@ import type {
 
 export const name = 'help';
 export const desc = 'Get the full list of available commands';
-export const usage = 'bunism help';
+export const usage = 'bun-magic help';
 
 function describeCommand(command: CMD) {
 	let desc = `  • ${ansis.bold(command.name)} `;

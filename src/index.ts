@@ -26,7 +26,7 @@ declare global {
 	const $HOME: typeof globals.$HOME;
 }
 
-const customGlobalsFile = `${os.homedir()}/.bunism/custom-globals.ts`;
+const customGlobalsFile = `${os.homedir()}/.bun-magic/custom-globals.ts`;
 if (await Bun.file(customGlobalsFile).exists()) {
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 	const customGlobals = await import(customGlobalsFile);

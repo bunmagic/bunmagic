@@ -1,8 +1,8 @@
 import * as config from '../lib/config';
 import {addSourceDirectory} from './link';
 
-export const desc = 'Install bunism and set up your environment';
-export const usage = 'bunism install';
+export const desc = 'Install bun-magic and set up your environment';
+export const usage = 'bun-magic install';
 
 async function require<T>(callback: () => Promise<T>, attempts = 3): Promise<T> {
 	while (attempts > 0) {
@@ -31,11 +31,11 @@ async function setupBinaryPath(binaryPath: string) {
 	const rcFiles = await availableRcFiles();
 
 	const select = [...rcFiles, 'Custom'];
-	let rcFile = selection(select, 'Which file would you like to add bunism to?');
+	let rcFile = selection(select, 'Which file would you like to add bun-magic to?');
 
 	if (rcFile === 'Custom') {
 		const customFile = await require(async () => {
-			const file = prompt('Enter the path to the file you\'d like to add bunism to:');
+			const file = prompt('Enter the path to the file you\'d like to add bun-magic to:');
 			if (!file) {
 				throw new Exit('No file path provided');
 			}
@@ -60,15 +60,15 @@ async function displayWelcomeMessage() {
 	const dimLine = ansis.dim('===============================================================');
 	const message = `
 	${dimLine}
-	 Welcome to ${ansis.bold('bunism')}!
+	 Welcome to ${ansis.bold('bun-magic')}!
 	${dimLine}
 	
-	 Reload the terminal and run ${ansis.bold('bunism')} to finish the setup process.
+	 Reload the terminal and run ${ansis.bold('bun-magic')} to finish the setup process.
 	
 	 Some useful commands to get you started:
-	 • ${ansis.bold('bunism help')} 			get the full list of available commands
-	 • ${ansis.bold('bunism new my-script')} 	create your first script
-	 • ${ansis.bold('bunism list')} 			see a list of scripts you've defined.
+	 • ${ansis.bold('bun-magic help')} 			get the full list of available commands
+	 • ${ansis.bold('bun-magic new my-script')} 	create your first script
+	 • ${ansis.bold('bun-magic list')} 			see a list of scripts you've defined.
 
 	 ${dimLine}`;
 
@@ -89,13 +89,13 @@ async function setupConfig(bmPath: string) {
 }
 
 export async function uninstall() {
-	const confirm = ack('Are you sure you want to uninstall bunism?');
+	const confirm = ack('Are you sure you want to uninstall bun-magic?');
 	if (!confirm) {
 		return;
 	}
 
 	const rcFiles = await availableRcFiles();
-	const binaryPath = `${$HOME}/.bunism/bin`;
+	const binaryPath = `${$HOME}/.bun-magic/bin`;
 
 	for (const file of rcFiles) {
 		const content = await Bun.file(file).text();
@@ -106,8 +106,8 @@ export async function uninstall() {
 	}
 
 	cd($HOME);
-	await $`rm -rf ${$HOME}/.bunism`;
-	throw new Exit('Uninstalled bunism.');
+	await $`rm -rf ${$HOME}/.bun-magic`;
+	throw new Exit('Uninstalled bun-magic.');
 }
 
 export default async function setup() {
@@ -116,27 +116,27 @@ export default async function setup() {
 		return;
 	}
 
-	console.log(`\nInstalling ${ansis.bold('bunism')}...\n`);
+	console.log(`\nInstalling ${ansis.bold('bun-magic')}...\n`);
 	if (!Bun.env.PATH) {
 		throw new Exit('Can\'t find $PATH variable. Exiting.');
 	}
 
-	const bunism = await $`which bunism`.quiet().text();
-	if (bunism.trim() === '') {
-		console.log('bunism is already installed globally.');
+	const bun-magic = await $`which bun-magic`.quiet().text();
+	if (bun-magic.trim() === '') {
+		console.log('bun-magic is already installed globally.');
 	} else {
-		console.log('Installing bunism globally...');
-		await $`bun install -g bunism`;
+		console.log('Installing bun-magic globally...');
+		await $`bun install -g bun-magic`;
 	}
 
-	console.log('\n- Setting up the necessary paths for bunism scripts to run.');
-	const bmPath = `${$HOME}/.bunism`;
+	console.log('\n- Setting up the necessary paths for bun-magic scripts to run.');
+	const bmPath = `${$HOME}/.bun-magic`;
 	const binaryPath = path.join(bmPath, 'bin');
 	if (!Bun.env.PATH.includes(bmPath)) {
 		await setupBinaryPath(binaryPath);
 	}
 
-	console.log('\n- Setting up the bunism config file.');
+	console.log('\n- Setting up the bun-magic config file.');
 	await ensureDirectory(binaryPath);
 	await setupConfig(bmPath);
 
@@ -146,9 +146,9 @@ export default async function setup() {
 	}
 
 	const bmAliasBinary = `${binaryPath}/bm`;
-	const bmAliasQuestion = `\n- Do you want to setup ${ansis.bold('bm')} as a shortcut for ${ansis.bold('bunism')}?`;
+	const bmAliasQuestion = `\n- Do you want to setup ${ansis.bold('bm')} as a shortcut for ${ansis.bold('bun-magic')}?`;
 	if (!await Bun.file(bmAliasBinary).exists() && Bun.which('bm') === null && ack(bmAliasQuestion)) {
-		await Bun.write(`${bmAliasBinary}`, '#!/bin/bash\nbunism $@');
+		await Bun.write(`${bmAliasBinary}`, '#!/bin/bash\nbun-magic $@');
 		await $`chmod +x ${bmAliasBinary}`;
 		console.log(`\n- Created a new bin: ${ansis.bold('bm')} -> ${bmAliasBinary} \n`);
 	}

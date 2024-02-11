@@ -1,12 +1,12 @@
 export const PATHS: {
-	bunism: string;
+	bun-magic: string;
 	bins: string;
 	config: string;
 	source: string;
 } = {
-	bunism: `${$HOME}/.bunism`,
-	bins: `${$HOME}/.bunism/bin`,
-	config: `${$HOME}/.bunism/config.json`,
+	bun-magic: `${$HOME}/.bun-magic`,
+	bins: `${$HOME}/.bun-magic/bin`,
+	config: `${$HOME}/.bun-magic/config.json`,
 	source: Bun.env.BUNS_PATH ?? `${os.homedir()}/.buns`,
 };
 
@@ -26,7 +26,7 @@ export type Script = {
 	command: string;
 	/**
 	 * The full path to the bin file, for example
-	 * `~/.bunism/bins/my-command`
+	 * `~/.bun-magic/bins/my-command`
 	 */
 	bin: string;
 	/**

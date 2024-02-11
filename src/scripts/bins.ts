@@ -2,7 +2,7 @@ import {PATHS} from '../lib/config';
 import {getSources} from '../lib/sources';
 
 export const desc = 'Ensure all your script files have an executable in the bin directory.';
-export const usage = 'bunism bins [--force]';
+export const usage = 'bun-magic bins [--force]';
 
 function template(name: string, scriptPath: string, exec: string): string {
 	let output = '#!/bin/bash\n';
@@ -16,7 +16,7 @@ export async function getBins(): Promise<string[]> {
 }
 
 export async function ensureBin(binaryName: string, targetPath: string, namespace = false) {
-	const exec = namespace ? 'bunism-exec-namespace' : 'bunism-exec';
+	const exec = namespace ? 'bun-magic-exec-namespace' : 'bun-magic-exec';
 	const binaryPath = path.join(PATHS.bins, binaryName);
 
 	if (argv.force === true && await Bun.file(binaryPath).exists()) {
