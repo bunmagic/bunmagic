@@ -2,7 +2,7 @@ import {PATHS} from '@lib/config';
 import {getScripts, getSources} from '@lib/sources';
 
 export const desc = 'Reload your script files and ensure that they have an executable bin.';
-export const usage = 'bun-magic reload [--force]';
+export const usage = 'bunmagic reload [--force]';
 
 function template(name: string, scriptPath: string, exec: string): string {
 	let output = '#!/bin/bash\n';
@@ -16,7 +16,7 @@ export async function getBins(): Promise<string[]> {
 }
 
 export async function ensureBin(binaryName: string, targetPath: string, namespace = false) {
-	const exec = namespace ? 'bun-magic-exec-namespace' : 'bun-magic-exec';
+	const exec = namespace ? 'bunmagic-exec-namespace' : 'bunmagic-exec';
 	const binaryPath = path.join(PATHS.bins, binaryName);
 
 	if (argv.force === true && await Bun.file(binaryPath).exists()) {

@@ -1,5 +1,5 @@
 {
-	"name": "bun-magic",
+	"name": "bunmagic",
 	"dependencies": {
 		"ansis": "^2.1.0"
 	},
@@ -11,9 +11,9 @@
 		"xo": "^0.57.0"
 	},
 	"bin": {
-		"bun-magic": "src/bin/bun-magic.ts",
-		"bun-magic-exec": "src/bin/bun-magic-exec.ts",
-		"bun-magic-exec-namespace": "src/bin/bun-magic-exec-namespace.ts"
+		"bunmagic": "src/bin/bunmagic.ts",
+		"bunmagic-exec": "src/bin/bunmagic-exec.ts",
+		"bunmagic-exec-namespace": "src/bin/bunmagic-exec-namespace.ts"
 	},
 	"scripts": {
 		"fix": "xo --fix",

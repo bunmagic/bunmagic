@@ -5,11 +5,11 @@ import {getSources} from '@lib/sources';
 import {reloadBins} from './reload';
 
 export const desc = 'Add an additional directory to use as script source.';
-export const usage = 'bun-magic link';
+export const usage = 'bunmagic link';
 
 export async function addSourceDirectory(target?: string) {
 	const sources = await getSources().catch(() => [] as Collection[]);
-	let defaultSource = `${PATHS['bun-magic']}/default`;
+	let defaultSource = `${PATHS.bunmagic}/default`;
 
 	if (sources.some(source => source.dir === defaultSource)) {
 		defaultSource = process.cwd();

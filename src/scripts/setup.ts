@@ -2,8 +2,8 @@ import * as config from '@lib/config';
 import {setupAlias} from '@lib/setup';
 import {addSourceDirectory} from './link';
 
-export const desc = 'Install bun-magic and set up your environment';
-export const usage = 'bun-magic install';
+export const desc = 'Install bunmagic and set up your environment';
+export const usage = 'bunmagic install';
 
 async function require<T>(callback: () => Promise<T>, attempts = 3): Promise<T> {
 	while (attempts > 0) {
@@ -32,11 +32,11 @@ async function setupBinaryPath(binaryPath: string) {
 	const rcFiles = await availableRcFiles();
 
 	const select = [...rcFiles, 'Custom'];
-	let rcFile = selection(select, 'Which file would you like to add bun-magic to?');
+	let rcFile = selection(select, 'Which file would you like to add bunmagic to?');
 
 	if (rcFile === 'Custom') {
 		const customFile = await require(async () => {
-			const file = prompt('Enter the path to the file you\'d like to add bun-magic to:');
+			const file = prompt('Enter the path to the file you\'d like to add bunmagic to:');
 			if (!file) {
 				throw new Exit('No file path provided');
 			}
@@ -61,15 +61,15 @@ async function displayWelcomeMessage() {
 	const dimLine = ansis.dim('===============================================================');
 	const message = `
 	${dimLine}
-	 Welcome to ${ansis.bold('bun-magic')}!
+	 Welcome to ${ansis.bold('bunmagic')}!
 	${dimLine}
 	
-	 Reload the terminal and run ${ansis.bold('bun-magic')} to finish the setup process.
+	 Reload the terminal and run ${ansis.bold('bunmagic')} to finish the setup process.
 	
 	 Some useful commands to get you started:
-	 • ${ansis.bold('bun-magic help')} 			get the full list of available commands
-	 • ${ansis.bold('bun-magic new my-script')} 	create your first script
-	 • ${ansis.bold('bun-magic list')} 			see a list of scripts you've defined.
+	 • ${ansis.bold('bunmagic help')} 			get the full list of available commands
+	 • ${ansis.bold('bunmagic new my-script')} 	create your first script
+	 • ${ansis.bold('bunmagic list')} 			see a list of scripts you've defined.
 
 	 ${dimLine}`;
 
@@ -90,13 +90,13 @@ async function setupConfig(bmPath: string) {
 }
 
 export async function uninstall() {
-	const confirm = ack('Are you sure you want to uninstall bun-magic?');
+	const confirm = ack('Are you sure you want to uninstall bunmagic?');
 	if (!confirm) {
 		return;
 	}
 
 	const rcFiles = await availableRcFiles();
-	const binaryPath = `${$HOME}/.bun-magic/bin`;
+	const binaryPath = `${$HOME}/.bunmagic/bin`;
 
 	for (const file of rcFiles) {
 		const content = await Bun.file(file).text();
@@ -107,8 +107,8 @@ export async function uninstall() {
 	}
 
 	cd($HOME);
-	await $`rm -rf ${$HOME}/.bun-magic`;
-	throw new Exit('Uninstalled bun-magic.');
+	await $`rm -rf ${$HOME}/.bunmagic`;
+	throw new Exit('Uninstalled bunmagic.');
 }
 
 export default async function setup() {
@@ -117,27 +117,27 @@ export default async function setup() {
 		return;
 	}
 
-	console.log(`\nInstalling ${ansis.bold('bun-magic')}...\n`);
+	console.log(`\nInstalling ${ansis.bold('bunmagic')}...\n`);
 	if (!Bun.env.PATH) {
 		throw new Exit('Can\'t find $PATH variable. Exiting.');
 	}
 
-	const existingMagic = await $`which bun-magic`.quiet().text();
+	const existingMagic = await $`which bunmagic`.quiet().text();
 	if (existingMagic.trim() === '') {
-		console.log('bun-magic is already installed globally.');
+		console.log('bunmagic is already installed globally.');
 	} else {
-		console.log('Installing bun-magic globally...');
-		await $`bun install -g bun-magic`;
+		console.log('Installing bunmagic globally...');
+		await $`bun install -g bunmagic`;
 	}
 
-	console.log('\n- Setting up the necessary paths for bun-magic scripts to run.');
-	const bmPath = `${$HOME}/.bun-magic`;
+	console.log('\n- Setting up the necessary paths for bunmagic scripts to run.');
+	const bmPath = `${$HOME}/.bunmagic`;
 	const binaryPath = path.join(bmPath, 'bin');
 	if (!Bun.env.PATH.includes(bmPath)) {
 		await setupBinaryPath(binaryPath);
 	}
 
-	console.log('\n- Setting up the bun-magic config file.');
+	console.log('\n- Setting up the bunmagic config file.');
 	await ensureDirectory(binaryPath);
 	await setupConfig(bmPath);
 

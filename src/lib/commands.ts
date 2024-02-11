@@ -21,7 +21,7 @@ export type Script = {
 	command: string;
 	/**
 	 * The full path to the bin file, for example
-	 * `~/.bun-magic/bins/my-command`
+	 * `~/.bunmagic/bins/my-command`
 	 */
 	bin: string;
 	/**

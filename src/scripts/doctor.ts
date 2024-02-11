@@ -3,8 +3,8 @@ import {setupAlias} from '@lib/setup';
 import {addSourceDirectory} from './link';
 import {reloadBins} from './reload';
 
-export const desc = 'Check if bun-magic is set up correctly';
-export const usage = 'bun-magic doctor';
+export const desc = 'Check if bunmagic is set up correctly';
+export const usage = 'bunmagic doctor';
 
 type CheckCallback = () => Promise<{
 	level: Levels;
@@ -46,7 +46,7 @@ function response(status: Levels, followup?: () => Promise<unknown>) {
 
 export default async function setup() {
 	const PATH = Bun.env.PATH;
-	const BIN_PATH = `${$HOME}/.bun-magic/bin` as const;
+	const BIN_PATH = `${$HOME}/.bunmagic/bin` as const;
 
 	await check(
 		'$PATH is set',
@@ -67,12 +67,12 @@ export default async function setup() {
 		async () => {
 			const sources = await getSources();
 			if (sources.length === 0) {
-				console.log('Welcome! Where should bun-magic store your scripts?');
+				console.log('Welcome! Where should bunmagic store your scripts?');
 				await addSourceDirectory();
 				await reloadBins();
 
 				console.log('All done! If you want to add more source directories,');
-				console.log(`run ${ansis.bold('bun-magic link')}`);
+				console.log(`run ${ansis.bold('bunmagic link')}`);
 			}
 
 			return response(sources.length > 0 ? 'ok' : 'warning');

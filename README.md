@@ -1,3 +1,3 @@
-# bun-magic
+# bunmagic
 
 WIP
