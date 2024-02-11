@@ -23,7 +23,7 @@ const router: RouterCallback = async (_, __, cmd, command, commands) => {
 			await create(input);
 			return;
 		} catch (error) {
-			die(error);
+			throw new Exit(error);
 		}
 	}
 
@@ -37,7 +37,7 @@ const router: RouterCallback = async (_, __, cmd, command, commands) => {
 		argv._.shift();
 		await cmd();
 	} catch (error) {
-		die(error);
+		throw new Exit(error);
 	}
 };
 

@@ -39,7 +39,7 @@ async function scriptPath(slug: string): Promise<PartialScriptPath> {
 	// Check if a command with this name already exists on the system
 	if (commandExists.exitCode !== 1) {
 		const alias = await $`which ${slug}`.text();
-		die(`Command "${ansis.bold(slug)}" is already aliased to "${alias.trim()}"\n`);
+		throw new Exit(`Command "${ansis.bold(slug)}" is already aliased to "${alias.trim()}"\n`);
 	}
 
 	// Where to place the script?
@@ -89,7 +89,7 @@ export async function create(command: string) {
 
 	console.log(ansis.dim(`Creating new script: ${editFilePath}`));
 	if (!ack(`Create new command "${ansis.bold(command)}" ? `)) {
-		die('Aborted');
+		throw new Exit('Aborted');
 	}
 
 	const binaryFile = await ensureBin(binaryName, targetPath, Boolean(namespace));

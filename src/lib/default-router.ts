@@ -10,7 +10,7 @@ const router: RouterCallback = async (namespace, name, script, command, commands
 		try {
 			await create(input);
 		} catch (error) {
-			die(error);
+			throw new Exit(error);
 		}
 
 		return;
@@ -29,7 +29,7 @@ const router: RouterCallback = async (namespace, name, script, command, commands
 		try {
 			await script();
 		} catch (error) {
-			die(error);
+			throw new Exit(error);
 		}
 	} else {
 		console.log('No command found.');
