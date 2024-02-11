@@ -1,18 +1,18 @@
-import type { RouterCallback } from '../lib/commands';
+import type {RouterCallback} from '../lib/commands';
+import {slugify} from '../lib/utils';
 import help from './help';
-import { create } from './create';
+import {create} from './create';
 import version from './version';
-import { slugify } from '../lib/utils';
 
 export const isRouter = true;
 const router: RouterCallback = async (_, __, cmd, command, commands) => {
-	const input = argv._.map(t => slugify(t)).join(" ");
-	if (argv.v || argv.version || input === "version") {
+	const input = argv._.map(t => slugify(t)).join(' ');
+	if (argv.v || argv.version || input === 'version') {
 		await version();
 		return;
 	}
 
-	if (argv.h || argv.help || input === "help") {
+	if (argv.h || argv.help || input === 'help') {
 		await help(commands);
 		return;
 	}
@@ -22,8 +22,8 @@ const router: RouterCallback = async (_, __, cmd, command, commands) => {
 		try {
 			await create(input);
 			return;
-		} catch (e) {
-			die(e);
+		} catch (error) {
+			die(error);
 		}
 	}
 
@@ -32,13 +32,13 @@ const router: RouterCallback = async (_, __, cmd, command, commands) => {
 		return;
 	}
 
-
 	try {
 		// Shift the first argument off the list and run the command.
 		argv._.shift();
-		return await cmd();
-	} catch (e) {
-		die(e);
+		await cmd();
+	} catch (error) {
+		die(error);
 	}
-}
+};
+
 export default router;

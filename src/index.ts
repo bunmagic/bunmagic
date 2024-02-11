@@ -1,7 +1,7 @@
-import * as globals from "./globals/index";
+import * as globals from './globals/index';
 
 const BUNS_GLOBAL = {
-	verbose: true
+	verbose: true,
 };
 
 Object.assign(globalThis, {
@@ -18,16 +18,17 @@ declare global {
 	const selection: typeof globals.selection;
 	const cd: typeof globals.cd;
 	const ack: typeof globals.ack;
-	const isDir: typeof globals.isDir;
-	const ensureDir: typeof globals.ensureDir;
+	const isDirectory: typeof globals.isDirectory;
+	const ensureDirectory: typeof globals.ensureDirectory;
 	const notMinimist: typeof globals.notMinimist;
-	const die: typeof globals.die;
+	const Exit: typeof globals.Exit; // eslint-disable-line @typescript-eslint/naming-convention
 	const os: typeof globals.os;
 	const $HOME: typeof globals.$HOME;
 }
 
 const customGlobalsFile = `${os.homedir()}/.bunism/custom-globals.ts`;
 if (await Bun.file(customGlobalsFile).exists()) {
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 	const customGlobals = await import(customGlobalsFile);
 	Object.assign(globalThis, customGlobals);
 }

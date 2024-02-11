@@ -1,8 +1,16 @@
+export const name = 'version';
+export const desc = 'Display the current version of bunism';
 
-export const name = "version";
-export const desc = "Display the current version of bunism";
+type PackageJson = {
+	version: string;
+};
 
-export default async function version() {
-	const pkg = require("../../package.json");
-	console.log(pkg.version);
+export async function getVersion() {
+	const packageFile = path.resolve(import.meta.dir, '../../package.json');
+	const packageJson = await Bun.file(packageFile).json<PackageJson>();
+	return packageJson.version;
+}
+
+export default async function () {
+	console.log(await getVersion());
 }

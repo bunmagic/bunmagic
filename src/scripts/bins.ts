@@ -1,49 +1,45 @@
-import { PATHS } from '../lib/config';
-import { getSources } from '../lib/sources';
+import {PATHS} from '../lib/config';
+import {getSources} from '../lib/sources';
 
-export const desc = "Ensure all your script files have an executable in the bin directory.";
-export const usage = `bunism bins [--force]`;
+export const desc = 'Ensure all your script files have an executable in the bin directory.';
+export const usage = 'bunism bins [--force]';
 
 function template(name: string, scriptPath: string, exec: string): string {
-	let output = "#!/bin/bash\n";
+	let output = '#!/bin/bash\n';
 	output += `${exec} ${scriptPath} ${name} $@`;
 	return output;
 }
 
-
 export async function getBins(): Promise<string[]> {
-	return (await $`ls ${PATHS.bins}`.text()).split("\n");
+	const result = await $`ls ${PATHS.bins}`.text();
+	return result.split('\n');
 }
 
+export async function ensureBin(binaryName: string, targetPath: string, namespace = false) {
+	const exec = namespace ? 'bunism-exec-namespace' : 'bunism-exec';
+	const binaryPath = path.join(PATHS.bins, binaryName);
 
-export async function ensureBin(binName: string, targetPath: string, namespace = false) {
-	const exec = namespace ? "bunism-exec-namespace" : "bunism-exec";
-	const binPath = path.join(PATHS.bins, binName);
-
-	if (argv.force === true && (await Bun.file(binPath).exists()) === true) {
-		console.log(`Removing ${ansis.bold(binName)} bin file`);
-		await $`rm ${binPath}`
+	if (argv.force === true && await Bun.file(binaryPath).exists()) {
+		console.log(`Removing ${ansis.bold(binaryName)} bin file`);
+		await $`rm ${binaryPath}`;
 	}
 
-	if (false !== await Bun.file(binPath).exists()) {
+	if (await Bun.file(binaryPath).exists()) {
 		return false;
 	}
 
 	// Create bin
-	await ensureDir(PATHS.bins);
-	await Bun.write(binPath, template(binName, targetPath, exec));
-	await $`chmod +x ${binPath}`;
+	await ensureDirectory(PATHS.bins);
+	await Bun.write(binaryPath, template(binaryName, targetPath, exec));
+	await $`chmod +x ${binaryPath}`;
 
-	console.log(`Created new bin: ${binName} -> ${binPath}\n`);
-	return binPath;
+	console.log(`Created new bin: ${binaryName} -> ${binaryPath}\n`);
+	return binaryPath;
 }
-
-
 
 export async function relinkBins() {
 	let count = 0;
 	for (const source of await getSources()) {
-
 		if (source.namespace) {
 			if (await ensureBin(source.namespace, source.dir, true)) {
 				count++;
@@ -56,14 +52,15 @@ export async function relinkBins() {
 			}
 		}
 	}
+
 	return count > 0;
 }
 
 export default async function () {
 	if (await relinkBins()) {
-		console.log("\nDone!");
+		console.log('\nDone!');
 	} else {
-		console.log("All executables are already linked.");
-		console.log(ansis.gray("Use the --force if you must"));
+		console.log('All executables are already linked.');
+		console.log(ansis.gray('Use the --force if you must'));
 	}
 }

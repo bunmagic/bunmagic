@@ -1,18 +1,19 @@
-import fs from "node:fs";
+import fs from 'node:fs';
 
-export async function isDir(path: string) {
+export async function isDirectory(path: string) {
 	const file = Bun.file(path);
-	return file.size !== 0 && file.type === "dir";
+	return file.size > 0 && file.type === 'dir';
 }
 
-export async function ensureDir(path: string) {
-	if (!await isDir(path)) {
-		fs.mkdir(path, { recursive: true }, (err) => {
-			if (err) {
-				console.error(err);
+export async function ensureDirectory(path: string) {
+	if (!await isDirectory(path)) {
+		fs.mkdir(path, {recursive: true}, error => {
+			if (error) {
+				console.error(error);
 				throw new Error(`Couldn't create directory: ${path}`);
 			}
 		});
 	}
+
 	return true;
 }

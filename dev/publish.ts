@@ -1,20 +1,28 @@
-import semver from 'semver';
+import semver, {type ReleaseType} from 'semver';
 
-if (ack("Increment version number?")) {
-	const pkgFile = path.resolve(import.meta.dir, "../package.json");
-	const pkgJson = await Bun.file(pkgFile).json();
+type PackageJson = {
+	version: string;
+};
+if (ack('Increment version number?')) {
+	const packageFile = path.resolve(import.meta.dir, '../package.json');
+	const packageJson = await Bun.file(packageFile).json<PackageJson>();
 
-	const increments = ['prerelease', 'major', 'minor', 'patch'];
-	const increment = selection(increments, "What kind of patch is this?");
-	const cv = semver.parse(pkgJson.version);
+	const increments: ReleaseType[] = ['prerelease', 'major', 'minor', 'patch'];
+	const increment = selection(increments, 'What kind of patch is this?');
+	const cv = semver.parse(packageJson.version);
+	if (!cv) {
+		throw new Error('Invalid version');
+	}
+
 	const nv = semver.inc(cv, increment);
-
-	pkgJson.version = nv;
-	await Bun.write(pkgFile, JSON.stringify(pkgJson, null, 2));
-	console.log(`\nUpdated version from ${cv} to ${nv}`);
+	if (nv) {
+		packageJson.version = nv;
+		await Bun.write(packageFile, JSON.stringify(packageJson, null, 2));
+		console.log(`\nUpdated version from ${cv.version} to ${nv}`);
+	}
 }
 
-if (ack("Do you want to publish this version?")) {
-	await $`npm publish > /dev/tty`
-	console.log(`Done!`);
+if (ack('Do you want to publish this version?')) {
+	await $`npm publish > /dev/tty`;
+	console.log('Done!');
 }

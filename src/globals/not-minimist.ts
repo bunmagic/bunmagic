@@ -8,39 +8,41 @@ type NmArgv = {
 	flags: Record<string, Flag>;
 	args: string[];
 };
-export function notMinimist(args: string[]) {
+export function notMinimist(arguments_: string[]) {
 	const output: NmArgv = {
 		flags: {},
-		args: []
+		args: [],
 	};
 
-	for (let i = 0; i < args.length; i++) {
+	for (let index = 0; index < arguments_.length; index++) {
 		let value: string | number | boolean | undefined;
-		const arg = args[i];
-		if (arg.startsWith("--") || arg.startsWith("-")) {
-			let [key, rawValue] = arg.replace(/^--?/, '').split("=");
+		const argument = arguments_[index];
+		if (argument.startsWith('--') || argument.startsWith('-')) {
+			const [key, rawValue] = argument.replace(/^--?/, '').split('=');
 			value = rawValue;
 			if (value === undefined) {
-				const nextArg = args[i + 1];
-				if (nextArg && !nextArg.startsWith("-")) {
-					value = nextArg;
-					i++;
+				const nextArgument = arguments_[index + 1];
+				if (nextArgument && !nextArgument.startsWith('-')) {
+					value = nextArgument;
+					index++;
 				} else {
 					value = true;
 				}
 			}
 
-			if (typeof value !== 'boolean' && !isNaN(value as any)) {
-				value = parseInt(value);
+			if (typeof value !== 'boolean' && !Number.isNaN(value)) {
+				value = Number.parseInt(value, 10);
 			}
+
 			output.flags[key] = value;
 		} else {
-			output.args.push(arg);
+			output.args.push(argument);
 		}
 	}
 
+	// eslint-disable-next-line @typescript-eslint/consistent-type-assertions
 	return {
 		_: output.args,
 		...output.flags,
-	} as Record<string, string | boolean | undefined> & { _: string[] };
+	} as Record< string, Flag > & {_: string[]};
 }

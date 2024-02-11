@@ -1,7 +1,10 @@
 {
 	"rules": {
+		"no-await-in-loop": 0,
 		"import/extensions": 0,
 		"@typescript-eslint/no-require-imports": 0,
+		"import/no-anonymous-default-export": 0,
+		"@typescript-eslint/prefer-nullish-coalescing": 0,
 		"@typescript-eslint/naming-convention": [
 			"error",
 			{
@@ -19,15 +22,7 @@
 					"boolean"
 				],
 				"format": [
-					"PascalCase"
-				],
-				"prefix": [
-					"is",
-					"should",
-					"has",
-					"can",
-					"did",
-					"will"
+					"camelCase"
 				]
 			},
 			{
@@ -36,6 +31,16 @@
 					"PascalCase"
 				]
 			}
-		]
+		],
+		"unicorn/prevent-abbreviations": [
+			"error",
+			{
+				"allowList": {
+					"bin": true
+				}
+			}
+		],
+		"no-alert": 0,
+		"n/prefer-global/process": 0
 	}
 }
