@@ -1,5 +1,6 @@
 export const name = 'version';
 export const desc = 'Display the current version of bun-magic';
+export const usage = 'bun-magic version';
 
 type PackageJson = {
 	version: string;
