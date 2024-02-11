@@ -2,6 +2,7 @@ import {getVersion} from './version';
 
 export const name = 'update';
 export const desc = 'Update bun-magic to the latest version';
+export const usage = 'bun-magic update';
 
 export default async function update() {
 	const cv = await getVersion();
