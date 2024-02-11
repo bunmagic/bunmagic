@@ -135,7 +135,7 @@ export async function getCommands(files: string[]): Promise<CommandList> {
 	}
 
 	if (router === undefined) {
-		const defaultRouter = path.resolve(import.meta.dirname, 'default-router.ts');
+		const defaultRouter = path.resolve(import.meta.dirname, 'router.ts');
 		router = {
 			type: 'router',
 			file: defaultRouter,
