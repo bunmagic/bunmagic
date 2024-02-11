@@ -53,6 +53,6 @@ export class Exit extends Error {
 
 	private exit(code: number) {
 		// eslint-disable-next-line unicorn/no-process-exit
-		process.exit(1);
+		process.exit(code);
 	}
 }
