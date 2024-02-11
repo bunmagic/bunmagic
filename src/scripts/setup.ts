@@ -1,4 +1,5 @@
 import * as config from '@lib/config';
+import {setupAlias} from '@lib/setup';
 import {addSourceDirectory} from './link';
 
 export const desc = 'Install bun-magic and set up your environment';
@@ -145,13 +146,7 @@ export default async function setup() {
 		await addSourceDirectory();
 	}
 
-	const bmAliasBinary = `${binaryPath}/bm`;
-	const bmAliasQuestion = `\n- Do you want to setup ${ansis.bold('bm')} as a shortcut for ${ansis.bold('bun-magic')}?`;
-	if (!await Bun.file(bmAliasBinary).exists() && Bun.which('bm') === null && ack(bmAliasQuestion)) {
-		await Bun.write(`${bmAliasBinary}`, '#!/bin/bash\nbun-magic $@');
-		await $`chmod +x ${bmAliasBinary}`;
-		console.log(`\n- Created a new bin: ${ansis.bold('bm')} -> ${bmAliasBinary} \n`);
-	}
+	await setupAlias(binaryPath);
 
 	// Welcome!
 	await displayWelcomeMessage();
