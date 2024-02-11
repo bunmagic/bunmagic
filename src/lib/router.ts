@@ -2,16 +2,36 @@ import {create} from '../scripts/create';
 import help from '../scripts/help';
 import type {Command, NotFound, InstantScript} from './commands';
 
-export type RouterCallback = (
-	namespace: string,
-	name: string,
-	cmd: () => Promise<void>,
-	command: Command | NotFound | InstantScript | undefined,
-	commands: Map<string, Command | NotFound | InstantScript>
-) => Promise<void>;
+export type Route = {
+	/**
+	 * The namespace of the command.
+	 * For example: `git commit` would be `git`.
+	 */
+	namespace: string;
+	/**
+	 * The name of the command.
+	 * For example: `git commit` would be `commit`.
+	 */
+	name: string;
+	/**
+	 * Information about the script that's being run.
+	 */
+	command: Command | NotFound | InstantScript | undefined;
+	/**
+	 * A list of all available scripts.
+	 */
+	commands: Map<string, Command | NotFound | InstantScript>;
+	/**
+	 * The script to run.
+	 * The router is responsible for running this script and handling any errors.
+	 */
+	script: () => Promise<void>;
+};
+
+export type RouterCallback = (route: Route) => Promise<void>;
 
 
-const router: RouterCallback = async (namespace, name, script, command, commands) => {
+const router: RouterCallback = async ({namespace, name, script, command, commands}) => {
 	const input = `${namespace} ${name}`;
 
 	// Offer to create utility if it doesn't exist.

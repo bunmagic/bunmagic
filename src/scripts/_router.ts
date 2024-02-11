@@ -5,7 +5,7 @@ import {create} from './create';
 import version from './version';
 
 export const isRouter = true;
-const router: RouterCallback = async (_, __, cmd, command, commands) => {
+const router: RouterCallback = async ({script, command, commands}) => {
 	const input = argv._.map(t => slugify(t)).join(' ');
 	if (argv.v || argv.version || input === 'version') {
 		await version();
@@ -33,9 +33,9 @@ const router: RouterCallback = async (_, __, cmd, command, commands) => {
 	}
 
 	try {
-		// Shift the first argument off the list and run the command.
+		// Shift the first argument off the list and run the script.
 		argv._.shift();
-		await cmd();
+		await script();
 	} catch (error) {
 		throw new Exit(error);
 	}
