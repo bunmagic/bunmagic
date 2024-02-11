@@ -2,7 +2,7 @@ import {
 	PATHS, update, type Namespace, type ScriptCollection,
 } from '@lib/config';
 import {getSources} from '@lib/sources';
-import {relinkBins} from './bins';
+import {reloadBins} from './reload';
 
 export const desc = 'Add an additional directory to use as script source.';
 export const usage = 'bun-magic link';
@@ -59,5 +59,5 @@ export default async function () {
 	await addSourceDirectory(directory);
 
 	// After a new directory is added, it might need to relink
-	await relinkBins();
+	await reloadBins();
 }

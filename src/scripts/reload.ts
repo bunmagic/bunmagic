@@ -1,8 +1,8 @@
 import {PATHS} from '@lib/config';
 import {getSources} from '@lib/sources';
 
-export const desc = 'Ensure all your script files have an executable in the bin directory.';
-export const usage = 'bun-magic bins [--force]';
+export const desc = 'Reload your script files and ensure that they have an executable bin.';
+export const usage = 'bun-magic reload [--force]';
 
 function template(name: string, scriptPath: string, exec: string): string {
 	let output = '#!/bin/bash\n';
@@ -37,7 +37,7 @@ export async function ensureBin(binaryName: string, targetPath: string, namespac
 	return binaryPath;
 }
 
-export async function relinkBins() {
+export async function reloadBins() {
 	let count = 0;
 	for (const source of await getSources()) {
 		if (source.namespace) {
@@ -57,7 +57,7 @@ export async function relinkBins() {
 }
 
 export default async function () {
-	if (await relinkBins()) {
+	if (await reloadBins()) {
 		console.log('\nDone!');
 	} else {
 		console.log('All executables are already linked.');

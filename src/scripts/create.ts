@@ -5,7 +5,7 @@ import {
 } from '@lib/sources';
 import {get} from '@lib/config';
 import {openEditor} from '@lib/utils';
-import {ensureBin} from './bins';
+import {ensureBin} from './reload';
 
 export const desc = 'Create a new script';
 export const usage = 'bun-magic create <script-name>';

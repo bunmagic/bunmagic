@@ -1,6 +1,6 @@
 import {getSources} from '@lib/sources';
 import {addSourceDirectory} from './link';
-import {relinkBins} from './bins';
+import {reloadBins} from './reload';
 
 export const desc = 'Check if bun-magic is set up correctly';
 export const usage = 'bun-magic doctor';
@@ -22,7 +22,7 @@ export default async function setup() {
 	if (sources.length === 0) {
 		console.log('Welcome! Where should bun-magic store your scripts?');
 		await addSourceDirectory();
-		await relinkBins();
+		await reloadBins();
 
 		console.log('All done! If you want to add more source directories,');
 		console.log(`run ${ansis.bold('bun-magic link')}`);
