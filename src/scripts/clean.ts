@@ -1,4 +1,4 @@
-import {getSources} from '@lib/sources';
+import {getScripts, getSources} from '@lib/sources';
 import {getBins} from './reload';
 
 export const desc = 'Remove bin files from the bin directory that don\'t have a matching script.';
@@ -10,13 +10,14 @@ export default async function () {
 	const realBins = await getBins();
 	const sources = await getSources();
 
-	const expectedBins = new Set(sources.flatMap(source => {
+	const expectedBins = new Set(await Promise.all(sources.flatMap(async source => {
 		if (source.namespace) {
 			return source.namespace;
 		}
 
-		return source.scripts.map(script => script.slug);
-	}));
+		const {scripts} = await getScripts(source.dir, source.namespace);
+		return scripts.map(script => script.slug);
+	})));
 
 	for (const binary of realBins) {
 		const name = path.basename(binary);

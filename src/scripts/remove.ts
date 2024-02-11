@@ -1,5 +1,5 @@
 import {
-	PATHS, update, type Namespace,
+	PATHS, update, type Collection,
 } from '@lib/config';
 import {
 	getSources, findNamespace, findScript,
@@ -20,7 +20,7 @@ async function removeNamespace(query: string) {
 	}
 
 	const sources = await getSources();
-	const updatedSources = sources.filter((d): d is Namespace => 'namespace' in d && d.namespace !== source.namespace);
+	const updatedSources = sources.filter((d): d is Collection => 'namespace' in d && d.namespace !== source.namespace);
 	// @TODO: The type doesn't complain, but the type is incorrect. I'm updating both scripts and namespaces.
 	await update('sources', updatedSources);
 }
@@ -66,3 +66,4 @@ export default async function () {
 		console.log(`🍀 You're in luck! "${input}" doesn't exist already!`);
 	}
 }
+

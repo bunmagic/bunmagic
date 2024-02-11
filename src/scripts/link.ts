@@ -1,5 +1,5 @@
 import {
-	PATHS, update, type Namespace, type ScriptCollection,
+	PATHS, update, type Collection,
 } from '@lib/config';
 import {getSources} from '@lib/sources';
 import {reloadBins} from './reload';
@@ -8,7 +8,7 @@ export const desc = 'Add an additional directory to use as script source.';
 export const usage = 'bun-magic link';
 
 export async function addSourceDirectory(target?: string) {
-	const sources = await getSources().catch(() => [] as Array<Namespace | ScriptCollection>);
+	const sources = await getSources().catch(() => [] as Collection[]);
 	let defaultSource = `${PATHS['bun-magic']}/default`;
 
 	if (sources.some(source => source.dir === defaultSource)) {
@@ -41,7 +41,7 @@ export async function addSourceDirectory(target?: string) {
 		scripts: [],
 	});
 	await ensureDirectory(target);
-	await update('sources', sources as Namespace[] | ScriptCollection[]);
+	await update('sources', sources);
 }
 
 export default async function () {

@@ -8,6 +8,43 @@ export type CMD = {
 	alias?: string[];
 };
 
+export type Script = {
+	/**
+	 * The command name, for example:
+	 * `my-command`
+	 */
+	slug: string;
+	/**
+	 * The full command name, for example:
+	 * `my-namespace my-command`
+	 */
+	command: string;
+	/**
+	 * The full path to the bin file, for example
+	 * `~/.bun-magic/bins/my-command`
+	 */
+	bin: string;
+	/**
+	 * The directory path, for example:
+	 * `/path/to/dir `
+	 */
+	dir: string;
+	/**
+	 * The filename, for example:
+	 * `my-command.js`
+	 */
+	filename: string;
+	/**
+	 * The full source path, for example:
+	 * `/path/to/dir/my-command.js`
+	 */
+	source: string;
+};
+
+export type Scripts = {
+	scripts: Script[];
+};
+
 export type InstantScript = CMD & {
 	type: 'instant-script';
 };

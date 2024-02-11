@@ -13,54 +13,21 @@ export const PATHS: {
 export const SUPPORTED_FILES = ['ts', 'mjs', 'js'] as const;
 export type SupportedFiles = typeof SUPPORTED_FILES[number];
 
-export type Script = {
-	/**
-	 * The command name, for example:
-	 * `my-command`
-	 */
-	slug: string;
-	/**
-	 * The full command name, for example:
-	 * `my-namespace my-command`
-	 */
-	command: string;
-	/**
-	 * The full path to the bin file, for example
-	 * `~/.bun-magic/bins/my-command`
-	 */
-	bin: string;
-	/**
-	 * The directory path, for example:
-	 * `/path/to/dir `
-	 */
+export type Collection<NS = unknown> = {
+	namespace: NS extends unknown
+		? string | undefined
+		: NS extends string
+			? NS
+			: undefined;
 	dir: string;
-	/**
-	 * The filename, for example:
-	 * `my-command.js`
-	 */
-	filename: string;
-	/**
-	 * The full source path, for example:
-	 * `/path/to/dir/my-command.js`
-	 */
-	source: string;
 };
 
-export type Namespace = {
-	namespace: string;
-	dir: string;
-	scripts: Script[];
-};
-
-export type ScriptCollection = {
-	namespace: undefined;
-	dir: string;
-	scripts: Script[];
-};
 export type Config = {
 	extension: string & typeof SUPPORTED_FILES[number];
-	sources?: ScriptCollection[] | Namespace[];
+	sources?: Collection[];
 };
+
+export type ConfigKey = keyof Config;
 
 async function config(): Promise<Config> {
 	try {
@@ -72,9 +39,9 @@ async function config(): Promise<Config> {
 	}
 }
 
-export async function get<K extends keyof Config>(key: K, fallback?: Config[K] | undefined): Promise<Config[K] | undefined> {
+export async function get<K extends ConfigKey>(key: K): Promise<Config[K]> {
 	const data = await config();
-	return data[key] ?? fallback;
+	return data[key];
 }
 
 export async function update<K extends keyof Config>(key: K, value: Config[K]) {

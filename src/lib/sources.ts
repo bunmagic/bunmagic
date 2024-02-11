@@ -1,6 +1,7 @@
+import type {Script, Scripts} from '@lib/commands';
 import {
-	PATHS, SUPPORTED_FILES, get, type Script, type Namespace, type ScriptCollection,
-} from './config';
+	PATHS, SUPPORTED_FILES, get, type Collection,
+} from '@lib/config';
 
 export async function listScripts(target: string): Promise<string[]> {
 	const result = await $`ls ${target}`.text();
@@ -25,17 +26,17 @@ async function getScript(file: string, parent?: string): Promise<Script> {
 	};
 }
 
-export async function getScripts(sourcePath: string, namespace?: string): Promise<(ScriptCollection | Namespace)> {
+export async function getScripts<T extends string | undefined>(sourcePath: string, namespace?: T): Promise<Collection<T> & Scripts> {
 	const files = await listScripts(sourcePath);
 	const scripts = await Promise.all(files.map(async file => getScript(file, namespace)));
 	return {
 		dir: sourcePath,
-		namespace,
+		namespace: namespace as Collection<T>['namespace'],
 		scripts,
 	};
 }
 
-export async function getSource(name: string): Promise<ScriptCollection | Namespace> {
+export async function getSource(name: string): Promise<Collection> {
 	const sources = await get('sources');
 	if (!sources) {
 		throw new Error('No sources defined.');
@@ -49,13 +50,13 @@ export async function getSource(name: string): Promise<ScriptCollection | Namesp
 	return getScripts(source.dir, source.namespace);
 }
 
-export async function getSources(): Promise<Array<ScriptCollection | Namespace>> {
+export async function getSources(): Promise<Collection[]> {
 	const sources = await get('sources');
 	if (!sources) {
 		throw new Error('No sources defined.');
 	}
 
-	const output: Array<Promise<(ScriptCollection | Namespace)>> = [];
+	const output: Array<Promise<Collection>> = [];
 	for (const source of sources) {
 		output.push(getScripts(source.dir, source.namespace));
 	}
@@ -76,40 +77,48 @@ export function commandFromString(input: string): [string, string | undefined] {
 	throw new Error('A command should consist of 1 or 2 words.');
 }
 
-export async function findScript(query: string): Promise<Script | undefined> {
+export async function findScript<T extends string>(query: T): Promise<Script | undefined> {
 	const sources = await getSources();
 	const [script, namespace] = commandFromString(query);
 
 	if (namespace) {
 		const source = sources.find(source => source.namespace === namespace);
 		if (source) {
-			const scriptSource = source?.scripts.find(s => s.slug === script);
-			if (scriptSource) {
-				return scriptSource;
+			const sourceWithScripts = await getScripts(source.dir, source.namespace);
+			const result = sourceWithScripts.scripts.find(s => s.command === script);
+			if (result) {
+				return result;
 			}
 		}
 	} else if (!namespace && script) {
 		// No namespace found. Maybe the source exists globally.
 		const noNsSources = sources.filter(source => !source.namespace);
-		const scripts = noNsSources.flatMap(source => source.scripts);
-		return scripts.find(s => s.command === script);
+		for (const source of noNsSources) {
+			const sourceWithScripts = await getScripts(source.dir);
+			const result = sourceWithScripts.scripts.find(s => s.command === script);
+			if (result) {
+				return result;
+			}
+		}
 	}
 }
 
-export async function findNamespace(query: string): Promise<Namespace | undefined> {
+export async function findNamespace<T extends string>(query: T): Promise<Collection<T> | undefined> {
 	const sources = await getSources();
 	const [script, namespace] = commandFromString(query);
 
 	if (!namespace && script) {
 		// Check if maybe only the namespace was passed in
-		const source = sources.find(source => source.namespace === script);
+		const source = sources.find((source): source is Collection<T> => source.namespace === query);
 		if (source) {
-			return source as Namespace;
+			return source;
 		}
 	}
+
+	return undefined;
 }
 
-export async function findAny(query: string): Promise<Script | Namespace | undefined> {
+export async function findAny<T extends string>(query: T): Promise<Script | Collection<T> | undefined> {
 	const script = await findScript(query);
 	if (script) {
 		return script;
