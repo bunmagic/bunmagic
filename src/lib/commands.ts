@@ -157,7 +157,7 @@ export async function getCommands(files: string[]): Promise<CommandList> {
 		}
 
 		if (command.type === 'command' || command.type === 'instant-script') {
-			map.set(command.name, command);
+			map.set(command.name.toLowerCase(), command);
 
 			if (command.alias) {
 				for (const alias of command.alias) {
