@@ -1,4 +1,5 @@
 import {SUPPORTED_FILES, type Config} from './config';
+import {slugify} from './utils';
 
 export type CMD = {
 	file: string;
@@ -157,7 +158,7 @@ export async function getCommands(files: string[]): Promise<CommandList> {
 		}
 
 		if (command.type === 'command' || command.type === 'instant-script') {
-			map.set(command.name.toLowerCase(), command);
+			map.set(slugify(command.name), command);
 
 			if (command.alias) {
 				for (const alias of command.alias) {
