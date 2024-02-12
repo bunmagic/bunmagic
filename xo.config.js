@@ -55,5 +55,7 @@ export default {
 		'n/prefer-global/process': 0,
 		// Adding multiple lines can be useful for readability
 		'no-multiple-empty-lines': 0,
+		// iLL wRite MY Comments aS I daM PLEase, TYVM.
+		'capitalized-comments': 0,
 	},
 };
