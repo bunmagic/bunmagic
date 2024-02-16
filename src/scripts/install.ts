@@ -23,9 +23,14 @@ async function require<T>(callback: () => Promise<T>, attempts = 3): Promise<T> 
 	throw new Exit('Failed to complete operation. Exiting.');
 }
 
+async function filterAsync<T>(array: T[], callback: (item: T) => Promise<boolean>) {
+	const results = await Promise.all(array.map(async index => callback(index)));
+	return array.filter((_v, index) => results[index]);
+}
+
 async function availableRcFiles() {
 	const rcFiles = [`${$HOME}/.zshrc`, `${$HOME}/.bashrc`, `${$HOME}/.profile`, `${$HOME}/.bash_profile`];
-	return Promise.all(rcFiles.filter(async f => Bun.file(f).exists()));
+	return filterAsync(rcFiles, async file => Bun.file(file).exists());
 }
 
 async function setupBinaryPath(binaryPath: string) {
