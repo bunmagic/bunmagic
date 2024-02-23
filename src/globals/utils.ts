@@ -1,3 +1,12 @@
+export async function $get(...properties: Parameters<typeof $>) {
+	const result = await $(...properties).quiet();
+	if (result.stdout.length > 0) {
+		return result.stdout.toString();
+	}
+
+	return result.stderr.toString();
+}
+
 export function selection<T extends string>(options: T[], selectionQuestion: string): T {
 	for (const [index, opt] of options.entries()) {
 		console.log(`> ${ansis.bold(`${index + 1}`)}:  ${opt} `);

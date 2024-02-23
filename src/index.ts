@@ -24,6 +24,7 @@ declare global {
 	const Exit: typeof globals.Exit; // eslint-disable-line @typescript-eslint/naming-convention
 	const os: typeof globals.os;
 	const $HOME: typeof globals.$HOME;
+	const $get: typeof globals.$get;
 }
 
 const customGlobalsFile = `${os.homedir()}/.bunmagic/custom-globals.ts`;
