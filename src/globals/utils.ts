@@ -23,7 +23,7 @@ export function selection<T extends string>(options: T[], selectionQuestion: str
 
 export function cd(path: string) {
 	if (path.startsWith('~')) {
-		path = os.homedir() + path.slice(1);
+		path = $HOME + path.slice(1);
 	}
 
 	$.cwd(path);
