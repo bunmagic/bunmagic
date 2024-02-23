@@ -1,46 +1,59 @@
+import {$} from 'bun';
+import ansis from 'ansis';
+
 // Define nice progress dots as spinner states
-const spinnerStates = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
+const spinnerStates = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'].map(s => ansis.dim(s));
+
+let label: string | undefined;
 let currentIndex = 0;
 
 async function stdout(string_: string) {
 	return Bun.write(Bun.stdout, string_);
 }
 
-// Capture console.log outputs
-const capturedLogs: string[] = [];
-
-// Temporarily override console.log
-const originalConsoleLog = console.log;
-const log = (...data: unknown[]) => {
-	capturedLogs.push(data.map(d => typeof d === 'object' ? JSON.stringify(d) : d).join(' '));
-};
-
 // Spinner update function
-async function updateSpinner(label?: string) {
+async function updateSpinner() {
 	await stdout('\r');
 	await stdout(`${spinnerStates[currentIndex]} ${label || ''}`);
 	currentIndex = (currentIndex + 1) % spinnerStates.length;
 }
 
-const originalConsole = console;
+const _console = console;
 function disableOutput() {
 	const consoleProxy = new Proxy(console, {
-		get() {
-			return log;
+		get(_, property) {
+			const colors = {
+				info: 'cyan',
+				warn: 'yellow',
+				error: 'red',
+			} as const;
+			return (data: unknown) => {
+				if (typeof data === 'string') {
+					if (property in colors) {
+						data = ansis[colors[property]](data);
+					}
+
+					label = data;
+				}
+			};
 		},
 	});
 	Reflect.set(globalThis, 'console', consoleProxy);
 }
 
 function enableOutput() {
-	Reflect.set(globalThis, 'console', originalConsole);
+	Reflect.set(globalThis, 'console', _console);
 }
 
-type Callback<T> = () => Promise<T>;
+
+// eslint-disable-next-line @typescript-eslint/promise-function-async
+const $quiet = (...properties: Parameters<typeof $>) => $(...properties).quiet();
+
+type Callback<T> = ($: typeof $quiet) => Promise<T>;
+
 export async function $spinner<T>(callback: Callback<T>): Promise<T>;
 export async function $spinner<T>(label: string, callback: Callback<T>): Promise<T>;
 export async function $spinner<T>(...arguments_: unknown[]): Promise<T> {
-	let label: string | undefined;
 	let callback: Callback<T>;
 
 	disableOutput();
@@ -54,25 +67,20 @@ export async function $spinner<T>(...arguments_: unknown[]): Promise<T> {
 
 	// Start the spinner
 	const spinnerInterval = setInterval(async () => {
-		await updateSpinner(label);
+		await updateSpinner();
 	}, 120);
 
 	try {
 		// Hide the cursor
 		await stdout('\u001B[?25l');
 		// Execute the callback function
-		const result: T = await callback();
+		const result: T = await callback($quiet);
 
 		// Return the result after clearing the spinner
 		clearInterval(spinnerInterval);
 		await stdout('\r');
 		await stdout(' '.repeat(spinnerStates.length + (label?.length || 0) + 1)); // Clear the spinner line
 		await stdout('\r');
-
-		if (capturedLogs.length > 0) {
-			originalConsoleLog(capturedLogs.join('\n'));
-		}
-
 		return result;
 	} catch (error) {
 		// In case of an error, clear the spinner and rethrow the error

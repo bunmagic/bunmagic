@@ -5,24 +5,14 @@ import ansis from 'ansis';
 import {$} from 'bun';
 import {notMinimist} from './not-minimist';
 
-export {$spinner} from './spinner';
-export {default as path} from 'node:path';
-export {notMinimist};
-
 export const BM = {
 	verbose: false,
 } as const;
 
-/**
- * Customize $ to allow enabling/disabling verbose mode globally
- */
-Object.assign($, async (...properties: Parameters<typeof $>) => {
-	if (BM.verbose) {
-		return $(...properties);
-	}
 
-	return $(...properties).quiet();
-});
+export {$spinner} from './spinner';
+export {default as path} from 'node:path';
+export {notMinimist};
 
 export * from './utils';
 export * from './fs';
