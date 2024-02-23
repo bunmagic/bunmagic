@@ -69,3 +69,8 @@ export class Exit extends Error {
 		process.exit(code);
 	}
 }
+
+
+export const sleep = async (ms: number) => new Promise(resolve => {
+	setTimeout(resolve, ms);
+});
