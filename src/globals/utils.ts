@@ -1,3 +1,7 @@
+/**
+ * Run a shell command and return the result as text,
+ * even if it's an error.
+ */
 export async function $get(...properties: Parameters<typeof $>) {
 	const result = await $(...properties).quiet();
 	if (result.stdout.length > 0) {
