@@ -74,6 +74,10 @@ class Spinner {
 		await Spinner.stdout('\r');
 		await Spinner.stdout(' '.repeat(frame.length));
 		await Spinner.stdout('\r');
+		if (frame.length === 0) {
+			await Spinner.moveUp(Spinner.linesRendered);
+		}
+
 		await Spinner.showCursor();
 		Spinner.enableConsole();
 
