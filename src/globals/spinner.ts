@@ -23,7 +23,7 @@ class Spinner {
 			await Bun.write(Bun.stdout, `${line}\n`);
 		}
 
-		Spinner.linesRendered = lines.length;
+		Spinner.linesRendered = lines.map(line => line.split('\n').length).reduce((a, b) => a + b, 0);
 	}
 
 	private static async stdout(s: string) {
@@ -87,7 +87,7 @@ class Spinner {
 	private animationIndex = 0;
 	private label: string | undefined;
 	private animation = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'].map(s => ansis.dim(s));
-
+	private error: Error | undefined;
 
 
 	public setLabel = (text: string) => {
@@ -109,7 +109,16 @@ class Spinner {
 			flag = ansis.red('✖');
 		}
 
-		return `${flag} ${this.label || ''}`;
+		let output = `${flag} ${this.label || ''}`;
+		if (this.error) {
+			const debugMessage = ansis.dim(' (Use --debug to see the full error stack.)');
+			output += ` ${ansis.red(this.error.message)}${argv.debug ? '' : debugMessage}`;
+			if (argv.debug) {
+				output += ansis.dim(`\n${this.error.stack}`);
+			}
+		}
+
+		return output;
 	}
 
 	async start() {
@@ -132,7 +141,13 @@ class Spinner {
 		}
 	}
 
+	public setError(error: unknown) {
+		if (error instanceof Error) {
+			this.error = error;
+		}
 
+		this.error = new Error(String(error));
+	}
 
 	public setStatus(status: 'success' | 'error') {
 		this.status = status;
@@ -164,7 +179,7 @@ export async function $spinner<T>(...arguments_: unknown[]): Promise<T> {
 		return result;
 	} catch (error) {
 		spinner.setStatus('error');
-		throw error;
+		spinner.setError(error);
 	} finally {
 		await spinner.stop();
 	}
