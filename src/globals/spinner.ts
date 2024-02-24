@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/prefer-readonly */
+import {CLI} from 'bunmagic/extras';
 import {$} from 'bun';
 import ansis from 'ansis';
 
@@ -6,7 +6,7 @@ class Spinner {
 	private static spinners: Spinner[] = [];
 	private static linesRendered = 0;
 	private static interval: ReturnType<typeof setInterval> | undefined;
-	private static consoleRef = console;
+	private static readonly consoleRef = console;
 
 	private static async tick() {
 		const lines: string[] = [];
@@ -16,35 +16,14 @@ class Spinner {
 		}
 
 		if (Spinner.linesRendered !== 0) {
-			await this.clearLines(Spinner.linesRendered);
+			await CLI.clearLines(Spinner.linesRendered);
 		}
 
 		for (const line of lines) {
-			await Bun.write(Bun.stdout, `${line}\n`);
+			await CLI.stdout(`${line}\n`);
 		}
 
 		Spinner.linesRendered = lines.map(line => line.split('\n').length).reduce((a, b) => a + b, 0);
-	}
-
-	private static async stdout(s: string) {
-		return Bun.write(Bun.stdout, s);
-	}
-
-	private static async moveUp(count = 1) {
-		await Spinner.stdout(`\u001B[${count}A`);
-	}
-
-	private static async clearLines(count = 1) {
-		await Spinner.moveUp(count);
-		await Spinner.stdout('\u001B[2K'.repeat(count));
-	}
-
-	private static async hideCursor() {
-		await Spinner.stdout('\u001B[?25l');
-	}
-
-	private static async showCursor() {
-		await Spinner.stdout('\u001B[?25h');
 	}
 
 	private static disableConsole() {
@@ -66,22 +45,22 @@ class Spinner {
 			await Spinner.tick();
 		}, 120);
 		Spinner.disableConsole();
-		await Spinner.hideCursor();
+		await CLI.hideCursor();
 	}
 
 	private static async onFinalStop(frame: string) {
 		await Spinner.tick();
-		await Spinner.stdout('\r');
-		await Spinner.stdout(' '.repeat(frame.length));
-		await Spinner.stdout('\r');
+		await CLI.stdout('\r');
+		await CLI.stdout(' '.repeat(frame.length));
+		await CLI.stdout('\r');
 
 		// Move the cursor up if the previous frame was completely empty.
 		// (this happens when not using a label with spinner)
 		if (frame.length === 0) {
-			await Spinner.moveUp(Spinner.linesRendered);
+			await CLI.clearFrame(frame, true);
 		}
 
-		await Spinner.showCursor();
+		await CLI.showCursor();
 		Spinner.enableConsole();
 
 		clearInterval(Spinner.interval);
@@ -93,7 +72,7 @@ class Spinner {
 	private status: 'inactive' | 'running' | 'success' | 'error' = 'inactive';
 	private animationIndex = 0;
 	private label: string | undefined;
-	private animation = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'].map(s => ansis.dim(s));
+	private readonly animation = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'].map(s => ansis.dim(s));
 	private error: Error | undefined;
 
 
