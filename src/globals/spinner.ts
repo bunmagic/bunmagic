@@ -201,6 +201,7 @@ export async function $spinner<T>(...arguments_: unknown[]): Promise<T> {
 	} catch (error) {
 		spinner.setStatus('error');
 		spinner.setError(error);
+		throw error;
 	} finally {
 		await spinner.stop();
 	}
