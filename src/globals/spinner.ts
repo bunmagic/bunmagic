@@ -95,7 +95,8 @@ class Spinner {
 	};
 
 	async frame() {
-		let flag = '';
+		let flag = ' ';
+		let output = '';
 		if (this.status === 'running') {
 			this.animationIndex = (this.animationIndex + 1) % this.animation.length;
 			flag = this.animation[this.animationIndex];
@@ -109,10 +110,16 @@ class Spinner {
 			flag = ansis.red('✖');
 		}
 
-		let output = `${flag} ${this.label || ''}`;
+
+		if (this.label && this.label.trim() !== '') {
+			output = `${flag} ${this.label || ''}`;
+		} else if (this.status === 'running') {
+			output = flag;
+		}
+
 		if (this.error) {
 			const debugMessage = ansis.dim(' (Use --debug to see the full error stack.)');
-			output += ` ${ansis.red(this.error.message)}${argv.debug ? '' : debugMessage}`;
+			output += `${ansis.red(this.error.message)}${argv.debug ? '' : debugMessage}`;
 			if (argv.debug) {
 				output += ansis.dim(`\n${this.error.stack}`);
 			}
