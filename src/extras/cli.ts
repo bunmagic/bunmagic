@@ -28,11 +28,9 @@ async function clearFrame(frame: string, wipe = false) {
 	const lines = frame.split('\n');
 	const lineCount = lines.length - 1;
 	if (wipe) {
-		await stdout('\r');
 		await moveUp(lineCount);
-		await stdout('\r\n\u001B[2K'.repeat(lineCount));
-		await moveUp(lineCount);
-		await stdout('\r\n');
+		await stdout(lines.map(line => '\r' + ' '.repeat(line.length)).join('\n'));
+		await clearLines(lineCount);
 	} else {
 		await clearLines(lineCount);
 	}

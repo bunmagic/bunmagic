@@ -12,6 +12,7 @@ export default {
 		'import/no-anonymous-default-export': 0,
 		// I'm not sure I agree that everything should be a nullish coalescing operator
 		'@typescript-eslint/prefer-nullish-coalescing': 0,
+		'@typescript-eslint/array-type': 0,
 		// Allow UPPER_CASE_CONSTANTS
 		'@typescript-eslint/naming-convention': [
 			'error',
