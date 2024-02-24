@@ -7,6 +7,10 @@ const spinnerStates = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '
 let label: string | undefined;
 let currentIndex = 0;
 
+function setLabel(text: string) {
+	label = text;
+}
+
 async function stdout(string_: string) {
 	return Bun.write(Bun.stdout, string_);
 }
@@ -22,18 +26,30 @@ const _console = console;
 function disableOutput() {
 	const consoleProxy = new Proxy(console, {
 		get(_, property) {
-			const colors = {
+			const colors: Record<string, string> = {
 				info: 'cyan',
 				warn: 'yellow',
 				error: 'red',
-			} as const;
+			};
 			return (data: unknown) => {
-				if (typeof data === 'string') {
+				if (
+					typeof data === 'string'
+					&& typeof property === 'string'
+				) {
+					let text = data;
 					if (property in colors) {
-						data = ansis[colors[property]](data);
+						const color = colors[property];
+						if (
+							colors[property] in ansis
+							&& color in ansis
+							&& typeof ansis[color as keyof typeof ansis] === 'function'
+						) {
+							const colorFunction = ansis[color as keyof typeof ansis] as (text: string) => string;
+							text = colorFunction(data);
+						}
 					}
 
-					label = data;
+					setLabel(text);
 				}
 			};
 		},
@@ -51,8 +67,8 @@ const $quiet = (...properties: Parameters<typeof $>) => $(...properties).quiet()
 
 type Callback<T> = ($: typeof $quiet) => Promise<T>;
 
-export async function $spinner<T>(callback: Callback<T>): Promise<T>;
-export async function $spinner<T>(label: string, callback: Callback<T>): Promise<T>;
+export async function $spinner<T>(callback: Callback<T>, replaceConsole: boolean): Promise<T>;
+export async function $spinner<T>(label: string, callback: Callback<T>, replaceConsole: boolean): Promise<T>;
 export async function $spinner<T>(...arguments_: unknown[]): Promise<T> {
 	let callback: Callback<T>;
 
