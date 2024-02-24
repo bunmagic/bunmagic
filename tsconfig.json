@@ -25,6 +25,9 @@
 			"@lib/*": [
 				"./src/lib/*"
 			],
+			"bunmagic/extras": [
+				"./src/extras/index.ts"
+			],
 		}
 	}
 }

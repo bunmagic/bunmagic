@@ -37,7 +37,7 @@ async function setupBinaryPath(binaryPath: string) {
 	const rcFiles = await availableRcFiles();
 
 	const select = [...rcFiles, 'Custom'];
-	let rcFile = selection(select, 'Which file would you like to add bunmagic to?');
+	let rcFile = await selection(select, 'Which file would you like to add bunmagic to?');
 
 	if (rcFile === 'Custom') {
 		const customFile = await require(async () => {
