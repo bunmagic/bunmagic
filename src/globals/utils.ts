@@ -79,10 +79,14 @@ export async function selection<T extends string>(options: T[], selectionQuestio
 		}
 
 		if (key === 'interrupt') {
+			await CLI.clearFrame(frame, true);
+			await CLI.showCursor();
 			throw new Exit('User interrupted');
 		}
 
 		if (key === 'escape') {
+			await CLI.clearFrame(frame, true);
+			await CLI.showCursor();
 			throw new Error('User cancelled selection');
 		}
 
