@@ -13,7 +13,7 @@ export async function $get(...properties: Parameters<typeof $>) {
 }
 
 function selectionFrame(selected: number, selectionQuestion: string, options: string[]) {
-	const output: string[] = [`> ${ansis.bold(selectionQuestion)}`];
+	const output: string[] = [`\n> ${ansis.bold(selectionQuestion)}`];
 	for (const [index, opt] of options.entries()) {
 		const prefix = index === selected ? '→ ' : '  ';
 		const line = `${prefix} ${ansis.bold(`${index + 1}`)}:  ${opt} `;
