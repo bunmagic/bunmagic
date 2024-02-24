@@ -3,15 +3,13 @@ import {$} from 'bun';
 import ansis from 'ansis';
 
 class Spinner {
-	static instances: Spinner[] = [];
+	static active: Spinner[] = [];
 	private linesRendered = 0;
 	private animationIndex = 0;
 	private label: string | undefined;
 	private interval: ReturnType<typeof setInterval> | undefined;
 	private animation = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'].map(s => ansis.dim(s));
-	constructor() {
-		Spinner.instances.push(this);
-	}
+	private consoleRef = console;
 
 	async stdout(s: string) {
 		return Bun.write(Bun.stdout, s);
@@ -51,6 +49,8 @@ class Spinner {
 	}
 
 	async start() {
+		Spinner.active.push(this);
+		this.disableConsole();
 		await this.hideCursor();
 		this.interval = setInterval(async () => {
 			await this.update();
@@ -63,61 +63,41 @@ class Spinner {
 		const lineLength = this.animation.length + (this.label?.length || 0) + 1;
 		await this.stdout(' '.repeat(lineLength));
 		await this.stdout('\r');
-		await this.showCursor();
+
+		if (Spinner.active.length === 1) {
+			await this.showCursor();
+			this.enableConsole();
+		}
+
+		// Remove this instance from the active list
+		Spinner.active = Spinner.active.filter(instance => instance !== this);
+	}
+
+	disableConsole() {
+		// eslint-disable-next-line @typescript-eslint/no-empty-function
+		const noop = () => {};
+		Reflect.set(globalThis, 'console', new Proxy(console, {
+			get() {
+				return noop;
+			},
+		}));
+	}
+
+	enableConsole() {
+		Reflect.set(globalThis, 'console', this.consoleRef);
 	}
 }
-
-const _console = console;
-function disableOutput(setLabel: (text: string) => void) {
-	const consoleProxy = new Proxy(console, {
-		get(_, property) {
-			const colors: Record<string, string> = {
-				info: 'cyan',
-				warn: 'yellow',
-				error: 'red',
-			};
-			return (data: unknown) => {
-				if (
-					typeof data === 'string'
-					&& typeof property === 'string'
-				) {
-					let text = data;
-					if (property in colors) {
-						const color = colors[property];
-						if (
-							colors[property] in ansis
-							&& color in ansis
-							&& typeof ansis[color as keyof typeof ansis] === 'function'
-						) {
-							const colorFunction = ansis[color as keyof typeof ansis] as (text: string) => string;
-							text = colorFunction(data);
-						}
-					}
-
-					setLabel(text);
-				}
-			};
-		},
-	});
-	Reflect.set(globalThis, 'console', consoleProxy);
-}
-
-function enableOutput() {
-	Reflect.set(globalThis, 'console', _console);
-}
-
 
 // eslint-disable-next-line @typescript-eslint/promise-function-async
 const $quiet = (...properties: Parameters<typeof $>) => $(...properties).quiet();
 
-type Callback<T> = ($: typeof $quiet) => Promise<T>;
+type Callback<T> = ($: typeof $quiet, setLabel: Spinner['setLabel']) => Promise<T>;
 
 export async function $spinner<T>(callback: Callback<T>, replaceConsole: boolean): Promise<T>;
 export async function $spinner<T>(label: string, callback: Callback<T>, replaceConsole: boolean): Promise<T>;
 export async function $spinner<T>(...arguments_: unknown[]): Promise<T> {
 	let callback: Callback<T>;
 	const spinner = new Spinner();
-	disableOutput(spinner.setLabel);
 
 	if (typeof arguments_[0] === 'string') {
 		spinner.setLabel(arguments_[0]);
@@ -128,12 +108,11 @@ export async function $spinner<T>(...arguments_: unknown[]): Promise<T> {
 
 	try {
 		await spinner.start();
-		const result: T = await callback($quiet);
+		const result: T = await callback($quiet, spinner.setLabel);
 		return result;
 	} catch (error) {
 		throw error;
 	} finally {
 		await spinner.stop();
-		enableOutput();
 	}
 }
