@@ -3,77 +3,51 @@ import {$} from 'bun';
 import ansis from 'ansis';
 
 class Spinner {
-	static active: Spinner[] = [];
-	private linesRendered = 0;
-	private animationIndex = 0;
-	private label: string | undefined;
-	private interval: ReturnType<typeof setInterval> | undefined;
-	private animation = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'].map(s => ansis.dim(s));
-	private consoleRef = console;
+	private static spinners: Spinner[] = [];
+	private static linesRendered = 0;
+	private static interval: ReturnType<typeof setInterval> | undefined;
+	private static consoleRef = console;
 
-	async stdout(s: string) {
+	private static async tick() {
+		const lines: string[] = [];
+
+		for (const spinner of Spinner.spinners) {
+			lines.push(await spinner.frame());
+		}
+
+		if (Spinner.linesRendered !== 0) {
+			await this.clearLines(Spinner.linesRendered);
+		}
+
+		for (const line of lines) {
+			await Bun.write(Bun.stdout, `${line}\n`);
+		}
+
+		Spinner.linesRendered = lines.length;
+	}
+
+	private static async stdout(s: string) {
 		return Bun.write(Bun.stdout, s);
 	}
 
-	async moveUp(count = 1) {
-		await this.stdout(`\u001B[${count}A`);
+	private static async moveUp(count = 1) {
+		await Spinner.stdout(`\u001B[${count}A`);
 	}
 
-	async clearLines(count = 1) {
-		await this.moveUp(count);
-		await this.stdout('\u001B[2K'.repeat(count));
+	private static async clearLines(count = 1) {
+		await Spinner.moveUp(count);
+		await Spinner.stdout('\u001B[2K'.repeat(count));
 	}
 
-	public setLabel = (text: string) => {
-		this.label = text;
-	};
-
-	async update() {
-		const {linesRendered, animationIndex, label} = this;
-
-		if (linesRendered !== 0) {
-			await this.clearLines();
-		}
-
-		await this.stdout('\r');
-		await this.stdout(`${this.animation[animationIndex]} ${label || ''}`);
-		this.animationIndex = (animationIndex + 1) % this.animation.length;
+	private static async hideCursor() {
+		await Spinner.stdout('\u001B[?25l');
 	}
 
-	async hideCursor() {
-		await this.stdout('\u001B[?25l');
+	private static async showCursor() {
+		await Spinner.stdout('\u001B[?25h');
 	}
 
-	async showCursor() {
-		await this.stdout('\u001B[?25h');
-	}
-
-	async start() {
-		Spinner.active.push(this);
-		this.disableConsole();
-		await this.hideCursor();
-		this.interval = setInterval(async () => {
-			await this.update();
-		}, 120);
-	}
-
-	async stop() {
-		clearInterval(this.interval);
-		await this.stdout('\r');
-		const lineLength = this.animation.length + (this.label?.length || 0) + 1;
-		await this.stdout(' '.repeat(lineLength));
-		await this.stdout('\r');
-
-		if (Spinner.active.length === 1) {
-			await this.showCursor();
-			this.enableConsole();
-		}
-
-		// Remove this instance from the active list
-		Spinner.active = Spinner.active.filter(instance => instance !== this);
-	}
-
-	disableConsole() {
+	private static disableConsole() {
 		// eslint-disable-next-line @typescript-eslint/no-empty-function
 		const noop = () => {};
 		Reflect.set(globalThis, 'console', new Proxy(console, {
@@ -83,8 +57,85 @@ class Spinner {
 		}));
 	}
 
-	enableConsole() {
-		Reflect.set(globalThis, 'console', this.consoleRef);
+	private static enableConsole() {
+		Reflect.set(globalThis, 'console', Spinner.consoleRef);
+	}
+
+	private static async onFirstStart() {
+		Spinner.interval ||= setInterval(async () => {
+			await Spinner.tick();
+		}, 120);
+		Spinner.disableConsole();
+		await Spinner.hideCursor();
+	}
+
+	private static async onFinalStop(frame: string) {
+		await Spinner.tick();
+		await Spinner.stdout('\r');
+		await Spinner.stdout(' '.repeat(frame.length));
+		await Spinner.stdout('\r');
+		await Spinner.showCursor();
+		Spinner.enableConsole();
+
+		clearInterval(Spinner.interval);
+		Spinner.interval = undefined;
+		Spinner.linesRendered = 0;
+		Spinner.spinners = [];
+	}
+
+	private status: 'inactive' | 'running' | 'success' | 'error' = 'inactive';
+	private animationIndex = 0;
+	private label: string | undefined;
+	private animation = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'].map(s => ansis.dim(s));
+
+
+
+	public setLabel = (text: string) => {
+		this.label = text;
+	};
+
+	async frame() {
+		let flag = '';
+		if (this.status === 'running') {
+			this.animationIndex = (this.animationIndex + 1) % this.animation.length;
+			flag = this.animation[this.animationIndex];
+		}
+
+		if (this.status === 'success') {
+			flag = ansis.green('✔');
+		}
+
+		if (this.status === 'error') {
+			flag = ansis.red('✖');
+		}
+
+		return `${flag} ${this.label || ''}`;
+	}
+
+	async start() {
+		if (Spinner.spinners.length === 0) {
+			await Spinner.onFirstStart();
+		}
+
+		Spinner.spinners.push(this);
+		this.status = 'running';
+	}
+
+	async stop() {
+		if (this.status === 'running') {
+			this.status = 'inactive';
+		}
+
+		if (Spinner.spinners.filter(spinner => spinner.status === 'running').length === 0) {
+			const frame = await this.frame();
+			await Spinner.onFinalStop(frame);
+		}
+	}
+
+
+
+	public setStatus(status: 'success' | 'error') {
+		this.status = status;
 	}
 }
 
@@ -109,8 +160,10 @@ export async function $spinner<T>(...arguments_: unknown[]): Promise<T> {
 	try {
 		await spinner.start();
 		const result: T = await callback($quiet, spinner.setLabel);
+		spinner.setStatus('success');
 		return result;
 	} catch (error) {
+		spinner.setStatus('error');
 		throw error;
 	} finally {
 		await spinner.stop();
