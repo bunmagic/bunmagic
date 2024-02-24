@@ -1,29 +1,74 @@
+/* eslint-disable @typescript-eslint/prefer-readonly */
 import {$} from 'bun';
 import ansis from 'ansis';
 
-// Define nice progress dots as spinner states
-const spinnerStates = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'].map(s => ansis.dim(s));
+class Spinner {
+	static instances: Spinner[] = [];
+	private linesRendered = 0;
+	private animationIndex = 0;
+	private label: string | undefined;
+	private interval: ReturnType<typeof setInterval> | undefined;
+	private animation = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'].map(s => ansis.dim(s));
+	constructor() {
+		Spinner.instances.push(this);
+	}
 
-let label: string | undefined;
-let currentIndex = 0;
+	async stdout(s: string) {
+		return Bun.write(Bun.stdout, s);
+	}
 
-function setLabel(text: string) {
-	label = text;
-}
+	async moveUp(count = 1) {
+		await this.stdout(`\u001B[${count}A`);
+	}
 
-async function stdout(string_: string) {
-	return Bun.write(Bun.stdout, string_);
-}
+	async clearLines(count = 1) {
+		await this.moveUp(count);
+		await this.stdout('\u001B[2K'.repeat(count));
+	}
 
-// Spinner update function
-async function updateSpinner() {
-	await stdout('\r');
-	await stdout(`${spinnerStates[currentIndex]} ${label || ''}`);
-	currentIndex = (currentIndex + 1) % spinnerStates.length;
+	public setLabel = (text: string) => {
+		this.label = text;
+	};
+
+	async update() {
+		const {linesRendered, animationIndex, label} = this;
+
+		if (linesRendered !== 0) {
+			await this.clearLines();
+		}
+
+		await this.stdout('\r');
+		await this.stdout(`${this.animation[animationIndex]} ${label || ''}`);
+		this.animationIndex = (animationIndex + 1) % this.animation.length;
+	}
+
+	async hideCursor() {
+		await this.stdout('\u001B[?25l');
+	}
+
+	async showCursor() {
+		await this.stdout('\u001B[?25h');
+	}
+
+	async start() {
+		await this.hideCursor();
+		this.interval = setInterval(async () => {
+			await this.update();
+		}, 120);
+	}
+
+	async stop() {
+		clearInterval(this.interval);
+		await this.stdout('\r');
+		const lineLength = this.animation.length + (this.label?.length || 0) + 1;
+		await this.stdout(' '.repeat(lineLength));
+		await this.stdout('\r');
+		await this.showCursor();
+	}
 }
 
 const _console = console;
-function disableOutput() {
+function disableOutput(setLabel: (text: string) => void) {
 	const consoleProxy = new Proxy(console, {
 		get(_, property) {
 			const colors: Record<string, string> = {
@@ -71,41 +116,24 @@ export async function $spinner<T>(callback: Callback<T>, replaceConsole: boolean
 export async function $spinner<T>(label: string, callback: Callback<T>, replaceConsole: boolean): Promise<T>;
 export async function $spinner<T>(...arguments_: unknown[]): Promise<T> {
 	let callback: Callback<T>;
-
-	disableOutput();
+	const spinner = new Spinner();
+	disableOutput(spinner.setLabel);
 
 	if (typeof arguments_[0] === 'string') {
-		label = arguments_[0];
+		spinner.setLabel(arguments_[0]);
 		callback = arguments_[1] as Callback<T>;
 	} else {
 		callback = arguments_[0] as Callback<T>;
 	}
 
-	// Start the spinner
-	const spinnerInterval = setInterval(async () => {
-		await updateSpinner();
-	}, 120);
-
 	try {
-		// Hide the cursor
-		await stdout('\u001B[?25l');
-		// Execute the callback function
+		await spinner.start();
 		const result: T = await callback($quiet);
-
-		// Return the result after clearing the spinner
-		clearInterval(spinnerInterval);
-		await stdout('\r');
-		await stdout(' '.repeat(spinnerStates.length + (label?.length || 0) + 1)); // Clear the spinner line
-		await stdout('\r');
 		return result;
 	} catch (error) {
-		// In case of an error, clear the spinner and rethrow the error
-		clearInterval(spinnerInterval);
-		await stdout('\r');
 		throw error;
 	} finally {
-		// Show the cursor
-		await stdout('\u001B[?25h');
+		await spinner.stop();
 		enableOutput();
 	}
 }
