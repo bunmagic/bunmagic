@@ -102,7 +102,7 @@ function renderFrame(selectionQuestion: string, options: Option<string>[], query
 	}
 
 	if (query.length > 0) {
-		output.push(` Searching: ${ansis.dim.underline(query)}`);
+		output.push(`${ansis.bold.yellow('    »')} ${ansis.dim.underline(query)}`);
 	}
 
 	return output.join('\n');
