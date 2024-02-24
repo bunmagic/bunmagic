@@ -74,6 +74,9 @@ class Spinner {
 		await Spinner.stdout('\r');
 		await Spinner.stdout(' '.repeat(frame.length));
 		await Spinner.stdout('\r');
+
+		// Move the cursor up if the previous frame was completely empty.
+		// (this happens when not using a label with spinner)
 		if (frame.length === 0) {
 			await Spinner.moveUp(Spinner.linesRendered);
 		}
@@ -101,6 +104,7 @@ class Spinner {
 	async frame() {
 		let flag = ' ';
 		let output = '';
+
 		if (this.status === 'running') {
 			this.animationIndex = (this.animationIndex + 1) % this.animation.length;
 			flag = this.animation[this.animationIndex];
@@ -114,22 +118,28 @@ class Spinner {
 			flag = ansis.red('✖');
 		}
 
-
+		// Only show the flag if there's a label or the spinner is running
 		if (this.label && this.label.trim() !== '') {
 			output = `${flag} ${this.label || ''}`;
 		} else if (this.status === 'running') {
 			output = flag;
 		}
 
+		// Show the error message
 		if (this.error) {
+			output += ' ';
 			const debugMessage = ansis.dim(' (Use --debug to see the full error stack.)');
-			output += `${ansis.red(this.error.message)}${argv.debug ? '' : debugMessage}`;
-			if (argv.debug) {
-				output += ansis.dim(`\n${this.error.stack}`);
+			const errorMessage = this.error.message.replace('Error: ', '');
+			output += `${ansis.red(errorMessage)}${argv.debug ? '' : debugMessage}`;
+			if (argv.debug && this.error.stack) {
+				const padSize = this.label?.length ? this.label.length + 3 : 0;
+				const padding = ' '.repeat(padSize);
+				const paddedStack = this.error.stack.split('\n').map(line => `${padding}${line.trim()}`).join('\n');
+				output += ansis.dim(`\n${paddedStack}`);
 			}
 		}
 
-		return output;
+		return output.trim();
 	}
 
 	async start() {
