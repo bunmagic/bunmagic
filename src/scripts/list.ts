@@ -4,7 +4,6 @@ import {
 } from '@lib/sources';
 
 export const desc = 'List all known scripts.';
-export const usage = `bunmagic list ${ansis.gray('| bunmagic ls')}`;
 export const alias = ['ls'];
 
 export default async function () {

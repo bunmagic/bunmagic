@@ -2,7 +2,7 @@ import {PATHS} from '@lib/config';
 import {getScripts, getSources} from '@lib/sources';
 
 export const desc = 'Reload your script files and ensure that they have an executable bin.';
-export const usage = 'bunmagic reload [--force]';
+export const usage = '[--force]';
 
 function template(name: string, scriptPath: string, exec: string): string {
 	let output = '#!/bin/bash\n';

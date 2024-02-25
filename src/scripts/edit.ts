@@ -6,7 +6,7 @@ import {openEditor} from '@lib/utils';
 import {create} from './create';
 
 export const desc = 'Edit scripts. If no script name is specified, will open all scripts and the ~/.bunmagic directory';
-export const usage = 'bunmagic edit [script-name]';
+export const usage = '[script-name]';
 
 export default async function () {
 	const slug = argv._.join(' ');

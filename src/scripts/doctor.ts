@@ -4,7 +4,6 @@ import {addSourceDirectory} from './link';
 import {reloadBins} from './reload';
 
 export const desc = 'Check if bunmagic is set up correctly';
-export const usage = 'bunmagic doctor';
 
 type CheckCallback = () => Promise<{
 	level: Levels;

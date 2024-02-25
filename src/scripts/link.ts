@@ -5,7 +5,6 @@ import {getSources} from '@lib/sources';
 import {reloadBins} from './reload';
 
 export const desc = 'Add an additional directory to use as script source.';
-export const usage = 'bunmagic link';
 
 export async function addSourceDirectory(target?: string) {
 	const sources = await getSources().catch(() => [] as Collection[]);

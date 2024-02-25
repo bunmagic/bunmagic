@@ -8,7 +8,7 @@ import {openEditor} from '@lib/utils';
 import {ensureBin} from './reload';
 
 export const desc = 'Create a new script';
-export const usage = 'bunmagic create <script-name>';
+export const usage = '<script-name>';
 export const alias = ['new'];
 
 export default async function () {

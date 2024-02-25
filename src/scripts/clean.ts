@@ -2,7 +2,6 @@ import {getScripts, getSources} from '@lib/sources';
 import {getBins} from './reload';
 
 export const desc = 'Remove bin files from the bin directory that don\'t have a matching script.';
-export const usage = 'bunmagic clean';
 
 export default async function () {
 	console.log('Cleaning up the the bin directory.');
