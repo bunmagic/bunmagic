@@ -26,6 +26,8 @@ if (ack('Increment version number?')) {
 }
 
 if (ack('Do you want to publish this version?')) {
+	const projectPath = path.resolve(import.meta.dir, '..');
+	cd(projectPath);
 	await $`npm publish > /dev/tty`;
 	console.log('Done!');
 }
