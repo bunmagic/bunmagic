@@ -96,7 +96,13 @@ export class Columns<T extends number, Row extends string | FixedArray<string, T
 				output += '\n';
 
 				const remainingContent = content.slice(wrapAt);
-				const columnsToWrap = ['', '', remainingContent];
+				const columnsLeft = column;
+				const columnsRight = this.columnCount - column - 1;
+				const columnsToWrap = [
+					...Array.from({length: columnsLeft}, () => ''),
+					remainingContent,
+					...Array.from({length: columnsRight}, () => ''),
+				];
 				output += this.renderRow(columnsToWrap);
 			} else {
 				const width = widthLimit - contentWidth;
