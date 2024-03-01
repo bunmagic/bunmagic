@@ -3,7 +3,7 @@ type GrowToSize<T, N extends number, A extends T[]> =
   A['length'] extends N ? A : GrowToSize<T, N, [...A, T]>;
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-export type FixedArray<T, N extends number> = GrowToSize<T, N, []>;
+export type FixedArray<T, N extends number> = T[] & GrowToSize<T, N, []>;
 
 export class Columns<T extends number, Row extends string | FixedArray<string, T>> {
 	public indent = 2;
@@ -18,6 +18,15 @@ export class Columns<T extends number, Row extends string | FixedArray<string, T
 	}
 
 	public setColumnWidths(widths: FixedArray<number, T>) {
+		const maxCols = process.stdout.columns || 80;
+		const totalGap = this.indent + (this.gap * (this.columnCount - 1));
+		const totalWidth = widths.reduce((accumulator, width) => accumulator + width, 0) + totalGap;
+		const lastWidth = widths.at(-1) || 100;
+		const maxLastColumnWidth = maxCols - totalWidth + lastWidth;
+		if (maxLastColumnWidth < lastWidth) {
+			widths[widths.length - 1] = maxLastColumnWidth;
+		}
+
 		this.columnWidths = widths;
 	}
 
