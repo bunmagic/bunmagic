@@ -18,25 +18,12 @@ export class Columns<T extends number, Row extends string | FixedArray<string, T
 	}
 
 	public setColumnWidths(widths: FixedArray<number, T>) {
-		const maxCols = (process.stdout.columns || 80) - this.indent;
-		const totalGap = this.indent + (this.gap * (this.columnCount - 1));
-		const totalWidth = widths.reduce((accumulator, width) => accumulator + width, 0) + totalGap;
-
-		if (totalWidth > maxCols) {
-			const maxWidth = Math.max(...widths);
-			const maxWidthIndex = widths.indexOf(maxWidth);
-			const adjustment = totalWidth - maxCols;
-			widths[maxWidthIndex] = maxWidth - adjustment;
-		}
-
 		this.columnWidths = widths;
 	}
 
-	public render() {
-		if (this.columnWidths.length !== this.columnCount) {
-			this.setColumnWidths(this.getColumnWidths());
-		}
 
+
+	public render() {
 		let output = '';
 		for (const row of this.rows) {
 			output += '\n';
@@ -87,6 +74,39 @@ export class Columns<T extends number, Row extends string | FixedArray<string, T
 		return before;
 	}
 
+	private calculateColumnWidths() {
+		const widths = this.columnWidths;
+		const autoWidths = this.getColumnWidths();
+		const maxCols = (process.stdout.columns || 80) - this.indent;
+
+		for (let [index, width] of widths.entries()) {
+			const autoWidth = autoWidths[index];
+
+			if (width > maxCols) {
+				width = Math.floor(maxCols / this.columnCount);
+			}
+
+			if (width === 0) {
+				width = autoWidth;
+			}
+
+			widths[index] = width;
+		}
+
+
+		const totalGap = this.indent + (this.gap * (this.columnCount - 1));
+		const totalWidth = widths.reduce((accumulator, width) => accumulator + width, 0) + totalGap;
+
+		if (totalWidth > maxCols) {
+			const maxWidth = Math.max(...widths);
+			const maxWidthIndex = widths.indexOf(maxWidth);
+			const adjustment = totalWidth - maxCols;
+			widths[maxWidthIndex] = maxWidth - adjustment;
+		}
+
+		return widths;
+	}
+
 	private renderRow(columns: string[]) {
 		let output = '';
 		if (this.indent > 0) {
@@ -98,7 +118,8 @@ export class Columns<T extends number, Row extends string | FixedArray<string, T
 				output += ' '.repeat(this.gap);
 			}
 
-			const widthLimit = this.columnWidths[column];
+			const widths = this.calculateColumnWidths();
+			const widthLimit = widths[column];
 			const contentWidth = ansis.strip(content).length;
 			if (contentWidth > widthLimit) {
 				const wrapAt = this.nearestWrap(content, widthLimit);
