@@ -14,6 +14,7 @@ export class Columns<T extends number, Row extends string | FixedArray<string, T
 	public indent = 2;
 	public gap = 2;
 	private readonly rows: Row[] = [];
+	private isBuffering = false;
 
 	constructor(
 		private readonly columnCount: T,
@@ -22,13 +23,30 @@ export class Columns<T extends number, Row extends string | FixedArray<string, T
 
 	log(data: Row) {
 		this.rows.push(data);
+		if (!this.isBuffering) {
+			console.log(this.render());
+			this.rows.length = 0;
+		}
+
+		return this;
+	}
+
+	public buffer() {
+		this.isBuffering = true;
+		return this;
+	}
+
+	public flush() {
+		this.isBuffering = false;
+		const result = this.render();
+		this.rows.length = 0;
+		return result;
 	}
 
 	public render() {
-		let output = '';
+		const rows: string[] = [];
 		for (const row of this.rows) {
-			output += '\n';
-
+			let output = '';
 			if (typeof row === 'string') {
 				if (this.indent > 0) {
 					output += ' '.repeat(this.indent);
@@ -40,9 +58,11 @@ export class Columns<T extends number, Row extends string | FixedArray<string, T
 			if (Array.isArray(row)) {
 				output += this.renderRow(row);
 			}
+
+			rows.push(output);
 		}
 
-		return output;
+		return rows.join('\n');
 	}
 
 	private nearestWrap(content: string, before: number, maxRangeWords = 2): number {
