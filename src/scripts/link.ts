@@ -1,14 +1,12 @@
-import {
-	PATHS, update,
-} from '@lib/config';
-import {getSources, type Source} from '@lib/sources';
+import * as config from '@lib/config';
 import {reloadBins} from './reload';
 
 export const desc = 'Add an additional directory to use as script source.';
 
 export async function addSourceDirectory(target?: string) {
-	const sources = await getSources().catch(() => [] as Source[]);
-	let defaultSource = `${PATHS.bunmagic}/default`;
+	const sources = (await config.get('sources')) || [];
+
+	let defaultSource = `${config.PATHS.bunmagic}/default`;
 
 	if (sources.some(source => source.dir === defaultSource)) {
 		defaultSource = process.cwd();
@@ -37,10 +35,9 @@ export async function addSourceDirectory(target?: string) {
 	sources.push({
 		namespace,
 		dir: target,
-		scripts: [],
 	});
 	await ensureDirectory(target);
-	await update('sources', sources);
+	await config.update('sources', sources);
 }
 
 export default async function () {
