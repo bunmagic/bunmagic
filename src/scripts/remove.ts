@@ -1,6 +1,4 @@
-import {
-	PATHS, update,
-} from '@lib/config';
+import {update} from '@lib/config';
 import {
 	getSources, findNamespace, findScript, type Source,
 } from '@lib/sources';
@@ -50,13 +48,11 @@ export default async function () {
 		return false;
 	}
 
-	const binaryFile = path.join(PATHS.bins, script.source);
 	const binaryFileExists = await Bun.file(script.bin).exists();
 	const sourceFileExists = await Bun.file(script.source).exists();
 
 	if (binaryFileExists) {
-		await $`rm ${binaryFile}`;
-		return;
+		await $`rm ${script.bin}`;
 	}
 
 	if (sourceFileExists && ack('Remove the source file?')) {
