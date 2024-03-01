@@ -1,5 +1,3 @@
-import type {Script} from './commands';
-
 export const PATHS: {
 	bunmagic: string;
 	bins: string;
@@ -13,15 +11,13 @@ export const PATHS: {
 export const SUPPORTED_FILES = ['ts', 'mjs', 'js'] as const;
 export type SupportedFiles = typeof SUPPORTED_FILES[number];
 
-export type Collection = {
-	namespace: string;
+export type SourcePaths = {
+	namespace?: string;
 	dir: string;
-	scripts: Script[];
 };
-
 export type Config = {
 	extension: string & typeof SUPPORTED_FILES[number];
-	sources?: Omit<Collection, 'scripts'>[];
+	sources?: SourcePaths[];
 };
 
 export type ConfigKey = keyof Config;
