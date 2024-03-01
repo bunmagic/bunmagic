@@ -12,9 +12,12 @@ export default async function (commands: Map<string, Command | NotFound | Instan
 
 	console.log(`\n  ${ansis.bold.yellow('Bunmagic')}\n  ${ansis.dim('Poof! Your buns are now magical.')}`);
 	console.log(`\n  ${ansis.bold('Usage:')} ${ansis.bold.yellowBright('bunmagic')} ${ansis.dim('<command>')} ${ansis.dim('[arguments]')}`);
-	console.log(`\n  ${ansis.bold('Commands:')}`);
+
 
 	columns.buffer();
+	columns.log('');
+	columns.log(['command', 'args', 'description'].map(s => ansis.dim(s)) as [string, string, string]);
+	columns.log(['-------', '----', '-----------'].map(s => ansis.dim(s)) as [string, string, string]);
 	for (const [name, command] of commands.entries()) {
 		if (('alias' in command && command.alias && command.alias.includes(name))) {
 			continue;
