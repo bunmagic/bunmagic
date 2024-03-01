@@ -146,9 +146,9 @@ export class Columns<T extends number, Row extends string | FixedArray<string, T
 				const columnsLeft = column;
 				const columnsRight = this.columnCount - column - 1;
 				const columnsToWrap = [
-					...Array.from({length: columnsLeft}, () => ''),
+					...fixedLengthArray(columnsLeft, ''),
 					remainingContent,
-					...Array.from({length: columnsRight}, () => ''),
+					...fixedLengthArray(columnsRight, ''),
 				];
 				output += this.renderRow(columnsToWrap) + '\n';
 			} else {
