@@ -1,9 +1,7 @@
-import {SUPPORTED_FILES, type Config} from './config';
+import {SUPPORTED_FILES, type Config, PATHS} from './config';
 import {slugify} from './utils';
 
-export type CMD = {
-	file: string;
-	name: string;
+export type ScriptInfo = {
 	desc?: string;
 	usage?: string;
 	alias?: string[];
@@ -46,11 +44,11 @@ export type Scripts = {
 	scripts: Script[];
 };
 
-export type InstantScript = CMD & {
+export type InstantScript = Script & ScriptInfo & {
 	type: 'instant-script';
 };
 
-export type Command = CMD & {
+export type Command = Script & ScriptInfo & {
 	type: 'command';
 };
 
@@ -97,17 +95,22 @@ function parseInstantScript(filePath: string, allLines: string[]): InstantScript
 		throw new Error(`Instant script at ${filePath} must have a name.`);
 	}
 
+	const slug = slugify(name);
 	return {
 		type: 'instant-script',
-		file: filePath,
-		name,
+		source: filePath,
+		filename: path.basename(filePath),
+		command: slug, // @TODO include namespace...?
+		bin: `${PATHS.bins}/${slug}`,
+		dir: path.dirname(filePath),
+		slug,
 		desc,
 		usage,
 		alias,
 	};
 }
 
-async function importCommand(file: string): Promise<Command | InstantScript | Router | NotFound> {
+async function importCommand(file: string, namespace?: string): Promise<Command | InstantScript | Router | NotFound> {
 	const content = await Bun.file(file).text();
 	const lines = content.split('\n');
 	if (lines.some(line => line.trim().startsWith('export default'))) {
@@ -122,10 +125,15 @@ async function importCommand(file: string): Promise<Command | InstantScript | Ro
 
 		if ('default' in handle) {
 			const meta = {...handle, default: undefined};
+			const slug = path.parse(file).name;
 			return {
-				name: path.parse(file).name,
+				slug,
+				command: namespace ? `${namespace} ${slug}` : slug,
 				type: 'command',
-				file,
+				bin: `${PATHS.bins}/${slug}`,
+				dir: path.dirname(file),
+				filename: path.basename(file),
+				source: file,
 				...meta,
 			};
 		}
@@ -143,10 +151,17 @@ type CommandList = {
 	router: Router;
 	commands: Map<string, Command | NotFound | InstantScript>;
 };
+export async function getPathCommands(target: string, namespace?: string): Promise<CommandList> {
+	const result = await $`ls ${target}`.text();
+	const files = result.split('\n')
+		.map((file: string) => `${target}/${file}`)
+		.filter((file: string) => SUPPORTED_FILES.some((extension: string) => file.endsWith(extension)));
+	return getCommands(files, namespace);
+}
 
-export async function getCommands(files: string[]): Promise<CommandList> {
+export async function getCommands(files: string[], namespace?: string): Promise<CommandList> {
 	const validFiles = files.filter((file: string) => SUPPORTED_FILES.includes(path.extname(file).replace('.', '') as Config['extension']));
-	const list = await Promise.all(validFiles.map(async value => importCommand(value)));
+	const list = await Promise.all(validFiles.map(async value => importCommand(value, namespace)));
 
 	const map = new Map<string, Command | NotFound | InstantScript>();
 	let router: Router | undefined;
@@ -158,7 +173,7 @@ export async function getCommands(files: string[]): Promise<CommandList> {
 		}
 
 		if (command.type === 'command' || command.type === 'instant-script') {
-			map.set(slugify(command.name), command);
+			map.set(slugify(command.slug), command);
 
 			if (command.alias) {
 				for (const alias of command.alias) {

@@ -1,5 +1,4 @@
 import {
-	getScripts,
 	getSources,
 } from '@lib/sources';
 
@@ -21,7 +20,7 @@ export default async function () {
 		console.log('  ' + ansis.dim(source.dir));
 		console.log(separator);
 
-		const {scripts} = await getScripts(source.dir, source.namespace);
+		const {scripts} = source;
 		for (const {slug, bin} of scripts) {
 			if (slug.startsWith('_')) {
 				continue;

@@ -1,67 +1,33 @@
-import type {Script, Scripts} from '@lib/commands';
+
 import {
-	PATHS, SUPPORTED_FILES, get, type Collection,
-} from '@lib/config';
+	getPathCommands, type Command, type InstantScript, type Script, type Scripts,
+} from '@lib/commands';
+import {get, type Collection} from '@lib/config';
 
-export async function listScripts(target: string): Promise<string[]> {
-	const result = await $`ls ${target}`.text();
-	return result.split('\n')
-		.map((file: string) => `${target}/${file}`)
-		.filter((file: string) => SUPPORTED_FILES.some((extension: string) => file.endsWith(extension)));
-}
-
-async function getScript(file: string, parent?: string): Promise<Script> {
-	const slug = path.parse(file).name;
-	const filename = path.parse(file).base;
-	const binary = `${PATHS.bins}/${slug}`;
-	const directory = path.dirname(file);
-	const command = parent ? `${parent} ${slug}` : slug;
-	return {
-		slug,
-		bin: binary,
-		source: file,
-		filename,
-		command,
-		dir: directory,
-	};
-}
-
-export async function getScripts<T extends string | undefined>(sourcePath: string, namespace?: T): Promise<Collection<T> & Scripts> {
-	const files = await listScripts(sourcePath);
-	const scripts = await Promise.all(files.map(async file => getScript(file, namespace)));
-	return {
-		dir: sourcePath,
-		namespace: namespace as Collection<T>['namespace'],
-		scripts,
-	};
-}
-
-export async function getSource(name: string): Promise<Collection> {
+export async function getSources(): Promise<Array<Collection & Scripts>> {
 	const sources = await get('sources');
 	if (!sources) {
 		throw new Error('No sources defined.');
 	}
 
-	const source = sources.find(source => path.basename(source.dir) === name);
-	if (!source) {
-		throw new Error(`No source found with the name: ${name}`);
-	}
-
-	return getScripts(source.dir, source.namespace);
-}
-
-export async function getSources(): Promise<Collection[]> {
-	const sources = await get('sources');
-	if (!sources) {
-		throw new Error('No sources defined.');
-	}
-
-	const output: Array<Promise<Collection>> = [];
+	const output: Array<Collection & Scripts> = [];
 	for (const source of sources) {
-		output.push(getScripts(source.dir, source.namespace));
+		const commands = await getPathCommands(source.dir, source.namespace);
+
+		const scripts: Script[] = Array.from(commands.commands)
+			.filter(
+				(entry): entry is [string, InstantScript | Command] =>
+					entry[1].type === 'instant-script' || entry[1].type === 'command',
+			).map(entry => entry[1]);
+
+		output.push({
+			dir: source.dir,
+			namespace: source.namespace,
+			scripts,
+		});
 	}
 
-	return Promise.all(output);
+	return output;
 }
 
 export function commandFromString(input: string): [string, string | undefined] {
@@ -84,8 +50,7 @@ export async function findScript<T extends string>(query: T): Promise<Script | u
 	if (namespace) {
 		const source = sources.find(source => source.namespace === namespace);
 		if (source) {
-			const sourceWithScripts = await getScripts(source.dir, source.namespace);
-			const result = sourceWithScripts.scripts.find(s => s.command === script);
+			const result = source.scripts.find(s => s.command === script);
 			if (result) {
 				return result;
 			}
@@ -94,8 +59,7 @@ export async function findScript<T extends string>(query: T): Promise<Script | u
 		// No namespace found. Maybe the source exists globally.
 		const noNsSources = sources.filter(source => !source.namespace);
 		for (const source of noNsSources) {
-			const sourceWithScripts = await getScripts(source.dir);
-			const result = sourceWithScripts.scripts.find(s => s.command === script);
+			const result = source.scripts.find(s => s.command === script);
 			if (result) {
 				return result;
 			}
@@ -109,7 +73,7 @@ export async function findNamespace<T extends string>(query: T): Promise<Collect
 
 	if (!namespace && script) {
 		// Check if maybe only the namespace was passed in
-		const source = sources.find((source): source is Collection<T> => source.namespace === query);
+		const source = sources.find((source): source is Collection<T> & Scripts => source.namespace === query);
 		if (source) {
 			return source;
 		}

@@ -1,5 +1,5 @@
 import {PATHS} from '@lib/config';
-import {getScripts, getSources} from '@lib/sources';
+import {getSources} from '@lib/sources';
 
 export const desc = 'Reload your script files and ensure that they have an executable bin.';
 export const usage = '[--force]';
@@ -45,7 +45,7 @@ export async function reloadBins() {
 				count++;
 			}
 		} else {
-			const {scripts} = await getScripts(source.dir, source.namespace);
+			const {scripts} = source;
 			for (const script of scripts) {
 				if (await ensureBin(script.slug, script.source, false)) {
 					count++;

@@ -23,7 +23,7 @@ export default async function (commands: Map<string, Command | NotFound | Instan
 			continue;
 		}
 
-		if (Bun.file(command.file).name?.startsWith('_')) {
+		if (command.type !== 'not-found' && Bun.file(command.source).name?.startsWith('_')) {
 			continue;
 		}
 
@@ -34,7 +34,7 @@ export default async function (commands: Map<string, Command | NotFound | Instan
 			}
 
 			columns.log([
-				ansis.bold(command.name),
+				ansis.bold(command.slug),
 				ansis.gray(command.usage || ''),
 				description,
 			]);

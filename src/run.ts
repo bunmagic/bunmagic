@@ -11,13 +11,8 @@ export async function run(scriptFile: string) {
 
 
 export async function runNamespace(namespace: string, sourcePath: string) {
-	const getScripts = await import('./lib/sources').then(m => m.getScripts);
-	const getCommands = await import('./lib/commands').then(m => m.getCommands);
-
-	const source = await getScripts(sourcePath, namespace);
-	const files = source.scripts.map(script => script.source);
-
-	const {router: routerInfo, commands} = await getCommands(files);
+	const getPathCommands = await import('./lib/commands').then(m => m.getPathCommands);
+	const {router: routerInfo, commands} = await getPathCommands(sourcePath, namespace);
 	const input = slugify(argv._[0] ?? '');
 
 	try {
@@ -49,8 +44,8 @@ export async function runNamespace(namespace: string, sourcePath: string) {
 
 		// Prepare the script
 		const script = (command.type === 'instant-script')
-			? async () => import(command.file)
-			: await import(command.file).then(m => m.default as () => Promise<void>);
+			? async () => import(command.source)
+			: await import(command.source).then(m => m.default as () => Promise<void>);
 
 		// Let the router execute the command
 		await router({
