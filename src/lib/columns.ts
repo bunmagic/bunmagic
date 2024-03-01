@@ -18,7 +18,7 @@ export class Columns<T extends number, Row extends string | FixedArray<string, T
 	}
 
 	public setColumnWidths(widths: FixedArray<number, T>) {
-		const maxCols = process.stdout.columns || 80;
+		const maxCols = (process.stdout.columns || 80) - this.indent;
 		const totalGap = this.indent + (this.gap * (this.columnCount - 1));
 		const totalWidth = widths.reduce((accumulator, width) => accumulator + width, 0) + totalGap;
 		const lastWidth = widths.at(-1) || 100;
