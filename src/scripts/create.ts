@@ -82,7 +82,7 @@ export async function create(command: string) {
 		? await namespacedScriptPath(slug, namespace)
 		: await scriptPath(slug);
 
-	const extension = await get('extension', 'ts');
+	const extension = await get('extension');
 	const binaryName = namespace ?? slug;
 	const editFilePath = `${partialPath}.${extension}`;
 	const targetPath = namespace ?? editFilePath;
