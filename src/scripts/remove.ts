@@ -1,9 +1,8 @@
-import type {Scripts} from '@lib/commands';
 import {
-	PATHS, update, type Collection,
+	PATHS, update,
 } from '@lib/config';
 import {
-	getSources, findNamespace, findScript,
+	getSources, findNamespace, findScript, type Source,
 } from '@lib/sources';
 
 export const desc = 'Remove and unlink a script';
@@ -21,8 +20,9 @@ async function removeNamespace(query: string) {
 	}
 
 	const sources = await getSources();
-	const updatedSources = sources.filter((d): d is Scripts & Collection => 'namespace' in d && d.namespace !== source.namespace);
-	// @TODO: The type doesn't complain, but the type is incorrect. I'm updating both scripts and namespaces.
+	const updatedSources = sources
+		.filter((d): d is Source => 'namespace' in d && d.namespace !== source.namespace)
+		.map(({namespace, dir}) => ({namespace, dir}));
 	await update('sources', updatedSources);
 }
 
