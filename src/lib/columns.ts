@@ -4,24 +4,25 @@ type GrowToSize<T, N extends number, A extends T[]> =
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type FixedArray<T, N extends number> = T[] & GrowToSize<T, N, []>;
+type ColumnConfig = 'auto' | '' | number | `${number}%`;
+
+function fixedLengthArray<T, N extends number>(length: N, fill: T): FixedArray<T, N> {
+	return Array.from({length}, () => fill) as FixedArray<T, N>;
+}
 
 export class Columns<T extends number, Row extends string | FixedArray<string, T>> {
 	public indent = 2;
 	public gap = 2;
 	private readonly rows: Row[] = [];
-	private columnWidths: number[] = [];
 
-	constructor(private readonly columnCount: T) {}
+	constructor(
+		private readonly columnCount: T,
+		private readonly config: FixedArray<ColumnConfig, T> = fixedLengthArray(columnCount, 'auto'),
+	) {}
 
 	log(data: Row) {
 		this.rows.push(data);
 	}
-
-	public setColumnWidths(widths: FixedArray<number, T>) {
-		this.columnWidths = widths;
-	}
-
-
 
 	public render() {
 		let output = '';
@@ -75,19 +76,33 @@ export class Columns<T extends number, Row extends string | FixedArray<string, T
 	}
 
 	private calculateColumnWidths() {
-		const widths = this.columnWidths;
 		const autoWidths = this.getColumnWidths();
 		const maxCols = (process.stdout.columns || 80) - this.indent;
 
-		for (let [index, width] of widths.entries()) {
-			const autoWidth = autoWidths[index];
+		const widths = Array.from({length: this.columnCount}, () => 0);
+		// Loop over the automatically set widths
+		for (let [index, width] of autoWidths.entries()) {
+			const config = this.config[index];
 
-			if (width > maxCols) {
-				width = Math.floor(maxCols / this.columnCount);
+
+			// If the column is set to auto or an empty string, skip it
+			if (config === 'auto' || config === '') {
+				widths[index] = width;
 			}
 
-			if (width === 0) {
-				width = autoWidth;
+			// Calculate the percentage width
+			if (typeof config === 'string' && config.endsWith('%')) {
+				const percentage = Number(config.slice(0, -1));
+				width = Math.floor(maxCols * (percentage / 100));
+			}
+
+			if (typeof config === 'number') {
+				width = config;
+			}
+
+			// Make sure that the column can fit
+			if (width > maxCols) {
+				width = Math.floor(maxCols / this.columnCount);
 			}
 
 			widths[index] = width;
