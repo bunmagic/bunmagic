@@ -14,6 +14,7 @@ export default async function (commands: Map<string, Command | NotFound | Instan
 	console.log(`\n  ${ansis.bold('Usage:')} ${ansis.bold.yellowBright('bunmagic')} ${ansis.dim('<command>')} ${ansis.dim('[arguments]')}`);
 	console.log(`\n  ${ansis.bold('Commands:')}`);
 
+	columns.buffer();
 	for (const [name, command] of commands.entries()) {
 		if (('alias' in command && command.alias && command.alias.includes(name))) {
 			continue;
@@ -37,5 +38,5 @@ export default async function (commands: Map<string, Command | NotFound | Instan
 		}
 	}
 
-	console.log(columns.render());
+	columns.flushLog();
 }

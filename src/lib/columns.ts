@@ -43,6 +43,12 @@ export class Columns<T extends number, Row extends string | FixedArray<string, T
 		return result;
 	}
 
+	public flushLog() {
+		this.isBuffering = false;
+		console.log(this.render());
+		this.rows.length = 0;
+	}
+
 	public render() {
 		const rows: string[] = [];
 		for (const row of this.rows) {
