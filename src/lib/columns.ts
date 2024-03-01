@@ -21,18 +21,20 @@ export class Columns<T extends number, Row extends string | FixedArray<string, T
 		const maxCols = (process.stdout.columns || 80) - this.indent;
 		const totalGap = this.indent + (this.gap * (this.columnCount - 1));
 		const totalWidth = widths.reduce((accumulator, width) => accumulator + width, 0) + totalGap;
-		const lastWidth = widths.at(-1) || 100;
-		const maxLastColumnWidth = maxCols - totalWidth + lastWidth;
-		if (maxLastColumnWidth < lastWidth) {
-			widths[widths.length - 1] = maxLastColumnWidth;
+
+		if (totalWidth > maxCols) {
+			const maxWidth = Math.max(...widths);
+			const maxWidthIndex = widths.indexOf(maxWidth);
+			const adjustment = totalWidth - maxCols;
+			widths[maxWidthIndex] = maxWidth - adjustment;
 		}
 
 		this.columnWidths = widths;
 	}
 
 	public render() {
-		if (this.columnWidths.length === 0) {
-			this.columnWidths = this.getColumnWidths();
+		if (this.columnWidths.length !== this.columnCount) {
+			this.setColumnWidths(this.getColumnWidths());
 		}
 
 		let output = '';
@@ -112,7 +114,7 @@ export class Columns<T extends number, Row extends string | FixedArray<string, T
 					remainingContent,
 					...Array.from({length: columnsRight}, () => ''),
 				];
-				output += this.renderRow(columnsToWrap);
+				output += this.renderRow(columnsToWrap) + '\n';
 			} else {
 				const width = widthLimit - contentWidth;
 				output += content;
@@ -123,7 +125,7 @@ export class Columns<T extends number, Row extends string | FixedArray<string, T
 		return output;
 	}
 
-	private getColumnWidths(): number[] {
+	private getColumnWidths(): FixedArray<number, T> {
 		const rows = this.rows.filter(row => typeof row !== 'string') as string[][];
 		const widths = Array.from({length: this.columnCount}, () => 0);
 		for (const row of rows) {
@@ -139,6 +141,6 @@ export class Columns<T extends number, Row extends string | FixedArray<string, T
 			}
 		}
 
-		return widths;
+		return widths as FixedArray<number, T>;
 	}
 }
