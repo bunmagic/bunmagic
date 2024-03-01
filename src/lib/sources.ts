@@ -1,16 +1,16 @@
 
 import {
-	getPathCommands, type Command, type InstantScript, type Script, type Scripts,
+	getPathCommands, type Command, type InstantScript, type Script,
 } from '@lib/commands';
 import {get, type Collection} from '@lib/config';
 
-export async function getSources(): Promise<Array<Collection & Scripts>> {
+export async function getSources(): Promise<Array<Collection>> {
 	const sources = await get('sources');
 	if (!sources) {
 		throw new Error('No sources defined.');
 	}
 
-	const output: Array<Collection & Scripts> = [];
+	const output: Collection[] = [];
 	for (const source of sources) {
 		const commands = await getPathCommands(source.dir, source.namespace);
 
@@ -67,13 +67,13 @@ export async function findScript<T extends string>(query: T): Promise<Script | u
 	}
 }
 
-export async function findNamespace<T extends string>(query: T): Promise<Collection<T> | undefined> {
+export async function findNamespace<T extends string>(query: T): Promise<Collection | undefined> {
 	const sources = await getSources();
 	const [script, namespace] = commandFromString(query);
 
 	if (!namespace && script) {
 		// Check if maybe only the namespace was passed in
-		const source = sources.find((source): source is Collection<T> & Scripts => source.namespace === query);
+		const source = sources.find((source): source is Collection => source.namespace === query);
 		if (source) {
 			return source;
 		}
@@ -82,7 +82,7 @@ export async function findNamespace<T extends string>(query: T): Promise<Collect
 	return undefined;
 }
 
-export async function findAny<T extends string>(query: T): Promise<Script | Collection<T> | undefined> {
+export async function findAny<T extends string>(query: T): Promise<Script | Collection | undefined> {
 	const script = await findScript(query);
 	if (script) {
 		return script;
