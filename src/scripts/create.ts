@@ -2,6 +2,7 @@ import {
 	commandFromString,
 	getSources,
 	findAny,
+	findNamespace,
 } from '@lib/sources';
 import {get} from '@lib/config';
 import {openEditor} from '@lib/utils';
@@ -23,8 +24,7 @@ export default async function () {
 type PartialScriptPath = string & {__partialPath: true};
 async function namespacedScriptPath(slug: string, namespace: string): Promise<PartialScriptPath> {
 	// Get the namespace directory
-	const sources = await getSources();
-	const source = sources.find(d => 'namespace' in d && d.namespace === namespace);
+	const source = await findNamespace(namespace);
 	if (!source) {
 		throw new Error(`Namespace "${namespace}" not found`);
 	}
