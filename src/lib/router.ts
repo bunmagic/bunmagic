@@ -1,6 +1,7 @@
 import {create} from '../scripts/create';
 import help from '../scripts/help';
-import type {Script, NotFound} from './scripts';
+import type {Script} from './script';
+import type {NotFound} from './scripts';
 
 export type Route = {
 	/**
