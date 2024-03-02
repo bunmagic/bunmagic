@@ -35,7 +35,11 @@ const router: RouterCallback = async ({script, command, commands}) => {
 	try {
 		// Shift the first argument off the list and run the script.
 		argv._.shift();
-		await script();
+		const source = await script();
+		// If the script is a module, run it.
+		if (source && 'default' in source) {
+			await source.default();
+		}
 	} catch (error) {
 		throw new Exit(error);
 	}

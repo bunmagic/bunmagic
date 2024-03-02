@@ -16,10 +16,10 @@ export default async function (commands: Map<string, Script | NotFound>) {
 
 	columns.buffer();
 	columns.log('');
-	columns.log(['command', 'args', 'description'].map(s => ansis.dim(s)) as [string, string, string]);
-	columns.log(['-------', '----', '-----------'].map(s => ansis.dim(s)) as [string, string, string]);
+	columns.log(['script', 'args', 'description'].map(s => ansis.dim(s)) as [string, string, string]);
+	columns.log(['------', '----', '-----------'].map(s => ansis.dim(s)) as [string, string, string]);
 	for (const [name, command] of commands.entries()) {
-		if (command.type !== 'command') {
+		if (command.type !== 'script') {
 			continue;
 		}
 

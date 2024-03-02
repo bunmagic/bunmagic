@@ -25,7 +25,7 @@ export type Route = {
 	 * The script to run.
 	 * The router is responsible for running this script and handling any errors.
 	 */
-	script: () => Promise<void>;
+	script: () => Promise<void | {default: () => Promise<void>}>;
 };
 
 export type RouterCallback = (route: Route) => Promise<void>;
@@ -56,7 +56,11 @@ const router: RouterCallback = async ({namespace, name, script, command, command
 
 	if (command) {
 		try {
-			await script();
+			const source = await script();
+			// If the script is a module, run it.
+			if (source && 'default' in source) {
+				await source.default();
+			}
 		} catch (error) {
 			throw new Exit(error);
 		}

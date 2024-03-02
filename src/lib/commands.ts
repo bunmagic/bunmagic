@@ -2,7 +2,7 @@ import {SUPPORTED_FILES, type Config, PATHS} from './config';
 import {slugify} from './utils';
 
 export type Script = {
-	type: 'command';
+	type: 'script';
 	/**
 	 * The command name, for example:
 	 * `my-command`
@@ -83,7 +83,7 @@ function commentToString(needle: string, haystack: string[]) {
 	return value;
 }
 
-function parseInstantScript(filePath: string, allLines: string[], namespace?: string): Script {
+function extractScriptMetadata(filePath: string, allLines: string[], namespace?: string): Script {
 	// Only search first 20 lines.
 	const lines = allLines.slice(0, 20);
 
@@ -99,7 +99,7 @@ function parseInstantScript(filePath: string, allLines: string[], namespace?: st
 	const slug = slugify(name);
 	return {
 		source: filePath,
-		type: 'command',
+		type: 'script',
 		filename: path.basename(filePath),
 		command: namespace ? `${namespace} ${slug}` : slug,
 		bin: `${PATHS.bins}/${slug}`,
@@ -134,7 +134,7 @@ async function describeCommand(file: string, namespace?: string): Promise<Script
 			const desc = typeof meta.desc === 'string' ? meta.desc : undefined;
 			return {
 				slug,
-				type: 'command',
+				type: 'script',
 				command: namespace ? `${namespace} ${slug}` : slug,
 				bin: `${PATHS.bins}/${slug}`,
 				dir: path.dirname(file),
@@ -146,7 +146,7 @@ async function describeCommand(file: string, namespace?: string): Promise<Script
 			};
 		}
 	} else {
-		return parseInstantScript(file, lines, namespace);
+		return extractScriptMetadata(file, lines, namespace);
 	}
 
 	return {
@@ -155,19 +155,19 @@ async function describeCommand(file: string, namespace?: string): Promise<Script
 	};
 }
 
-type CommandList = {
+type ScriptList = {
 	router: Router;
-	commands: Map<string, Script | NotFound >;
+	scripts: Map<string, Script | NotFound >;
 };
-export async function getPathCommands(target: string, namespace?: string): Promise<CommandList> {
+export async function getPathScripts(target: string, namespace?: string): Promise<ScriptList> {
 	const result = await $`ls ${target}`.text();
 	const files = result.split('\n')
 		.map((file: string) => `${target}/${file}`)
 		.filter((file: string) => SUPPORTED_FILES.some((extension: string) => file.endsWith(extension)));
-	return getCommands(files, namespace);
+	return getScripts(files, namespace);
 }
 
-export async function getCommands(files: string[], namespace?: string): Promise<CommandList> {
+async function getScripts(files: string[], namespace?: string): Promise<ScriptList> {
 	const validFiles = files.filter((file: string) => SUPPORTED_FILES.includes(path.extname(file).replace('.', '') as Config['extension']));
 	const list = await Promise.all(validFiles.map(async value => describeCommand(value, namespace)));
 
@@ -180,7 +180,7 @@ export async function getCommands(files: string[], namespace?: string): Promise<
 			continue;
 		}
 
-		if (command.type === 'command') {
+		if (command.type === 'script') {
 			const commandSlug = slugify(command.slug);
 			if (map.has(commandSlug)) {
 				console.warn(`Warning: Duplicate command slug '${commandSlug}' detected. Skipping.`);
@@ -214,5 +214,5 @@ export async function getCommands(files: string[], namespace?: string): Promise<
 		};
 	}
 
-	return {router, commands: map};
+	return {router, scripts: map};
 }

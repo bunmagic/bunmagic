@@ -9,10 +9,9 @@ export async function run(scriptFile: string) {
 	}
 }
 
-
 export async function runNamespace(namespace: string, sourcePath: string) {
-	const getPathCommands = await import('./lib/commands').then(m => m.getPathCommands);
-	const {router: routerInfo, commands} = await getPathCommands(sourcePath, namespace);
+	const getPathCommands = await import('./lib/commands').then(m => m.getPathScripts);
+	const {router: routerInfo, scripts: commands} = await getPathCommands(sourcePath, namespace);
 	const input = slugify(argv._[0] ?? '');
 
 	try {
@@ -28,8 +27,8 @@ export async function runNamespace(namespace: string, sourcePath: string) {
 		const command = commands.get(input);
 
 		if (!command || command.type === 'not-found') {
-			const commandNotFound = () => {
-				throw new Error(`Command not found: ${input}`);
+			const scriptNotFound = () => {
+				throw new Error(`Script not found: ${input}`);
 			};
 
 			await router({
@@ -37,15 +36,13 @@ export async function runNamespace(namespace: string, sourcePath: string) {
 				name: input,
 				command,
 				commands,
-				script: commandNotFound,
+				script: scriptNotFound,
 			});
 			return;
 		}
 
 		// Prepare the script
-		const script = (command.type === 'instant-script')
-			? async () => import(command.source)
-			: await import(command.source).then(m => m.default as () => Promise<void>);
+		const script = async () => import(command.source);
 
 		// Let the router execute the command
 		await router({

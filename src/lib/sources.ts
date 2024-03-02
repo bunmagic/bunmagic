@@ -1,6 +1,6 @@
 
 import {
-	getPathCommands, type Script,
+	getPathScripts, type Script,
 } from '@lib/commands';
 import {get, type SourcePaths} from '@lib/config';
 
@@ -15,11 +15,11 @@ export async function getSources(): Promise<Array<Source>> {
 
 	const sources: Source[] = [];
 	for (const source of sourceConfig) {
-		const commands = await getPathCommands(source.dir, source.namespace);
+		const commands = await getPathScripts(source.dir, source.namespace);
 
-		const scripts: Script[] = Array.from(commands.commands)
+		const scripts: Script[] = Array.from(commands.scripts)
 			.filter(
-				(entry): entry is [string, Script] => entry[1].type === 'command',
+				(entry): entry is [string, Script] => entry[1].type === 'script',
 			).map(entry => entry[1]);
 
 		sources.push({
