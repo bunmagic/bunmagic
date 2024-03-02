@@ -32,3 +32,12 @@ export async function ensureDirectory(path: string) {
 
 	return true;
 }
+
+
+export function resolveTilde(input: string) {
+	if (input.startsWith('~')) {
+		return `${$HOME}${input.slice(1)}`;
+	}
+
+	return input;
+}
