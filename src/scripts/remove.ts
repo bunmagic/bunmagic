@@ -1,6 +1,7 @@
+import type {Script} from '@lib/commands';
 import {update} from '@lib/config';
 import {
-	getSources, findNamespace, findScript, type Source,
+	getSources, findNamespace, type Source, findAny,
 } from '@lib/sources';
 
 export const desc = 'Remove and unlink a script';
@@ -24,6 +25,29 @@ async function removeNamespace(query: string) {
 	await update('sources', updatedSources);
 }
 
+async function removeScript(script: Script) {
+	if (!ack(`Delete command "${ansis.bold(script.slug)}"?`)) {
+		return false;
+	}
+
+	const binaryFileExists = await Bun.file(script.bin).exists();
+	const sourceFileExists = await Bun.file(script.source).exists();
+
+	console.log(ansis.gray(`Removing "${script.bin}"`));
+	if (binaryFileExists && ack('Remove the binary?')) {
+		await $`rm ${script.bin}`;
+	}
+
+	console.log(ansis.gray(`Removing "${script.source}"`));
+	if (sourceFileExists && ack('Remove the source file?')) {
+		await $`rm ${script.source}`;
+	}
+
+	if (!binaryFileExists && !sourceFileExists) {
+		console.log(`🍀 You're in luck! "${script.slug}" doesn't exist already!`);
+	}
+}
+
 export default async function () {
 	if (argv._.length === 0) {
 		throw new Error(
@@ -32,35 +56,19 @@ export default async function () {
 	}
 
 	const input = argv._.join(' ');
-	const script = await findScript(input);
+	const script = await findAny(input);
 
 	if (!script) {
-		try {
-			await removeNamespace(input);
-		} catch {
-			console.log(`Can't find a namespace or a script with the name "${input}".`);
-		}
-
-		return;
+		throw new Exit(`Can't find script or namespace "${input}"`);
 	}
 
-	if (!ack(`Delete command "${ansis.bold(input)}"?`)) {
-		return false;
+	if ('namespace' in script) {
+		console.log(script);
+		return removeNamespace(input);
 	}
 
-	const binaryFileExists = await Bun.file(script.bin).exists();
-	const sourceFileExists = await Bun.file(script.source).exists();
-
-	if (binaryFileExists) {
-		await $`rm ${script.bin}`;
-	}
-
-	if (sourceFileExists && ack('Remove the source file?')) {
-		await $`rm ${script.source}`;
-	}
-
-	if (!binaryFileExists && !sourceFileExists) {
-		console.log(`🍀 You're in luck! "${input}" doesn't exist already!`);
+	if ('slug' in script) {
+		return removeScript(script);
 	}
 }
 
