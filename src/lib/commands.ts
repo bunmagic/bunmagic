@@ -82,7 +82,7 @@ function commentToString(needle: string, haystack: string[]) {
 	return value;
 }
 
-function parseInstantScript(filePath: string, allLines: string[]): InstantScript {
+function parseInstantScript(filePath: string, allLines: string[], namespace?: string): InstantScript {
 	// Only search first 20 lines.
 	const lines = allLines.slice(0, 20);
 
@@ -100,7 +100,7 @@ function parseInstantScript(filePath: string, allLines: string[]): InstantScript
 		type: 'instant-script',
 		source: filePath,
 		filename: path.basename(filePath),
-		command: slug, // @TODO include namespace...?
+		command: namespace ? `${namespace} ${slug}` : slug,
 		bin: `${PATHS.bins}/${slug}`,
 		dir: path.dirname(filePath),
 		slug,
@@ -138,7 +138,7 @@ async function importCommand(file: string, namespace?: string): Promise<Command 
 			};
 		}
 	} else {
-		return parseInstantScript(file, lines);
+		return parseInstantScript(file, lines, namespace);
 	}
 
 	return {
