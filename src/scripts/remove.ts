@@ -1,4 +1,4 @@
-import type {Script} from '@lib/script';
+import {Script} from '@lib/script';
 import {update} from '@lib/config';
 import {
 	getSources, findNamespace, type Source, findAny,
@@ -63,12 +63,13 @@ export default async function () {
 	}
 
 	if ('namespace' in script) {
-		console.log(script);
 		return removeNamespace(input);
 	}
 
-	if ('slug' in script) {
+	if (script instanceof Script) {
 		return removeScript(script);
 	}
+
+	throw new Exit('Unknown script type');
 }
 
