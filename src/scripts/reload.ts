@@ -71,6 +71,19 @@ export async function ensureNamespaceBin(binaryName: string, targetPath: string)
 export async function reloadBins() {
 	let count = 0;
 	for (const source of await getSources()) {
+		if (argv.symlink === true) {
+			const directory = source.dir;
+			const linkPath = path.join(PATHS.bunmagic, 'sources', path.basename(directory));
+			if (directory.startsWith(PATHS.bunmagic)) {
+				console.log(`Source already in ${PATHS.bunmagic}: ${directory}`);
+			} else {
+				await $`rm -f ${linkPath}`;
+				await ensureDirectory(path.dirname(linkPath));
+				await $`ln -s ${directory} ${linkPath}`;
+				console.log(`Linked source: ${directory} -> ${linkPath}`);
+			}
+		}
+
 		if (source.namespace) {
 			if (await ensureNamespaceBin(source.namespace, source.dir)) {
 				count++;
