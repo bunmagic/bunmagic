@@ -12,8 +12,11 @@ export const usage = '[script-name]';
 export default async function () {
 	const slug = argv._.join(' ');
 	if (!slug) {
-		console.log('Slug not specified. Opening ~/.bunmagic and all scripts...');
-		return openEditor(PATHS.bunmagic);
+		if (ack(`Slug not specified. Open ${ansis.bold('~/.bunmagic')} ?`)) {
+			return openEditor(PATHS.bunmagic);
+		}
+
+		return;
 	}
 
 	return edit(slug);
