@@ -19,16 +19,6 @@ export class Script {
 	 */
 	bin: string;
 	/**
-	 * The directory path, for example:
-	 * `/path/to/dir `
-	 */
-	dir: string;
-	/**
-	 * The filename, for example:
-	 * `my-command.js`
-	 */
-	filename: string;
-	/**
 	 * The full source path, for example:
 	 * `/path/to/dir/my-command.js`
 	 */
@@ -68,12 +58,26 @@ export class Script {
 	}) {
 		this.source = source;
 		this.slug = slugify(slug ?? path.parse(source).name);
-		this.filename = path.basename(source);
 		this.command = namespace ? `${namespace} ${this.slug}` : this.slug;
 		this.bin = `${PATHS.bins}/${slug}`;
-		this.dir = path.dirname(source);
 		this.desc = desc;
 		this.usage = usage;
 		this.alias = alias ?? [];
+	}
+
+	/**
+	 * The filename, for example:
+	 * `my-command.js`
+	 */
+	get filename() {
+		return path.basename(this.source);
+	}
+
+	/**
+	 * The directory path, for example:
+	 * `/path/to/dir `
+	 */
+	get dir() {
+		return path.dirname(this.source);
 	}
 }
