@@ -1,6 +1,6 @@
 
 import {
-	getPathCommands, type Command, type InstantScript, type Script,
+	getPathCommands, type Script,
 } from '@lib/commands';
 import {get, type SourcePaths} from '@lib/config';
 
@@ -19,8 +19,7 @@ export async function getSources(): Promise<Array<Source>> {
 
 		const scripts: Script[] = Array.from(commands.commands)
 			.filter(
-				(entry): entry is [string, InstantScript | Command] =>
-					entry[1].type === 'instant-script' || entry[1].type === 'command',
+				(entry): entry is [string, Script] => entry[1].type === 'command',
 			).map(entry => entry[1]);
 
 		sources.push({

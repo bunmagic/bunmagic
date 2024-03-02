@@ -2,6 +2,7 @@ import {SUPPORTED_FILES, type Config, PATHS} from './config';
 import {slugify} from './utils';
 
 export type Script = {
+	type: 'command';
 	/**
 	 * The command name, for example:
 	 * `my-command`
@@ -36,20 +37,10 @@ export type Script = {
 	desc?: string;
 	usage?: string;
 	alias?: string[];
-
-	type: 'unknown' | 'instant-script' | 'command';
 };
 
 export type Scripts = {
 	scripts: Script[];
-};
-
-export type InstantScript = Script & {
-	type: 'instant-script';
-};
-
-export type Command = Script & {
-	type: 'command';
 };
 
 export type Router = {
@@ -82,7 +73,7 @@ function commentToString(needle: string, haystack: string[]) {
 	return value;
 }
 
-function parseInstantScript(filePath: string, allLines: string[], namespace?: string): InstantScript {
+function parseInstantScript(filePath: string, allLines: string[], namespace?: string): Script {
 	// Only search first 20 lines.
 	const lines = allLines.slice(0, 20);
 
@@ -97,8 +88,8 @@ function parseInstantScript(filePath: string, allLines: string[], namespace?: st
 
 	const slug = slugify(name);
 	return {
-		type: 'instant-script',
 		source: filePath,
+		type: 'command',
 		filename: path.basename(filePath),
 		command: namespace ? `${namespace} ${slug}` : slug,
 		bin: `${PATHS.bins}/${slug}`,
@@ -110,7 +101,7 @@ function parseInstantScript(filePath: string, allLines: string[], namespace?: st
 	};
 }
 
-async function importCommand(file: string, namespace?: string): Promise<Command | InstantScript | Router | NotFound> {
+async function importCommand(file: string, namespace?: string): Promise<Script | Router | NotFound> {
 	const content = await Bun.file(file).text();
 	const lines = content.split('\n');
 	if (lines.some(line => line.trim().startsWith('export default'))) {
@@ -124,12 +115,14 @@ async function importCommand(file: string, namespace?: string): Promise<Command 
 		}
 
 		if ('default' in handle) {
-			const meta = {...handle, default: undefined};
+			// Remove the `default` property from the object.
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
+			const {default: _, ...meta} = handle;
 			const slug = path.parse(file).name;
 			return {
 				slug,
-				command: namespace ? `${namespace} ${slug}` : slug,
 				type: 'command',
+				command: namespace ? `${namespace} ${slug}` : slug,
 				bin: `${PATHS.bins}/${slug}`,
 				dir: path.dirname(file),
 				filename: path.basename(file),
@@ -149,7 +142,7 @@ async function importCommand(file: string, namespace?: string): Promise<Command 
 
 type CommandList = {
 	router: Router;
-	commands: Map<string, Command | NotFound | InstantScript >;
+	commands: Map<string, Script | NotFound >;
 };
 export async function getPathCommands(target: string, namespace?: string): Promise<CommandList> {
 	const result = await $`ls ${target}`.text();
@@ -163,7 +156,7 @@ export async function getCommands(files: string[], namespace?: string): Promise<
 	const validFiles = files.filter((file: string) => SUPPORTED_FILES.includes(path.extname(file).replace('.', '') as Config['extension']));
 	const list = await Promise.all(validFiles.map(async value => importCommand(value, namespace)));
 
-	const map = new Map<string, Command | NotFound | InstantScript >();
+	const map = new Map<string, Script | NotFound >();
 	let router: Router | undefined;
 
 	for (const command of list) {
@@ -172,12 +165,23 @@ export async function getCommands(files: string[], namespace?: string): Promise<
 			continue;
 		}
 
-		if (command.type === 'command' || command.type === 'instant-script') {
-			map.set(slugify(command.slug), command);
+		if (command.type === 'command') {
+			const commandSlug = slugify(command.slug);
+			if (map.has(commandSlug)) {
+				console.warn(`Warning: Duplicate command slug '${commandSlug}' detected. Skipping.`);
+			} else {
+				map.set(commandSlug, command);
+			}
 
 			if (command.alias) {
 				for (const alias of command.alias) {
-					map.set(alias, command);
+					// @TODO - simplify - remove the need for this eslint ignore:
+					// eslint-disable-next-line max-depth
+					if (map.has(alias)) {
+						console.warn(`Warning: Alias '${alias}' conflicts with an existing command or alias. Skipping.`);
+					} else {
+						map.set(alias, command);
+					}
 				}
 			}
 		}
