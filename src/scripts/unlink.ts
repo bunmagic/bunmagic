@@ -1,5 +1,4 @@
 import * as config from '@lib/config';
-import {getSources, type Source} from '@lib/sources';
 import {reloadBins} from './reload';
 
 export const desc = 'Remove a directory from the script source list.';
