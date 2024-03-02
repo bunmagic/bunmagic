@@ -34,13 +34,23 @@ export type Script = {
 	 */
 	source: string;
 
+	/**
+	 * A description of the command.
+	 * Used in the help command.
+	 */
 	desc: string | undefined;
-	usage: string | undefined;
-	alias: string[] | undefined;
-};
 
-export type Scripts = {
-	scripts: Script[];
+	/**
+	 * A usage example of the command.
+	 * Used in the help command.
+	 */
+	usage: string | undefined;
+
+	/**
+	 * A list of aliases for the command.
+	 * Creates bin files for each alias.
+	 */
+	alias: string[] | undefined;
 };
 
 export type Router = {
