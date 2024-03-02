@@ -1,4 +1,5 @@
 import {PATHS} from '@lib/config';
+import {slugify} from './utils';
 
 export class Script {
 	public readonly type = 'script' as const;
@@ -60,17 +61,17 @@ export class Script {
 	}: {
 		source: string;
 		namespace?: string;
-		slug: string;
+		slug?: string;
 		desc?: string;
 		usage?: string;
 		alias?: string[];
 	}) {
 		this.source = source;
+		this.slug = slugify(slug ?? path.parse(source).name);
 		this.filename = path.basename(source);
-		this.command = namespace ? `${namespace} ${slug}` : slug;
+		this.command = namespace ? `${namespace} ${this.slug}` : this.slug;
 		this.bin = `${PATHS.bins}/${slug}`;
 		this.dir = path.dirname(source);
-		this.slug = slug;
 		this.desc = desc;
 		this.usage = usage;
 		this.alias = alias ?? [];

@@ -36,20 +36,15 @@ function scriptFromText(source: string, allLines: string[], namespace?: string):
 	// Only search first 20 lines.
 	const lines = allLines.slice(0, 20);
 
-	const name = commentToString('name', lines) ?? path.basename(source, path.extname(source));
+	const slug = commentToString('name', lines);
 	const desc = commentToString('desc', lines);
 	const usage = commentToString('usage', lines);
 	const alias = commentToString('alias', lines)?.split(',').map(alias => alias.trim()) ?? [];
 
-	if (!name) {
-		throw new Error(`Instant script at ${source} must have a name.`);
-	}
-
-	const slug = slugify(name);
 	return new Script({
+		slug,
 		source,
 		namespace,
-		slug,
 		desc,
 		usage,
 		alias,
@@ -60,12 +55,10 @@ function scriptFromExport(source: string, handle: Record<string, unknown>, names
 	// Remove the `default` property from the object.
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const {default: _, ...meta} = handle;
-	const slug = path.parse(source).name;
 	const alias = Array.isArray(meta.alias) && meta.alias.every(alias => typeof alias === 'string') ? meta.alias : [];
 	const usage = typeof meta.usage === 'string' ? meta.usage : undefined;
 	const desc = typeof meta.desc === 'string' ? meta.desc : undefined;
 	return new Script({
-		slug,
 		namespace,
 		source,
 		alias,
