@@ -6,7 +6,7 @@ import {
 } from '@lib/sources';
 import {get} from '@lib/config';
 import {openEditor} from '@lib/utils';
-import {ensureBin} from './reload';
+import {ensureNamespaceBin, ensureScriptBin} from './reload';
 
 export const desc = 'Create a new script';
 export const usage = '<script-name>';
@@ -92,7 +92,12 @@ export async function create(command: string) {
 		throw new Exit('Aborted');
 	}
 
-	const binaryFile = await ensureBin(binaryName, targetPath, Boolean(namespace));
+	const binaryFile
+		= await (
+			namespace
+				? ensureNamespaceBin(binaryName, targetPath)
+				: ensureScriptBin(binaryName, targetPath)
+		);
 
 	if (binaryFile) {
 		await $`chmod +x ${binaryFile}`;

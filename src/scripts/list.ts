@@ -21,7 +21,7 @@ export default async function () {
 		console.log(separator);
 
 		const {scripts} = source;
-		for (const {slug, bin} of scripts) {
+		for (const {alias, slug, bin} of scripts) {
 			if (slug.startsWith('_')) {
 				continue;
 			}
@@ -45,6 +45,10 @@ export default async function () {
 			let line = `${scriptOutput}`;
 			if (!hasBinaryFile && !isNamespaced) {
 				line += `\n   ${ansis.red('▲ script executable missing')}`;
+			}
+
+			if (alias.length > 0) {
+				line += `\n   ${ansis.dim('▲ alias:')} ${alias.join(', ')}`;
 			}
 
 			console.log(line);

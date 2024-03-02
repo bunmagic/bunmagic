@@ -1,4 +1,5 @@
 import {PATHS} from '@lib/config';
+import type {Script} from '@lib/script';
 import {getSources} from '@lib/sources';
 
 export const desc = 'Reload your script files and ensure that they have an executable bin.';
@@ -15,12 +16,42 @@ export async function getBins(): Promise<string[]> {
 	return result.split('\n');
 }
 
-export async function ensureBin(binaryName: string, targetPath: string, namespace = false) {
-	const exec = namespace ? 'bunmagic-exec-namespace' : 'bunmagic-exec';
+export async function ensureScriptBin(script: Script) {
+	const exec = 'bunmagic-exec';
+
+	if (argv.force === true && await Bun.file(script.bin).exists()) {
+		console.log(`Removing ${ansis.bold(script.slug)} script bin file`);
+		await $`rm ${script.bin}`;
+	}
+
+	if (await Bun.file(script.bin).exists()) {
+		return false;
+	}
+
+	// Create script bin
+	await ensureDirectory(PATHS.bins);
+	await Bun.write(script.bin, template(script.slug, script.source, exec));
+	if (script.alias.length > 0) {
+		for (const alias of script.alias) {
+			const aliasBin = path.join(PATHS.bins, alias);
+			await Bun.write(aliasBin, template(script.slug, script.source, exec));
+			await $`chmod +x ${aliasBin}`;
+			console.log(`Created new script bin: ${script.slug} -> ${aliasBin}\n`);
+		}
+	}
+
+	await $`chmod +x ${script.bin}`;
+
+	console.log(`Created new script bin: ${script.slug} -> ${script.bin}\n`);
+	return script.bin;
+}
+
+export async function ensureNamespaceBin(binaryName: string, targetPath: string) {
+	const exec = 'bunmagic-exec-namespace';
 	const binaryPath = path.join(PATHS.bins, binaryName);
 
 	if (argv.force === true && await Bun.file(binaryPath).exists()) {
-		console.log(`Removing ${ansis.bold(binaryName)} bin file`);
+		console.log(`Removing ${ansis.bold(binaryName)} namespace bin file`);
 		await $`rm ${binaryPath}`;
 	}
 
@@ -28,12 +59,12 @@ export async function ensureBin(binaryName: string, targetPath: string, namespac
 		return false;
 	}
 
-	// Create bin
+	// Create namespace bin
 	await ensureDirectory(PATHS.bins);
 	await Bun.write(binaryPath, template(binaryName, targetPath, exec));
 	await $`chmod +x ${binaryPath}`;
 
-	console.log(`Created new bin: ${binaryName} -> ${binaryPath}\n`);
+	console.log(`Created new namespace bin: ${binaryName} -> ${binaryPath}\n`);
 	return binaryPath;
 }
 
@@ -41,7 +72,7 @@ export async function reloadBins() {
 	let count = 0;
 	for (const source of await getSources()) {
 		if (source.namespace) {
-			if (await ensureBin(source.namespace, source.dir, true)) {
+			if (await ensureNamespaceBin(source.namespace, source.dir)) {
 				count++;
 			}
 
@@ -50,17 +81,9 @@ export async function reloadBins() {
 
 		const {scripts} = source;
 		for (const script of scripts) {
-			if (await ensureBin(script.slug, script.source, false)) {
+			if (await ensureScriptBin(script)) {
 				count++;
 			}
-
-			// @TODO: Add alias support
-			// Currently ensureBin isn't flexible enough.
-			// for (const alias of script.alias) {
-			// 	if (await ensureBin(alias, source.dir, false)) {
-			// 		count++;
-			// 	}
-			// }
 		}
 	}
 
