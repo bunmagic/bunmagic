@@ -6,6 +6,7 @@ import {
 } from '@lib/sources';
 import {get} from '@lib/config';
 import {openEditor} from '@lib/utils';
+import {Script} from '@lib/script';
 import {ensureNamespaceBin, ensureScriptBin} from './reload';
 
 export const desc = 'Create a new script';
@@ -92,11 +93,16 @@ export async function create(command: string) {
 		throw new Exit('Aborted');
 	}
 
+	const script = new Script({
+		source: editFilePath,
+		namespace,
+		slug,
+	});
 	const binaryFile
 		= await (
 			namespace
 				? ensureNamespaceBin(binaryName, targetPath)
-				: ensureScriptBin(binaryName, targetPath)
+				: ensureScriptBin(script)
 		);
 
 	if (binaryFile) {
