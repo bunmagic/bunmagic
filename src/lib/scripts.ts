@@ -50,7 +50,7 @@ export type Script = {
 	 * A list of aliases for the command.
 	 * Creates bin files for each alias.
 	 */
-	alias: string[] | undefined;
+	alias: string[];
 };
 
 export type Router = {
@@ -90,7 +90,7 @@ function extractScriptMetadata(filePath: string, allLines: string[], namespace?:
 	const name = commentToString('name', lines) ?? path.basename(filePath, path.extname(filePath));
 	const desc = commentToString('desc', lines);
 	const usage = commentToString('usage', lines);
-	const alias = commentToString('alias', lines)?.split(',').map(alias => alias.trim());
+	const alias = commentToString('alias', lines)?.split(',').map(alias => alias.trim()) ?? [];
 
 	if (!name) {
 		throw new Error(`Instant script at ${filePath} must have a name.`);

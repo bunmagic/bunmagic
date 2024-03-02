@@ -44,13 +44,23 @@ export async function reloadBins() {
 			if (await ensureBin(source.namespace, source.dir, true)) {
 				count++;
 			}
-		} else {
-			const {scripts} = source;
-			for (const script of scripts) {
-				if (await ensureBin(script.slug, script.source, false)) {
-					count++;
-				}
+
+			continue;
+		}
+
+		const {scripts} = source;
+		for (const script of scripts) {
+			if (await ensureBin(script.slug, script.source, false)) {
+				count++;
 			}
+
+			// @TODO: Add alias support
+			// Currently ensureBin isn't flexible enough.
+			// for (const alias of script.alias) {
+			// 	if (await ensureBin(alias, source.dir, false)) {
+			// 		count++;
+			// 	}
+			// }
 		}
 	}
 

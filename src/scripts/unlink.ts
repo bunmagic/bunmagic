@@ -33,8 +33,8 @@ export async function removeSourceDirectory(target?: string): Promise<void> {
 
 async function cleanBins() {
 	const sources = await getSources();
-	// @TODO: also include aliases
-	const allBins = new Set(sources.flatMap(source => source.scripts ? source.scripts.map(script => script.bin) : []));
+	const allBins = new Set(sources.flatMap(source => source.scripts ? source.scripts.flatMap(script => [script.bin, ...script.alias ? script.alias.map(alias => `${PATHS.bins}/${alias}`) : []]) : []));
+	allBins.add(`${PATHS.bins}/bm`);
 	const binFiles = new Bun.Glob('*');
 	for await (const binName of binFiles.scan(PATHS.bins)) {
 		const binFile = `${PATHS.bins}/${binName}`;
