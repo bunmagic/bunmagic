@@ -1,45 +1,83 @@
 import * as config from '@lib/config';
+import {getSources} from '@lib/sources';
+import {PATHS} from '@lib/config';
 import {reloadBins} from './reload';
 
 export const desc = 'Remove a directory from the script source list.';
-
-export async function removeSourceDirectory(target?: string) {
+export async function removeSourceDirectory(target?: string): Promise<void> {
 	const sources = (await config.get('sources')) || [];
 	if (!target) {
 		const sourceDirectories = sources.map(source => source.dir);
 		if (sourceDirectories.length === 0) {
-			console.log('No source directories to remove.');
-			return;
+			throw new Error('No source directories to remove.');
 		}
 
-		try {
-			target = await selection(sourceDirectories, 'Select a directory to remove:');
-		} catch {
-			console.log('Selection was cancelled or an invalid selection was made.');
-			return;
-		}
+		target = await selection(sourceDirectories, 'Select a directory to remove:');
 	}
 
 	const fullPath = path.resolve(target);
 	console.log(ansis.dim(`Unlinking ${fullPath}`));
+
 	if (!ack('Are you sure?')) {
-		return;
+		throw new Error('Operation cancelled by the user.');
 	}
 
 	const updatedSources = sources.filter(source => source.dir !== target);
 	if (sources.length === updatedSources.length) {
-		console.log(`The path "${target}" does not exist in the source list.`);
-		return;
+		throw new Error(`The path "${target}" does not exist in the source list.`);
 	}
 
 	await config.update('sources', updatedSources);
 	console.log(`Removed "${target}" from the source list.`);
 }
 
-export default async function () {
-	const directory = argv._[0] || process.cwd();
-	await removeSourceDirectory(directory);
+async function cleanBins() {
+	const sources = await getSources();
+	// @TODO: also include aliases
+	const allBins = new Set(sources.flatMap(source => source.scripts ? source.scripts.map(script => script.bin) : []));
+	const binFiles = new Bun.Glob('*');
+	for await (const binName of binFiles.scan(PATHS.bins)) {
+		const binFile = `${PATHS.bins}/${binName}`;
+		if (!allBins.has(binFile)) {
+			console.log(ansis.dim(`Removing ${binFile}`));
+			await $`rm ${binFile}`;
+		}
+	}
+}
 
-	// After a directory is removed, it might need to relink
-	await reloadBins();
+
+export default async function () {
+	const directory = argv._[0];
+	const cwd = process.cwd();
+
+	const sources = await getSources();
+	const sourceExists = (targetDirectory: string): boolean => sources.some(source => source.dir === targetDirectory);
+
+	try {
+		if (directory && !sourceExists(directory)) {
+			// 1 - Directory provided, but doesn't exist
+			console.log(`The path "${directory}" does not exist in the source list.`);
+			return false;
+		}
+
+		if (!directory && !sourceExists(cwd)) {
+			// 2 - Directory not provided, Using CWD, but doesn't exist
+			console.log(`The current working directory "${cwd}" does not exist in the source list. Selecting from available sources.`);
+			await removeSourceDirectory();
+		} else if (directory && sourceExists(directory)) {
+			// 3 - Directory provided, exists
+			await removeSourceDirectory(directory);
+		} else if (!directory && sourceExists(cwd) && ack(`Do you want to delete the current working directory ${cwd}?`)) {
+			// 4 - Directory not provided, Using CWD, exists
+			await removeSourceDirectory(cwd);
+		}
+
+		// Remove any bins that are no longer in use
+		await cleanBins();
+		// Make sure all the bins are up to date
+		await reloadBins();
+	} catch (error) {
+		console.error(error);
+		return false;
+	}
 }
