@@ -27,22 +27,20 @@ export async function runNamespace(namespace: string, sourcePath: string) {
 		const command = commands.get(input);
 
 		if (!command || command.type === 'not-found') {
-			const scriptNotFound = () => {
-				throw new Error(`Script not found: ${input}`);
-			};
-
 			await router({
 				namespace,
 				name: input,
 				command,
 				commands,
-				script: scriptNotFound,
+				exec() {
+					throw new Error(`Script not found: ${input}`);
+				},
 			});
 			return;
 		}
 
 		// Prepare the script
-		const script = async () => import(command.source);
+		const exec = async () => import(command.source);
 
 		// Let the router execute the command
 		await router({
@@ -50,7 +48,7 @@ export async function runNamespace(namespace: string, sourcePath: string) {
 			name: input,
 			command,
 			commands,
-			script,
+			exec,
 		});
 	} catch (error) {
 		console.log(ansis.bold.red('Fatal Error: '), error);
