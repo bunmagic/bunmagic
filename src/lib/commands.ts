@@ -34,9 +34,9 @@ export type Script = {
 	 */
 	source: string;
 
-	desc?: string;
-	usage?: string;
-	alias?: string[];
+	desc: string | undefined;
+	usage: string | undefined;
+	alias: string[] | undefined;
 };
 
 export type Scripts = {
@@ -119,6 +119,9 @@ async function importCommand(file: string, namespace?: string): Promise<Script |
 			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			const {default: _, ...meta} = handle;
 			const slug = path.parse(file).name;
+			const alias = Array.isArray(meta.alias) && meta.alias.every(alias => typeof alias === 'string') ? meta.alias : [];
+			const usage = typeof meta.usage === 'string' ? meta.usage : undefined;
+			const desc = typeof meta.desc === 'string' ? meta.desc : undefined;
 			return {
 				slug,
 				type: 'command',
@@ -127,7 +130,9 @@ async function importCommand(file: string, namespace?: string): Promise<Script |
 				dir: path.dirname(file),
 				filename: path.basename(file),
 				source: file,
-				...meta,
+				alias,
+				usage,
+				desc,
 			};
 		}
 	} else {
