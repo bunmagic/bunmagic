@@ -1,4 +1,4 @@
-import type {Script} from '@lib/scripts';
+import type {Script} from '@lib/script';
 import {update} from '@lib/config';
 import {
 	getSources, findNamespace, type Source, findAny,

@@ -1,4 +1,4 @@
-import {SUPPORTED_FILES, type Config, PATHS} from './config';
+import {SUPPORTED_FILES, type Config} from './config';
 import {Script} from './script';
 import {slugify} from './utils';
 
@@ -32,26 +32,23 @@ function commentToString(needle: string, haystack: string[]) {
 	return value;
 }
 
-function extractScriptMetadata(filePath: string, allLines: string[], namespace?: string): Script {
+function extractScriptMetadata(source: string, allLines: string[], namespace?: string): Script {
 	// Only search first 20 lines.
 	const lines = allLines.slice(0, 20);
 
-	const name = commentToString('name', lines) ?? path.basename(filePath, path.extname(filePath));
+	const name = commentToString('name', lines) ?? path.basename(source, path.extname(source));
 	const desc = commentToString('desc', lines);
 	const usage = commentToString('usage', lines);
 	const alias = commentToString('alias', lines)?.split(',').map(alias => alias.trim()) ?? [];
 
 	if (!name) {
-		throw new Error(`Instant script at ${filePath} must have a name.`);
+		throw new Error(`Instant script at ${source} must have a name.`);
 	}
 
 	const slug = slugify(name);
 	return new Script({
-		source: filePath,
-		filename: path.basename(filePath),
-		command: namespace ? `${namespace} ${slug}` : slug,
-		bin: `${PATHS.bins}/${slug}`,
-		dir: path.dirname(filePath),
+		source,
+		namespace,
 		slug,
 		desc,
 		usage,
@@ -82,10 +79,7 @@ async function describeScript(file: string, namespace?: string): Promise<Script 
 			const desc = typeof meta.desc === 'string' ? meta.desc : undefined;
 			return new Script({
 				slug,
-				command: namespace ? `${namespace} ${slug}` : slug,
-				bin: `${PATHS.bins}/${slug}`,
-				dir: path.dirname(file),
-				filename: path.basename(file),
+				namespace,
 				source: file,
 				alias,
 				usage,

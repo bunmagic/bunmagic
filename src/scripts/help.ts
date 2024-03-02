@@ -1,6 +1,7 @@
 import {Columns} from '@lib/columns';
+import type {Script} from '@lib/script';
 import type {
-	Script, NotFound,
+	NotFound,
 } from '@lib/scripts';
 
 export const name = 'help';
@@ -23,7 +24,7 @@ export default async function (commands: Map<string, Script | NotFound>) {
 			continue;
 		}
 
-		if (command.alias && command.alias.includes(name)) {
+		if (command.alias?.includes(name)) {
 			continue;
 		}
 

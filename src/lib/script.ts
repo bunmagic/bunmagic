@@ -1,3 +1,4 @@
+import {PATHS} from '@lib/config';
 
 export class Script {
 	public readonly type = 'script' as const;
@@ -51,30 +52,24 @@ export class Script {
 	alias: string[];
 	constructor({
 		source,
-		filename,
-		command,
-		bin,
-		dir,
+		namespace,
 		slug,
 		desc,
 		usage,
 		alias,
 	}: {
 		source: string;
-		filename: string;
-		command: string;
-		bin: string;
-		dir: string;
+		namespace?: string;
 		slug: string;
 		desc?: string;
 		usage?: string;
 		alias?: string[];
 	}) {
 		this.source = source;
-		this.filename = filename;
-		this.command = command;
-		this.bin = bin;
-		this.dir = dir;
+		this.filename = path.basename(source);
+		this.command = namespace ? `${namespace} ${slug}` : slug;
+		this.bin = `${PATHS.bins}/${slug}`;
+		this.dir = path.dirname(source);
 		this.slug = slug;
 		this.desc = desc;
 		this.usage = usage;
