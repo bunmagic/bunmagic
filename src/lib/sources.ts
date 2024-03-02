@@ -1,8 +1,9 @@
 
 import {
-	getPathScripts, type Script,
+	getPathScripts,
 } from '@lib/scripts';
 import {get, type SourcePaths} from '@lib/config';
+import type {Script} from '@lib/script';
 
 export type Source = SourcePaths & {
 	scripts: Script[];

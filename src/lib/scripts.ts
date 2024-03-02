@@ -1,57 +1,6 @@
 import {SUPPORTED_FILES, type Config, PATHS} from './config';
+import {Script} from './script';
 import {slugify} from './utils';
-
-export type Script = {
-	type: 'script';
-	/**
-	 * The command name, for example:
-	 * `my-command`
-	 */
-	slug: string;
-	/**
-	 * The full command name, for example:
-	 * `my-namespace my-command`
-	 */
-	command: string;
-	/**
-	 * The full path to the bin file, for example
-	 * `~/.bunmagic/bins/my-command`
-	 */
-	bin: string;
-	/**
-	 * The directory path, for example:
-	 * `/path/to/dir `
-	 */
-	dir: string;
-	/**
-	 * The filename, for example:
-	 * `my-command.js`
-	 */
-	filename: string;
-	/**
-	 * The full source path, for example:
-	 * `/path/to/dir/my-command.js`
-	 */
-	source: string;
-
-	/**
-	 * A description of the command.
-	 * Used in the help command.
-	 */
-	desc: string | undefined;
-
-	/**
-	 * A usage example of the command.
-	 * Used in the help command.
-	 */
-	usage: string | undefined;
-
-	/**
-	 * A list of aliases for the command.
-	 * Creates bin files for each alias.
-	 */
-	alias: string[];
-};
 
 export type Router = {
 	type: 'router';
@@ -97,9 +46,8 @@ function extractScriptMetadata(filePath: string, allLines: string[], namespace?:
 	}
 
 	const slug = slugify(name);
-	return {
+	return new Script({
 		source: filePath,
-		type: 'script',
 		filename: path.basename(filePath),
 		command: namespace ? `${namespace} ${slug}` : slug,
 		bin: `${PATHS.bins}/${slug}`,
@@ -108,7 +56,7 @@ function extractScriptMetadata(filePath: string, allLines: string[], namespace?:
 		desc,
 		usage,
 		alias,
-	};
+	});
 }
 
 async function describeCommand(file: string, namespace?: string): Promise<Script | Router | NotFound> {
@@ -132,9 +80,8 @@ async function describeCommand(file: string, namespace?: string): Promise<Script
 			const alias = Array.isArray(meta.alias) && meta.alias.every(alias => typeof alias === 'string') ? meta.alias : [];
 			const usage = typeof meta.usage === 'string' ? meta.usage : undefined;
 			const desc = typeof meta.desc === 'string' ? meta.desc : undefined;
-			return {
+			return new Script({
 				slug,
-				type: 'script',
 				command: namespace ? `${namespace} ${slug}` : slug,
 				bin: `${PATHS.bins}/${slug}`,
 				dir: path.dirname(file),
@@ -143,7 +90,7 @@ async function describeCommand(file: string, namespace?: string): Promise<Script
 				alias,
 				usage,
 				desc,
-			};
+			});
 		}
 	} else {
 		return extractScriptMetadata(file, lines, namespace);
