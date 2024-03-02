@@ -1,7 +1,7 @@
 
 import {
 	getPathScripts, type Script,
-} from '@lib/commands';
+} from '@lib/scripts';
 import {get, type SourcePaths} from '@lib/config';
 
 export type Source = SourcePaths & {

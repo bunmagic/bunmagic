@@ -1,7 +1,7 @@
 import {Columns} from '@lib/columns';
 import type {
 	Script, NotFound,
-} from '@lib/commands';
+} from '@lib/scripts';
 
 export const name = 'help';
 export const desc = 'Get the full list of available commands';
