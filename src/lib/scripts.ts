@@ -32,7 +32,7 @@ function commentToString(needle: string, haystack: string[]) {
 	return value;
 }
 
-function extractScriptMetadata(source: string, allLines: string[], namespace?: string): Script {
+function scriptFromText(source: string, allLines: string[], namespace?: string): Script {
 	// Only search first 20 lines.
 	const lines = allLines.slice(0, 20);
 
@@ -56,7 +56,25 @@ function extractScriptMetadata(source: string, allLines: string[], namespace?: s
 	});
 }
 
-async function describeScript(file: string, namespace?: string): Promise<Script | Router | NotFound> {
+function scriptFromExport(source: string, handle: Record<string, unknown>, namespace?: string): Script {
+	// Remove the `default` property from the object.
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	const {default: _, ...meta} = handle;
+	const slug = path.parse(source).name;
+	const alias = Array.isArray(meta.alias) && meta.alias.every(alias => typeof alias === 'string') ? meta.alias : [];
+	const usage = typeof meta.usage === 'string' ? meta.usage : undefined;
+	const desc = typeof meta.desc === 'string' ? meta.desc : undefined;
+	return new Script({
+		slug,
+		namespace,
+		source,
+		alias,
+		usage,
+		desc,
+	});
+}
+
+async function describeFile(file: string, namespace?: string): Promise<Script | Router | NotFound> {
 	const content = await Bun.file(file).text();
 	const lines = content.split('\n');
 	if (lines.some(line => line.trim().startsWith('export default'))) {
@@ -70,24 +88,10 @@ async function describeScript(file: string, namespace?: string): Promise<Script 
 		}
 
 		if ('default' in handle) {
-			// Remove the `default` property from the object.
-			// eslint-disable-next-line @typescript-eslint/no-unused-vars
-			const {default: _, ...meta} = handle;
-			const slug = path.parse(file).name;
-			const alias = Array.isArray(meta.alias) && meta.alias.every(alias => typeof alias === 'string') ? meta.alias : [];
-			const usage = typeof meta.usage === 'string' ? meta.usage : undefined;
-			const desc = typeof meta.desc === 'string' ? meta.desc : undefined;
-			return new Script({
-				slug,
-				namespace,
-				source: file,
-				alias,
-				usage,
-				desc,
-			});
+			return scriptFromExport(file, handle, namespace);
 		}
 	} else {
-		return extractScriptMetadata(file, lines, namespace);
+		return scriptFromText(file, lines, namespace);
 	}
 
 	return {
@@ -110,7 +114,7 @@ export async function getPathScripts(target: string, namespace?: string): Promis
 
 async function getScripts(files: string[], namespace?: string): Promise<ScriptList> {
 	const validFiles = files.filter((file: string) => SUPPORTED_FILES.includes(path.extname(file).replace('.', '') as Config['extension']));
-	const list = await Promise.all(validFiles.map(async value => describeScript(value, namespace)));
+	const list = await Promise.all(validFiles.map(async value => describeFile(value, namespace)));
 
 	const map = new Map<string, Script | NotFound >();
 	let router: Router | undefined;
