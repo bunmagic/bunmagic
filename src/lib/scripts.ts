@@ -59,7 +59,7 @@ function extractScriptMetadata(filePath: string, allLines: string[], namespace?:
 	});
 }
 
-async function describeCommand(file: string, namespace?: string): Promise<Script | Router | NotFound> {
+async function describeScript(file: string, namespace?: string): Promise<Script | Router | NotFound> {
 	const content = await Bun.file(file).text();
 	const lines = content.split('\n');
 	if (lines.some(line => line.trim().startsWith('export default'))) {
@@ -116,7 +116,7 @@ export async function getPathScripts(target: string, namespace?: string): Promis
 
 async function getScripts(files: string[], namespace?: string): Promise<ScriptList> {
 	const validFiles = files.filter((file: string) => SUPPORTED_FILES.includes(path.extname(file).replace('.', '') as Config['extension']));
-	const list = await Promise.all(validFiles.map(async value => describeCommand(value, namespace)));
+	const list = await Promise.all(validFiles.map(async value => describeScript(value, namespace)));
 
 	const map = new Map<string, Script | NotFound >();
 	let router: Router | undefined;
