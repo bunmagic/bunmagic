@@ -1,12 +1,6 @@
 import {SUPPORTED_FILES, type Config, PATHS} from './config';
 import {slugify} from './utils';
 
-export type ScriptInfo = {
-	desc?: string;
-	usage?: string;
-	alias?: string[];
-};
-
 export type Script = {
 	/**
 	 * The command name, for example:
@@ -38,17 +32,23 @@ export type Script = {
 	 * `/path/to/dir/my-command.js`
 	 */
 	source: string;
+
+	desc?: string;
+	usage?: string;
+	alias?: string[];
+
+	type: 'unknown' | 'instant-script' | 'command';
 };
 
 export type Scripts = {
 	scripts: Script[];
 };
 
-export type InstantScript = Script & ScriptInfo & {
+export type InstantScript = Script & {
 	type: 'instant-script';
 };
 
-export type Command = Script & ScriptInfo & {
+export type Command = Script & {
 	type: 'command';
 };
 
@@ -149,7 +149,7 @@ async function importCommand(file: string, namespace?: string): Promise<Command 
 
 type CommandList = {
 	router: Router;
-	commands: Map<string, Command | NotFound | InstantScript>;
+	commands: Map<string, Command | NotFound | InstantScript >;
 };
 export async function getPathCommands(target: string, namespace?: string): Promise<CommandList> {
 	const result = await $`ls ${target}`.text();
@@ -163,7 +163,7 @@ export async function getCommands(files: string[], namespace?: string): Promise<
 	const validFiles = files.filter((file: string) => SUPPORTED_FILES.includes(path.extname(file).replace('.', '') as Config['extension']));
 	const list = await Promise.all(validFiles.map(async value => importCommand(value, namespace)));
 
-	const map = new Map<string, Command | NotFound | InstantScript>();
+	const map = new Map<string, Command | NotFound | InstantScript >();
 	let router: Router | undefined;
 
 	for (const command of list) {
