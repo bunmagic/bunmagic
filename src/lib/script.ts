@@ -41,6 +41,9 @@ export class Script {
 	 * Creates bin files for each alias.
 	 */
 	alias: string[];
+
+	namespace: string | undefined;
+
 	constructor({
 		source,
 		namespace,
@@ -59,10 +62,11 @@ export class Script {
 		this.source = source;
 		this.slug = slugify(slug ?? path.parse(source).name);
 		this.command = namespace ? `${namespace} ${this.slug}` : this.slug;
-		this.bin = `${PATHS.bins}/${slug}`;
+		this.bin = `${PATHS.bins}/${this.slug}`;
 		this.desc = desc;
 		this.usage = usage;
 		this.alias = alias ?? [];
+		this.namespace = namespace;
 	}
 
 	/**
