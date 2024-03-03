@@ -37,7 +37,7 @@ export async function runNamespace(namespace: string, sourcePath: string) {
 
 		const command = scripts.get(name);
 
-		if (!command || command.type === `not-found`) {
+		if (!command) {
 			await router.callback({
 				namespace,
 				name,
