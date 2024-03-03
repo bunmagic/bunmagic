@@ -57,11 +57,7 @@ const router: RouterCallback = async ({namespace, name, exec, command, scripts})
 
 	if (command) {
 		try {
-			const source = await exec();
-			// If the script is a module, run it.
-			if (source && 'default' in source) {
-				await source.default();
-			}
+			await exec();
 		} catch (error) {
 			throw new Exit(error);
 		}
