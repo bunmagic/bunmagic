@@ -7,7 +7,7 @@ export type FixedArray<T, N extends number> = T[] & GrowToSize<T, N, []>;
 type ColumnConfig = 'auto' | '' | number | `${number}%`;
 
 function fixedLengthArray<T, N extends number>(length: N, fill: T): FixedArray<T, N> {
-	return Array.from({length}, () => fill) as FixedArray<T, N>;
+	return Array.from({ length }, () => fill) as FixedArray<T, N>;
 }
 
 export class Columns<T extends number, Row extends string | FixedArray<string, T>> {
@@ -105,7 +105,7 @@ export class Columns<T extends number, Row extends string | FixedArray<string, T
 		const autoWidths = this.getColumnWidths();
 		const maxCols = (process.stdout.columns || 80) - this.indent;
 
-		const widths = Array.from({length: this.columnCount}, () => 0);
+		const widths = Array.from({ length: this.columnCount }, () => 0);
 		// Loop over the automatically set widths
 		for (let [index, width] of autoWidths.entries()) {
 			const config = this.config[index];
@@ -189,7 +189,7 @@ export class Columns<T extends number, Row extends string | FixedArray<string, T
 
 	private getColumnWidths(): FixedArray<number, T> {
 		const rows = this.rows.filter(row => typeof row !== 'string') as string[][];
-		const widths = Array.from({length: this.columnCount}, () => 0);
+		const widths = Array.from({ length: this.columnCount }, () => 0);
 		for (const row of rows) {
 			for (let index = 0; index < this.columnCount; index++) {
 				if (!(index in row)) {

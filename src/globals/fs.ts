@@ -22,7 +22,7 @@ export async function isDirectory(path: string) {
 
 export async function ensureDirectory(path: string) {
 	if (!await isDirectory(path)) {
-		fs.mkdir(path, {recursive: true}, error => {
+		fs.mkdir(path, { recursive: true }, error => {
 			if (error) {
 				console.error(error);
 				throw new Error(`Couldn't create directory: ${path}`);

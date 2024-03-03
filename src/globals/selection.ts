@@ -1,4 +1,4 @@
-import {CLI} from 'bunmagic/extras';
+import { CLI } from 'bunmagic/extras';
 
 type Option<T extends string> = {
 	text: T;

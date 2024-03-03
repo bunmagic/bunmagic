@@ -1,14 +1,14 @@
 // eslint-disable-next-line import/no-unassigned-import
 import 'bunmagic/globals';
-import type {RouterCallback} from './lib/router';
-import {slugify} from './lib/utils';
+import type { RouterCallback } from './lib/router';
+import { slugify } from './lib/utils';
 
 /**
  * This is run by `./bin/bunmagic-exec.ts` to execute a script.
  * It runs the script directly without loading any other dependencies.
  */
 export async function run(scriptFile: string) {
-	const script = await import(scriptFile) as {default: () => Promise<void>};
+	const script = await import(scriptFile) as { default: () => Promise<void> };
 	if (script.default) {
 		await script.default();
 	}

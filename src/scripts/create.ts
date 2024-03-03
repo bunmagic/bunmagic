@@ -4,10 +4,10 @@ import {
 	findAny,
 	findNamespace,
 } from '@lib/sources';
-import {get} from '@lib/config';
-import {openEditor} from '@lib/utils';
-import {Script} from '@lib/script';
-import {ensureNamespaceBin, ensureScriptBin} from './reload';
+import { get } from '@lib/config';
+import { openEditor } from '@lib/utils';
+import { Script } from '@lib/script';
+import { ensureNamespaceBin, ensureScriptBin } from './reload';
 
 export const desc = 'Create a new script';
 export const usage = '<script-name>';
@@ -22,7 +22,7 @@ export default async function () {
 	return create(slug);
 }
 
-type PartialScriptPath = string & {__partialPath: true};
+type PartialScriptPath = string & { __partialPath: true };
 async function namespacedScriptPath(slug: string, namespace: string): Promise<PartialScriptPath> {
 	// Get the namespace directory
 	const source = await findNamespace(namespace);

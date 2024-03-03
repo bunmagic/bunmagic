@@ -2,20 +2,20 @@
 // Importing each module
 import os from 'node:os';
 import ansis from 'ansis';
-import {$} from 'bun';
-import {notMinimist} from './not-minimist';
+import { $ } from 'bun';
+import { notMinimist } from './not-minimist';
 
 export const BM = {
 	verbose: false,
 } as const;
 
 
-export {$spinner} from './spinner';
-export {default as path} from 'node:path';
-export {notMinimist};
+export { $spinner } from './spinner';
+export { default as path } from 'node:path';
+export { notMinimist };
 
 export * from './utils';
-export {selection} from './selection';
+export { selection } from './selection';
 export * from './fs';
 
 

@@ -1,5 +1,5 @@
-import {Script} from '@lib/script';
-import {update} from '@lib/config';
+import { Script } from '@lib/script';
+import { update } from '@lib/config';
 import {
 	getSources, findNamespace, type Source, findAny,
 } from '@lib/sources';
@@ -21,7 +21,7 @@ async function removeNamespace(query: string) {
 	const sources = await getSources();
 	const updatedSources = sources
 		.filter((d): d is Source => 'namespace' in d && d.namespace !== source.namespace)
-		.map(({namespace, dir}) => ({namespace, dir}));
+		.map(({ namespace, dir }) => ({ namespace, dir }));
 	await update('sources', updatedSources);
 }
 

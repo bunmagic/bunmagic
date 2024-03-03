@@ -1,7 +1,7 @@
 // name: Publish
 // desc: Publishes the package to npm
 // usage: bmdev publish
-import semver, {type ReleaseType} from 'semver';
+import semver, { type ReleaseType } from 'semver';
 
 type PackageJson = {
 	version: string;

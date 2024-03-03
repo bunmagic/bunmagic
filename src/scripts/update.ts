@@ -1,4 +1,4 @@
-import {getVersion} from './version';
+import { getVersion } from './version';
 
 export const name = 'update';
 export const desc = 'Update bunmagic to the latest version';

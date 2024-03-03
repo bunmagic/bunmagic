@@ -1,5 +1,5 @@
-import {CLI} from 'bunmagic/extras';
-import {$} from 'bun';
+import { CLI } from 'bunmagic/extras';
+import { $ } from 'bun';
 import ansis from 'ansis';
 
 class Spinner {

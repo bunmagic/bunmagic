@@ -1,5 +1,5 @@
-import {SUPPORTED_FILES, type Config} from './config';
-import {Script} from './script';
+import { SUPPORTED_FILES, type Config } from './config';
+import { Script } from './script';
 
 export type Router = {
 	type: 'router';
@@ -53,7 +53,7 @@ function scriptFromText(source: string, allLines: string[], namespace?: string):
 function scriptFromExport(source: string, handle: Record<string, unknown>, namespace?: string): Script {
 	// Remove the `default` property from the object.
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	const {default: _, ...meta} = handle;
+	const { default: _, ...meta } = handle;
 	const alias = Array.isArray(meta.alias) && meta.alias.every(alias => typeof alias === 'string') ? meta.alias : [];
 	const usage = typeof meta.usage === 'string' ? meta.usage : undefined;
 	const desc = typeof meta.desc === 'string' ? meta.desc : undefined;
@@ -146,5 +146,5 @@ async function getScripts(files: string[], namespace?: string): Promise<ScriptLi
 		};
 	}
 
-	return {router, scripts: map};
+	return { router, scripts: map };
 }

@@ -20,8 +20,8 @@ export default async function () {
 		console.log('  ' + ansis.dim(source.dir));
 		console.log(separator);
 
-		const {scripts} = source;
-		for (const {alias, slug, bin} of scripts) {
+		const { scripts } = source;
+		for (const { alias, slug, bin } of scripts) {
 			if (slug.startsWith('_')) {
 				continue;
 			}

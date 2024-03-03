@@ -1,6 +1,6 @@
 import * as config from '@lib/config';
-import {setupAlias} from '@lib/setup';
-import {addSourceDirectory} from './link';
+import { setupAlias } from '@lib/setup';
+import { addSourceDirectory } from './link';
 
 export const desc = 'Install bunmagic and set up your environment';
 

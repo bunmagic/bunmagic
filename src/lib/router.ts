@@ -1,7 +1,7 @@
-import {create} from '../scripts/create';
+import { create } from '../scripts/create';
 import help from '../scripts/help';
-import type {Script} from './script';
-import type {NotFound} from './scripts';
+import type { Script } from './script';
+import type { NotFound } from './scripts';
 
 export type Route = {
 	/**
@@ -26,13 +26,13 @@ export type Route = {
 	 * The script to run.
 	 * The router is responsible for running this script and handling any errors.
 	 */
-	exec: () => Promise<void | {default: () => Promise<void>}>;
+	exec: () => Promise<void | { default: () => Promise<void> }>;
 };
 
 export type RouterCallback = (route: Route) => Promise<void>;
 
 
-const router: RouterCallback = async ({namespace, name, exec, command, scripts}) => {
+const router: RouterCallback = async ({ namespace, name, exec, command, scripts }) => {
 	const input = `${namespace} ${name}`;
 
 	// Offer to create utility if it doesn't exist.

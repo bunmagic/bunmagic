@@ -2,7 +2,21 @@ export default {
 	extends: [
 		'plugin:@typescript-eslint/recommended',
 	],
+	bracketSpacing: true,
 	rules: {
+		// Avoid converting backtick strings if they're used for escaping single or double quotes.
+		'quotes': [
+			'error',
+			'single',
+			{ avoidEscape: true },
+		],
+		// I like spacing, sosumi.
+		'object-curly-spacing': ['error', 'always'],
+		// "object-curly-spacing": "off",
+		'@typescript-eslint/object-curly-spacing': ['error', 'always'],
+		// 'object-curly-spacing': ['error', 'always'],
+		// Consistently quote object keys. Either all of them have quotes, or none of them.
+		'quote-props': ['error', 'consistent-as-needed'],
 		// Allow importing files without extensions
 		'import/extensions': 0,
 		// There's a lot of async loops here - allow await in loops.

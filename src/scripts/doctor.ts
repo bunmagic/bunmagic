@@ -1,7 +1,7 @@
-import {getSources} from '@lib/sources';
-import {setupAlias} from '@lib/setup';
-import {addSourceDirectory} from './link';
-import {reloadBins} from './reload';
+import { getSources } from '@lib/sources';
+import { setupAlias } from '@lib/setup';
+import { addSourceDirectory } from './link';
+import { reloadBins } from './reload';
 
 export const desc = 'Check if bunmagic is set up correctly';
 
@@ -40,7 +40,7 @@ async function check(message: string, callback: CheckCallback) {
 }
 
 function response(status: Levels, followup?: () => Promise<unknown>) {
-	return {level: status, followup};
+	return { level: status, followup };
 }
 
 export default async function setup() {

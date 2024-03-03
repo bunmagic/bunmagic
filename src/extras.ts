@@ -1,1 +1,1 @@
-export {CLI} from './extras/cli';
+export { CLI } from './extras/cli';

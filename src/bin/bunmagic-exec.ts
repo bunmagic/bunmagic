@@ -1,5 +1,5 @@
 #!/usr/bin/env bun
-import {run} from 'bunmagic/run';
+import { run } from 'bunmagic/run';
 
 const scriptFile = argv._.shift();
 argv._.shift(); // Remove the script name.

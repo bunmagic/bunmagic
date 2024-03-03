@@ -2,9 +2,9 @@ import {
 	findNamespace,
 	findScript,
 } from '@lib/sources';
-import {openEditor} from '@lib/utils';
-import {PATHS} from '@lib/config';
-import {create} from './create';
+import { openEditor } from '@lib/utils';
+import { PATHS } from '@lib/config';
+import { create } from './create';
 
 export const desc = 'Edit scripts. If no script name is specified, will open all scripts and the ~/.bunmagic directory';
 export const usage = '[script-name]';

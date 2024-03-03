@@ -1,5 +1,5 @@
 import * as config from '@lib/config';
-import {reloadBins} from './reload';
+import { reloadBins } from './reload';
 
 export const desc = 'Add an additional directory to use as script source.';
 

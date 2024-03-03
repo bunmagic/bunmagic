@@ -1,5 +1,5 @@
-import {Columns} from '@lib/columns';
-import type {Script} from '@lib/script';
+import { Columns } from '@lib/columns';
+import type { Script } from '@lib/script';
 import type {
 	NotFound,
 } from '@lib/scripts';

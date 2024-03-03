@@ -44,5 +44,5 @@ export function notMinimist(arguments_: string[]) {
 	return {
 		_: output.args,
 		...output.flags,
-	} as Record< string, Flag > & {_: string[]};
+	} as Record< string, Flag > & { _: string[] };
 }
