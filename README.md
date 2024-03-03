@@ -6,7 +6,7 @@ Bun Magic simplifies shell scripting by providing a toolkit to create, use and m
 **Bun Magic in 15 seconds**
 This is how you create a `demo` command and import `cowsay` from npm, and deliver an important message via the cow.
 
-![demo](./docs/assets/demo.gif)
+![demo](https://raw.githubusercontent.com/bunmagic/bunmagic/main/docs/assets/demo.gif)
 
 
 
