@@ -22,7 +22,7 @@ export async function openEditor(path: string) {
 	console.log(ansis.bold('Editor missing!'));
 	console.log(`I tried to use "${ansis.bold(edit)}" to open ${path}`);
 	console.log(
-		`\n 🔗 ${ansis.bold('Read more here: ')}\nhttps://github.com/pyronaur/bunmagic/tree/main#code-editor\n`,
+		`\n 🔗 ${ansis.bold('Read more here: ')}\nhttps://github.com/bunmagic/bunmagic/tree/main#code-editor\n`,
 	);
 	throw new Error(result.stdout.toString() || result.stderr.toString());
 }
