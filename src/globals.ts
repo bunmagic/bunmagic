@@ -16,7 +16,6 @@ declare global {
 	const ensureDirectory: typeof globals.ensureDirectory;
 	const notMinimist: typeof globals.notMinimist;
 	const Exit: typeof globals.Exit; // eslint-disable-line @typescript-eslint/naming-convention
-	const os: typeof globals.os;
 	const $HOME: typeof globals.$HOME;
 	const $get: typeof globals.$get;
 	const glob: typeof globals.glob;
