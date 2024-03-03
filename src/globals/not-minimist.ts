@@ -30,7 +30,7 @@ export function notMinimist(arguments_: string[]) {
 				}
 			}
 
-			if (typeof value !== 'boolean' && !Number.isNaN(value)) {
+			if (typeof value !== 'boolean' && !Number.isNaN(Number.parseInt(value, 10))) {
 				value = Number.parseInt(value, 10);
 			}
 
