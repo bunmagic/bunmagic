@@ -19,7 +19,6 @@ declare global {
 	const os: typeof globals.os;
 	const $HOME: typeof globals.$HOME;
 	const $get: typeof globals.$get;
-	const BM: typeof globals.BM;
 	const glob: typeof globals.glob;
 }
 
