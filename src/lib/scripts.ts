@@ -1,12 +1,6 @@
 import { SUPPORTED_FILES } from './config';
 import { Script } from './script';
 
-
-export type NotFound = {
-	type: 'not-found';
-	file: string;
-};
-
 function commentToString(needle: string, haystack: string[]) {
 	const string_ = `// ${needle}`;
 	const line = haystack.find(line => line.trim().startsWith(string_));
@@ -62,7 +56,7 @@ function scriptFromExport(source: string, handle: Record<string, unknown>, names
 	});
 }
 
-async function describeScript(file: string, namespace?: string): Promise<Script | NotFound> {
+async function describeScript(file: string, namespace?: string): Promise<Script | false> {
 	const content = await Bun.file(file).text();
 	const lines = content.split('\n');
 
@@ -75,46 +69,39 @@ async function describeScript(file: string, namespace?: string): Promise<Script 
 		return scriptFromText(file, lines, namespace);
 	}
 
-	return {
-		file,
-		type: 'not-found',
-	};
+	return false;
 }
 
-async function getScripts(files: string[], namespace?: string): Promise<Map<string, Script | NotFound >> {
+async function getScripts(files: string[], namespace?: string): Promise<Map<string, Script>> {
 	const validFiles = files.filter((file: string) => SUPPORTED_FILES.includes(path.extname(file).replace('.', '')));
-	const list = await Promise.all(validFiles.map(async value => describeScript(value, namespace)));
+	const scripts = new Map<string, Script>();
 
-	const map = new Map<string, Script | NotFound >();
-
-	for (const command of list) {
-		if (command.type === 'not-found') {
-			console.log(`Found a file, but it's not a command: ${command.file}`);
+	for (const file of validFiles) {
+		const script = await describeScript(file, namespace);
+		if (!script) {
 			continue;
 		}
 
-		if (command.type === 'script') {
-			if (map.has(command.slug)) {
-				console.warn(`Warning: Duplicate command slug '${command.slug}' detected. Skipping.`);
-			} else {
-				map.set(command.slug, command);
-			}
+		if (scripts.has(script.slug)) {
+			console.warn(`Warning: Duplicate command slug '${script.slug}' detected. Skipping.`);
+		} else {
+			scripts.set(script.slug, script);
+		}
 
-			for (const alias of command.alias) {
-				if (map.has(alias)) {
-					console.warn(`Warning: Alias '${alias}' conflicts with an existing command or alias. Skipping.`);
-				} else {
-					map.set(alias, command);
-				}
+		for (const alias of script.alias) {
+			if (scripts.has(alias)) {
+				console.warn(`Warning: Alias '${alias}' conflicts with an existing command or alias. Skipping.`);
+			} else {
+				scripts.set(alias, script);
 			}
 		}
 	}
 
-	return map;
+	return scripts;
 }
 
 
-export async function getPathScripts(target: string, namespace?: string): Promise<Map<string, Script | NotFound >> {
+export async function getPathScripts(target: string, namespace?: string): Promise<Map<string, Script >> {
 	const glob = new Bun.Glob(`*.{${SUPPORTED_FILES.join(',')}}`);
 	const files: string[] = [];
 	for await (const file of glob.scan({ onlyFiles: true, absolute: false, cwd: target })) {

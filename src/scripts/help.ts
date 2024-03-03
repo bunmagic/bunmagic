@@ -1,13 +1,10 @@
 import { Columns } from '@lib/columns';
 import type { Script } from '@lib/script';
-import type {
-	NotFound,
-} from '@lib/scripts';
 
 export const name = 'help';
 export const desc = 'Get the full list of available commands';
 
-export default async function (commands: Map<string, Script | NotFound>) {
+export default async function (commands: Map<string, Script>) {
 	const columns = new Columns(3);
 	columns.gap = 5;
 

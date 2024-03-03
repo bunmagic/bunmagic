@@ -1,7 +1,6 @@
 import { create } from '../scripts/create';
 import help from '../scripts/help';
 import type { Script } from './script';
-import type { NotFound } from './scripts';
 import { SUPPORTED_FILES } from './config';
 
 export type Route = {
@@ -18,11 +17,11 @@ export type Route = {
 	/**
 	 * Information about the script that's being run.
 	 */
-	command: Script | NotFound | undefined;
+	command: Script | undefined;
 	/**
 	 * A list of all available scripts.
 	 */
-	scripts: Map<string, Script | NotFound>;
+	scripts: Map<string, Script>;
 	/**
 	 * The script to run.
 	 * The router is responsible for running this script and handling any errors.
