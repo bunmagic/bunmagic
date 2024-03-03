@@ -1,7 +1,6 @@
+import type { RouterCallback } from '@lib/router';
 // eslint-disable-next-line import/no-unassigned-import
 import 'bunmagic/globals';
-import type { RouterCallback } from './lib/router';
-import { slugify } from './lib/utils';
 
 /**
  * This is run by `./bin/bunmagic-exec.ts` to execute a script.
@@ -19,7 +18,9 @@ export async function run(scriptFile: string) {
  * It runs scripts based on a namespace, via the namespace router file.
  */
 export async function runNamespace(namespace: string, sourcePath: string) {
-	const getPathScripts = await import('./lib/scripts').then(m => m.getPathScripts);
+	const getPathScripts = await import('@lib/scripts').then(m => m.getPathScripts);
+	const { slugify } = await import('@lib/utils');
+
 	const scripts = await getPathScripts(sourcePath, namespace);
 	const input = slugify(argv._[0] ?? '');
 
