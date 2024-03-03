@@ -72,12 +72,23 @@ async function describeScript(file: string, namespace?: string): Promise<Script 
 	return false;
 }
 
-async function getScripts(files: string[], namespace?: string): Promise<Map<string, Script>> {
-	const validFiles = files.filter((file: string) => SUPPORTED_FILES.includes(path.extname(file).replace('.', '')));
+export async function getPathScripts(target: string, namespace?: string): Promise<Map<string, Script >> {
+	const glob = new Bun.Glob(`*.{${SUPPORTED_FILES.join(',')}}`);
 	const scripts = new Map<string, Script>();
+	const descriptions: Promise<Script | false>[] = [];
+	for await (const file of glob.scan({ onlyFiles: true, absolute: false, cwd: target })) {
+		if (file.startsWith('_')) {
+			if (argv.debug) {
+				console.log(`Ignoring: ${file}`);
+			}
 
-	for (const file of validFiles) {
-		const script = await describeScript(file, namespace);
+			continue;
+		}
+
+		descriptions.push(describeScript(path.join(target, file), namespace));
+	}
+
+	for await (const script of descriptions) {
 		if (!script) {
 			continue;
 		}
@@ -97,24 +108,7 @@ async function getScripts(files: string[], namespace?: string): Promise<Map<stri
 		}
 	}
 
+
+
 	return scripts;
-}
-
-
-export async function getPathScripts(target: string, namespace?: string): Promise<Map<string, Script >> {
-	const glob = new Bun.Glob(`*.{${SUPPORTED_FILES.join(',')}}`);
-	const files: string[] = [];
-	for await (const file of glob.scan({ onlyFiles: true, absolute: false, cwd: target })) {
-		if (file.startsWith('_')) {
-			if (argv.debug) {
-				console.log(`Ignoring: ${file}`);
-			}
-
-			continue;
-		}
-
-		files.push(path.join(target, file));
-	}
-
-	return getScripts(files, namespace);
 }
