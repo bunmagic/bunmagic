@@ -154,7 +154,7 @@ The `glob` function is an asynchronous utility that searches for files matching 
 **Parameters**:
 - `cwd`: The current working directory in which to search for files.
 - `pattern`: The glob pattern to match files against. Defaults to `*`, which matches all files.
-- `options`: An optional (`GlobScanOptions`)[https://github.com/oven-sh/bun/blob/49ccad9367b0a30158dbb03ff00bc9a523d43c14/packages/bun-types/bun.d.ts#L4669-L4709] object to customize the search behavior, with the following properties:
+- `options`: An optional [`GlobScanOptions`](https://github.com/oven-sh/bun/blob/49ccad9367b0a30158dbb03ff00bc9a523d43c14/packages/bun-types/bun.d.ts#L4669-L4709) object to customize the search behavior, with the following properties:
   - `cwd`: The root directory to start matching from. Defaults to `process.cwd()`.
   - `dot`: Allow patterns to match entries that begin with a period (`.`). Defaults to `false`.
   - `absolute`: Return the absolute path for entries. Defaults to `false`.
