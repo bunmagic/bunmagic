@@ -1,3 +1,5 @@
+import { resolveTilde } from './fs';
+
 /**
  * Run a shell command and return the result as text,
  * even if it's an error.
@@ -15,11 +17,7 @@ export async function $get(...properties: Parameters<typeof $>) {
 
 
 export function cd(path: string) {
-	if (path.startsWith('~')) {
-		path = $HOME + path.slice(1);
-	}
-
-	$.cwd(path);
+	$.cwd(resolveTilde(path));
 }
 
 export function ack(q: string, defaultAnswer: 'y' | 'n' = 'y') {
