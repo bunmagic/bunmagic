@@ -63,6 +63,92 @@ Bunmagic is going to handle creating a binary and making sure it's executable fo
 | `bunmagic clean`                 | Remove bin files from the bin directory that don't have a matching script.  |             |
 
 
+## 📦 API
+
+Bun supports dynamic [package imports](https://bun.sh/docs/runtime/modules#importing-packages) out of the box. So you can use any npm package in your scripts:
+
+```ts
+import cowsay from 'cowsay';
+console.log(cowsay.say({ text: 'Hello, Bunmagic!' }));
+```
+
+However, there are a few global variables that are useful for writing CLI scripts that come bundled with Bunmagic:
+
+### `$` Bun Shell
+[Bun.Shell](https://bun.sh/docs/runtime/shell) is already imported as `$` globally.
+
+### `argv` - Arguments
+`argv` holds the arguments passed to your script already parsed by [`notMinimist](./src/globals/not-minimist.ts). It takes care of most of common use cases for you.
+
+```ts
+// minimist-example.ts not-minimist something nice --with --flags -n 10 --and=more --equal-sign is-optional
+// Produces an object like this:
+{
+  _: [ "something", "nice" ],
+  with: true,
+  flags: true,
+  n: 10,
+  and: "more",
+  "equal-sign": "is-optional",
+}
+```
+If you need more control over the arguments, you can use the `process.argv` array directly and parse the arguments using any `npm` package you like.
+
+```ts
+// minimist-example.ts
+console.log(Bun.argv);
+[
+  "/Users/user/.bun/bin/bun", "/Users/user/.bun/bin/bunmagic-exec", "/Users/user/.bunmagic/default/not-minimist.ts",
+  "not-minimist", "something", "nice", "--with", "--flags", "-n", "10", "--and=more", "--equal-sign",
+  "is-optional"
+]
+```
+
+### `selection(options: string[], message: string)`
+`selection` is a helper function that takes an array of strings as options and a message and provides an interactive selection prompt.
+
+```ts
+const options = ["one", "two", "three"];
+const selected = await selection(options, "Select an option:");
+console.log(selected);
+```
+### `cd(path: string)`
+`cd` is a tiny helper function that changes the current working directory and resolves the tilde ( `~` ) to the home directory.
+
+`cd` is a wrapper around `$.cwd`:
+
+```ts
+$.cwd(resolveTilde(path));
+```
+
+### `ack(question: string, default: 'y' | 'n' = 'y')`
+Out of the box, Bun provides `prompt()` inspired by the (`window.prompt`)[https://developer.mozilla.org/en-US/docs/Web/API/Window/prompt]. `ack` is a wrapper around that, but for `Yes` or `No` questions.
+
+### `isDirectory(path: string)`
+The `isDirectory` function is an asynchronous utility that checks if a given path points to a directory. It returns a promise that resolves to a boolean value: `true` if the path is a directory, and `false` otherwise.
+
+Due to Bun's current limitations in directly checking if a path is a directory, this function utilizes Node.js's `fs.stat` method to perform the check. If an error occurs during this process (e.g., if the path does not exist), the promise will resolve to `false`. Otherwise, it resolves based on whether the path points to a directory.
+
+### `ensureDirectory(path: string)`
+The `ensureDirectory` function is an asynchronous utility that ensures a given directory exists. If the directory does not exist, it will be created.
+
+This function is particularly useful when you need to make sure a directory is present before performing file operations that require the directory's existence.
+
+### `$HOME`
+The `$HOME` global variable in Bun provides the path to the current user's home directory. This variable is particularly useful when you need to access or modify files and directories located in the user's home directory.
+
+### `glob(cwd: string, pattern: string = '*', options: GlobScanOptions = {})`
+The `glob` function is an asynchronous utility that searches for files matching a specified pattern within a given directory (`cwd`). It returns a promise that resolves to an array of strings, each representing the absolute path to a file that matches the pattern.
+
+**Parameters**:
+- `cwd`: The current working directory in which to search for files.
+- `pattern`: The glob pattern to match files against. Defaults to `*`, which matches all files.
+- `options`: An optional `GlobScanOptions` object to customize the search behavior.
+
+**Returns**:
+A promise that resolves to an array of strings, where each string is the absolute path to a file that matches the specified pattern.
+
+
 ## 🎨 Customization
 
 ### Code Editor
