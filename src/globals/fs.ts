@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import type { GlobScanOptions } from 'bun';
 
 export async function isDirectory(path: string) {
 	// Bun currently doesn't support checking directories,
@@ -40,4 +41,19 @@ export function resolveTilde(input: string) {
 	}
 
 	return input;
+}
+
+export async function glob(cwd: string, pattern = '*', options: GlobScanOptions = {}) {
+	const defaultGlobOptions = {
+		onlyFiles: true,
+		absolute: true,
+		cwd,
+	};
+	const glob = new Bun.Glob(pattern);
+	const files: string[] = [];
+	for await (const file of glob.scan({ ...defaultGlobOptions, ...options })) {
+		files.push(file);
+	}
+
+	return files;
 }

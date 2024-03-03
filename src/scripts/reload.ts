@@ -12,8 +12,7 @@ function template(name: string, scriptPath: string, exec: string): string {
 }
 
 export async function getBins(): Promise<string[]> {
-	const result = await $`ls ${PATHS.bins}`.text();
-	return result.split('\n');
+	return glob(PATHS.bins);
 }
 
 export async function ensureScriptBin(script: Script) {

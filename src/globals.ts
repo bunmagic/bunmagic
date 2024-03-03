@@ -20,6 +20,7 @@ declare global {
 	const $HOME: typeof globals.$HOME;
 	const $get: typeof globals.$get;
 	const BM: typeof globals.BM;
+	const glob: typeof globals.glob;
 }
 
 const customGlobalsFile = `${$HOME}/.bunmagic/custom-globals.ts`;
