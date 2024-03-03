@@ -165,14 +165,18 @@ The `glob` function is an asynchronous utility that searches for files matching 
 **Returns**:
 A promise that resolves to an array of strings, where each string is the absolute path to a file that matches the specified pattern.
 
+## 🎨 Customization
+
 ### 🛠️ Custom Globals
 The `customGlobals` feature allows you to extend the global namespace with your own custom variables or functions. This is particularly useful for adding utilities or configurations that you frequently use across your scripts.
 
 To use `customGlobals`, create a file named `custom-globals.ts` in your `$HOME/.bunmagic` directory. In this file, you can export any JavaScript object, function, or variable that you wish to be available globally.
 
-For example, in your `custom-globals.ts` file, you might have:
+For example, to make `fs-extra` available in all your scripts by default, add this to  your `custom-globals.ts`:
 
-## 🎨 Customization
+```ts
+export * as fs from 'fs-extra';
+```
 
 ### Code Editor
 
