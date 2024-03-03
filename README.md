@@ -1,9 +1,6 @@
 # 🪄 Bun Magic
 Bun Magic simplifies shell scripting by providing a toolkit to create, use and manage scripts.
 
-**bunmagic** is a [Bun](https://bun.sh) script manager to help you create, use and manage Bun Shell scripts quickly.
-
-
 ## 🚀 Quick Start
 
 1. Make sure you have [Bun](https://bun.sh/) installed:
