@@ -5,7 +5,7 @@ import {create} from './create';
 import version from './version';
 
 export const isRouter = true;
-const router: RouterCallback = async ({exec, command, commands}) => {
+const router: RouterCallback = async ({exec, command, scripts}) => {
 	const input = argv._.map(t => slugify(t)).join(' ');
 	if (argv.v || argv.version || input === 'version') {
 		await version();
@@ -13,7 +13,7 @@ const router: RouterCallback = async ({exec, command, commands}) => {
 	}
 
 	if (argv.h || argv.help || input === 'help') {
-		await help(commands);
+		await help(scripts);
 		return;
 	}
 
@@ -28,7 +28,7 @@ const router: RouterCallback = async ({exec, command, commands}) => {
 	}
 
 	if (!command) {
-		await help(commands);
+		await help(scripts);
 		return;
 	}
 

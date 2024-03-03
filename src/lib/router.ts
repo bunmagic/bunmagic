@@ -21,7 +21,7 @@ export type Route = {
 	/**
 	 * A list of all available scripts.
 	 */
-	commands: Map<string, Script | NotFound>;
+	scripts: Map<string, Script | NotFound>;
 	/**
 	 * The script to run.
 	 * The router is responsible for running this script and handling any errors.
@@ -32,7 +32,7 @@ export type Route = {
 export type RouterCallback = (route: Route) => Promise<void>;
 
 
-const router: RouterCallback = async ({namespace, name, exec, command, commands}) => {
+const router: RouterCallback = async ({namespace, name, exec, command, scripts}) => {
 	const input = `${namespace} ${name}`;
 
 	// Offer to create utility if it doesn't exist.
@@ -51,7 +51,7 @@ const router: RouterCallback = async ({namespace, name, exec, command, commands}
 			console.log(ansis.yellow(`> Command not found: ${ansis.bold(input)}\n`));
 		}
 
-		await help(commands);
+		await help(scripts);
 		return;
 	}
 

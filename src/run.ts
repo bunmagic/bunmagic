@@ -10,28 +10,28 @@ export async function run(scriptFile: string) {
 }
 
 export async function runNamespace(namespace: string, sourcePath: string) {
-	const getPathCommands = await import('./lib/scripts').then(m => m.getPathScripts);
-	const {router: routerInfo, scripts: commands} = await getPathCommands(sourcePath, namespace);
+	const getPathScripts = await import('./lib/scripts').then(m => m.getPathScripts);
+	const scripts = await getPathScripts(sourcePath, namespace);
 	const input = slugify(argv._[0] ?? '');
 
 	try {
-		if (!routerInfo) {
+		if (!scripts.router) {
 			throw new Error('No router found.');
 		}
 
-		const router: RouterCallback = await import(routerInfo.file).then(m => m.default as RouterCallback);
+		const router: RouterCallback = await import(scripts.router.file).then(m => m.default as RouterCallback);
 		if (!router) {
-			throw new Error(`Couldn't load the router: ${routerInfo.file}`);
+			throw new Error(`Couldn't load the router: ${scripts.router.file}`);
 		}
 
-		const command = commands.get(input);
+		const command = scripts.scripts.get(input);
 
 		if (!command || command.type === 'not-found') {
 			await router({
 				namespace,
 				name: input,
 				command,
-				commands,
+				scripts: scripts.scripts,
 				exec() {
 					throw new Error(`Script not found: ${input}`);
 				},
@@ -47,7 +47,7 @@ export async function runNamespace(namespace: string, sourcePath: string) {
 			namespace,
 			name: input,
 			command,
-			commands,
+			scripts: scripts.scripts,
 			exec,
 		});
 	} catch (error) {
