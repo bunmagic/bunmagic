@@ -65,6 +65,7 @@ function scriptFromExport(source: string, handle: Record<string, unknown>, names
 async function describeFile(file: string, namespace?: string): Promise<Script | NotFound> {
 	const content = await Bun.file(file).text();
 	const lines = content.split('\n');
+
 	if (lines.some(line => line.trim().startsWith('export default'))) {
 		const handle = await import(file) as Record<string, unknown>;
 		if ('default' in handle) {
@@ -81,10 +82,20 @@ async function describeFile(file: string, namespace?: string): Promise<Script | 
 }
 
 export async function getPathScripts(target: string, namespace?: string): Promise<Map<string, Script | NotFound >> {
-	const result = await $`ls ${target}`.text();
-	const files = result.split('\n')
-		.map((file: string) => `${target}/${file}`)
-		.filter((file: string) => SUPPORTED_FILES.some((extension: string) => file.endsWith(extension)));
+	const glob = new Bun.Glob(`*.{${SUPPORTED_FILES.join(',')}}`);
+	const files = [];
+	for await (const file of glob.scan({ onlyFiles: true, absolute: false, cwd: target })) {
+		if (file.startsWith('_')) {
+			if (argv.debug) {
+				console.log(`Ignoring: ${file}`);
+			}
+
+			continue;
+		}
+
+		files.push(path.join(target, file));
+	}
+
 	return getScripts(files, namespace);
 }
 
