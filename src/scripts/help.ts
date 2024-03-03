@@ -16,27 +16,27 @@ export default async function (scripts: Map<string, Script>) {
 	columns.log('');
 	columns.log(['script', 'args', 'description'].map(s => ansis.dim(s)) as [string, string, string]);
 	columns.log(['------', '----', '-----------'].map(s => ansis.dim(s)) as [string, string, string]);
-	for (const [name, command] of scripts.entries()) {
-		if (command.type !== 'script') {
+	for (const [name, script] of scripts.entries()) {
+		if (script.type !== 'script') {
 			continue;
 		}
 
-		if (command.alias?.includes(name)) {
+		if (script.alias.includes(name)) {
 			continue;
 		}
 
-		if (Bun.file(command.source).name?.startsWith('_')) {
+		if (Bun.file(script.source).name?.startsWith('_')) {
 			continue;
 		}
 
-		let description = command.desc || '';
-		if (command.alias) {
-			description += ansis.dim(` (alias: ${command.alias.join(', ')})`);
+		let description = script.desc || '';
+		if (script.alias.length > 0) {
+			description += ansis.dim(` (alias: ${script.alias.join(', ')})`);
 		}
 
 		columns.log([
-			ansis.bold(command.slug),
-			ansis.gray(command.usage || ''),
+			ansis.bold(script.slug),
+			ansis.gray(script.usage || ''),
 			description,
 		]);
 	}
