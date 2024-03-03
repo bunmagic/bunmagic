@@ -62,7 +62,7 @@ export default async function () {
 		throw new Exit(`Can't find script or namespace "${input}"`);
 	}
 
-	if ('namespace' in script) {
+	if (script.namespace) {
 		return removeNamespace(input);
 	}
 
