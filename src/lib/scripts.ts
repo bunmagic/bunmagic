@@ -1,10 +1,6 @@
-import { SUPPORTED_FILES, type Config } from './config';
+import { SUPPORTED_FILES } from './config';
 import { Script } from './script';
 
-export type Router = {
-	type: 'router';
-	file: string;
-};
 
 export type NotFound = {
 	type: 'not-found';
@@ -66,19 +62,11 @@ function scriptFromExport(source: string, handle: Record<string, unknown>, names
 	});
 }
 
-async function describeFile(file: string, namespace?: string): Promise<Script | Router | NotFound> {
+async function describeFile(file: string, namespace?: string): Promise<Script | NotFound> {
 	const content = await Bun.file(file).text();
 	const lines = content.split('\n');
 	if (lines.some(line => line.trim().startsWith('export default'))) {
 		const handle = await import(file) as Record<string, unknown>;
-
-		if ('isRouter' in handle && handle.isRouter) {
-			return {
-				type: 'router',
-				file,
-			};
-		}
-
 		if ('default' in handle) {
 			return scriptFromExport(file, handle, namespace);
 		}
@@ -92,11 +80,7 @@ async function describeFile(file: string, namespace?: string): Promise<Script | 
 	};
 }
 
-type ScriptList = {
-	router: Router;
-	scripts: Map<string, Script | NotFound >;
-};
-export async function getPathScripts(target: string, namespace?: string): Promise<ScriptList> {
+export async function getPathScripts(target: string, namespace?: string): Promise<Map<string, Script | NotFound >> {
 	const result = await $`ls ${target}`.text();
 	const files = result.split('\n')
 		.map((file: string) => `${target}/${file}`)
@@ -104,12 +88,11 @@ export async function getPathScripts(target: string, namespace?: string): Promis
 	return getScripts(files, namespace);
 }
 
-async function getScripts(files: string[], namespace?: string): Promise<ScriptList> {
-	const validFiles = files.filter((file: string) => SUPPORTED_FILES.includes(path.extname(file).replace('.', '') as Config['extension']));
+async function getScripts(files: string[], namespace?: string): Promise<Map<string, Script | NotFound >> {
+	const validFiles = files.filter((file: string) => SUPPORTED_FILES.includes(path.extname(file).replace('.', '')));
 	const list = await Promise.all(validFiles.map(async value => describeFile(value, namespace)));
 
 	const map = new Map<string, Script | NotFound >();
-	let router: Router | undefined;
 
 	for (const command of list) {
 		if (command.type === 'not-found') {
@@ -132,19 +115,9 @@ async function getScripts(files: string[], namespace?: string): Promise<ScriptLi
 				}
 			}
 		}
-
-		if (router === undefined && command.type === 'router') {
-			router = command;
-		}
 	}
 
-	if (router === undefined) {
-		const defaultRouter = path.resolve(import.meta.dirname, 'router.ts');
-		router = {
-			type: 'router',
-			file: defaultRouter,
-		};
-	}
-
-	return { router, scripts: map };
+	return map;
 }
+
+

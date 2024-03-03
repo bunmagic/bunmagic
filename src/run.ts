@@ -1,4 +1,3 @@
-import type { RouterCallback } from '@lib/router';
 // eslint-disable-next-line import/no-unassigned-import
 import 'bunmagic/globals';
 
@@ -18,46 +17,48 @@ export async function run(scriptFile: string) {
  * It runs scripts based on a namespace, via the namespace router file.
  */
 export async function runNamespace(namespace: string, sourcePath: string) {
-	const getPathScripts = await import('@lib/scripts').then(m => m.getPathScripts);
-	const { slugify } = await import('@lib/utils');
+	const { getPathScripts } = await import(`@lib/scripts`);
+	const { getRouter } = await import(`@lib/router`);
+	const { slugify } = await import(`@lib/utils`);
 
 	const scripts = await getPathScripts(sourcePath, namespace);
-	const input = slugify(argv._[0] ?? '');
+	const router = await getRouter(sourcePath);
+
+	const name = slugify(argv._[0] ?? ``);
 
 	try {
-		if (!scripts.router) {
-			throw new Error('No router found.');
-		}
-
-		const router: RouterCallback = await import(scripts.router.file).then(m => m.default as RouterCallback);
 		if (!router) {
-			throw new Error(`Couldn't load the router: ${scripts.router.file}`);
+			throw new Error(`Couldn't load the router.`);
 		}
 
-		const command = scripts.scripts.get(input);
+		if (argv.debug) {
+			console.log(`Running ${ansis.bold(name)} via router: ${router.file}`);
+		}
 
-		if (!command || command.type === 'not-found') {
-			await router({
+		const command = scripts.get(name);
+
+		if (!command || command.type === `not-found`) {
+			await router.callback({
 				namespace,
-				name: input,
+				name,
 				command,
-				scripts: scripts.scripts,
+				scripts,
 				exec() {
-					throw new Error(`Script not found: ${input}`);
+					throw new Error(`Script not found: ${name}`);
 				},
 			});
 			return;
 		}
 
 		// Let the router execute the command
-		await router({
+		await router.callback({
 			namespace,
-			name: input,
+			name,
 			command,
-			scripts: scripts.scripts,
+			scripts,
 			exec: async () => run(command.source),
 		});
 	} catch (error) {
-		console.log(ansis.bold.red('Fatal Error: '), error);
+		console.log(ansis.bold.red(`Fatal Error: `), error);
 	}
 }

@@ -18,7 +18,7 @@ export async function getSources(): Promise<Array<Source>> {
 	for (const source of sourceConfig) {
 		const commands = await getPathScripts(source.dir, source.namespace);
 
-		const scripts: Script[] = Array.from(commands.scripts)
+		const scripts: Script[] = Array.from(commands)
 			.filter(
 				(entry): entry is [string, Script] => entry[1].type === 'script',
 			).map(entry => entry[1]);

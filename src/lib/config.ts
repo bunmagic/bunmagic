@@ -8,7 +8,7 @@ export const PATHS: {
 	config: `${$HOME}/.bunmagic/config.json`,
 };
 
-export const SUPPORTED_FILES = ['ts', 'mjs', 'js'] as const;
+export const SUPPORTED_FILES: string[] = ['ts', 'mjs', 'js'] as const;
 export type SupportedFiles = typeof SUPPORTED_FILES[number];
 
 export type SourcePaths = {
@@ -16,7 +16,7 @@ export type SourcePaths = {
 	dir: string;
 };
 export type Config = {
-	extension: string & typeof SUPPORTED_FILES[number];
+	extension: string;
 	sources?: SourcePaths[];
 };
 

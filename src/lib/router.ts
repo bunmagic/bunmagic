@@ -2,6 +2,7 @@ import { create } from '../scripts/create';
 import help from '../scripts/help';
 import type { Script } from './script';
 import type { NotFound } from './scripts';
+import { SUPPORTED_FILES } from './config';
 
 export type Route = {
 	/**
@@ -29,10 +30,13 @@ export type Route = {
 	exec: () => Promise<void | { default: () => Promise<void> }>;
 };
 
-export type RouterCallback = (route: Route) => Promise<void>;
+export type Router = {
+	file: string;
+	callback: (route: Route) => Promise<void>;
+};
 
 
-const router: RouterCallback = async ({ namespace, name, exec, command, scripts }) => {
+const defaultRouter: Router['callback'] = async ({ namespace, name, exec, command, scripts }) => {
 	const input = `${namespace} ${name}`;
 
 	// Offer to create utility if it doesn't exist.
@@ -66,4 +70,39 @@ const router: RouterCallback = async ({ namespace, name, exec, command, scripts 
 	}
 };
 
-export default router;
+
+export async function getRouter(sourcePath: string): Promise<Router> {
+	const routerGlob = new Bun.Glob('**router.*');
+
+	for await (const file of routerGlob.scan({
+		cwd: sourcePath,
+		absolute: true,
+		onlyFiles: true,
+	})) {
+		const extension = path.extname(file).slice(1);
+		if (!SUPPORTED_FILES.includes(extension)) {
+			continue;
+		}
+
+		try {
+			const source = await import(file) as Record<string, unknown>;
+			if (source.router) {
+				return {
+					file,
+					callback: source.router as Router['callback'],
+				};
+			}
+
+			throw new Error(`Tried to load router from ${file}, but it didn't export a router.`);
+		} catch (error) {
+			if (argv.debug) {
+				console.warn(`Error loading "${file}":\n`, error);
+			}
+		}
+	}
+
+	return {
+		file: import.meta.filename,
+		callback: defaultRouter,
+	};
+}
