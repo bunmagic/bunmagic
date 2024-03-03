@@ -125,17 +125,17 @@ async function searchOptions<T extends string>(query: string, options: Array<Opt
 	}
 }
 
-export async function selection<T extends string>(input: T[], selectionQuestion: string): Promise<T> {
+export async function selection<T extends string>(options: T[], message: string): Promise<T> {
 	let query = ''; // Start with an empty query
-	const options: Option<T>[] = input.map(text => ({
+	const _options: Option<T>[] = options.map(text => ({
 		text,
 		visible: true,
 		selected: false,
 		matches: [],
 	}));
 
-	options[0].selected = true;
-	let frame = renderFrame(selectionQuestion, options, query);
+	_options[0].selected = true;
+	let frame = renderFrame(message, _options, query);
 
 	await CLI.raw(true);
 	await CLI.hideCursor();
@@ -165,40 +165,40 @@ export async function selection<T extends string>(input: T[], selectionQuestion:
 		}
 
 		if (key === 'up') {
-			const previousSelected = options.findIndex(option => option.selected);
-			const selected = (previousSelected - 1 < 0) ? options.length - 1 : previousSelected - 1;
-			options[previousSelected].selected = false;
-			options[selected].selected = true;
+			const previousSelected = _options.findIndex(option => option.selected);
+			const selected = (previousSelected - 1 < 0) ? _options.length - 1 : previousSelected - 1;
+			_options[previousSelected].selected = false;
+			_options[selected].selected = true;
 		}
 
 		if (key === 'down') {
-			const previousSelected = options.findIndex(option => option.selected);
-			const selected = (previousSelected + 1) % options.length;
-			options[previousSelected].selected = false;
-			options[selected].selected = true;
+			const previousSelected = _options.findIndex(option => option.selected);
+			const selected = (previousSelected + 1) % _options.length;
+			_options[previousSelected].selected = false;
+			_options[selected].selected = true;
 		}
 
-		if (typeof key === 'number' && key > 0 && key <= options.length) {
+		if (typeof key === 'number' && key > 0 && key <= _options.length) {
 			const index = key - 1;
-			if (options[index]) {
-				for (const option of options) {
+			if (_options[index]) {
+				for (const option of _options) {
 					option.selected = false;
 				}
 
-				options[index].selected = true;
+				_options[index].selected = true;
 			}
 		}
 
 		if (key === 'backspace' || key === 'delete') {
 			query = query.slice(0, -1);
-			await searchOptions(query, options);
+			await searchOptions(query, _options);
 		} else if (typeof key === 'string' && key.length === 1) {
 			query += key;
-			await searchOptions(query, options);
+			await searchOptions(query, _options);
 		}
 
 		await CLI.clearFrame(frame, true);
-		frame = renderFrame(selectionQuestion, options, query);
+		frame = renderFrame(message, _options, query);
 		await CLI.stdout(frame);
 	}
 
@@ -208,6 +208,6 @@ export async function selection<T extends string>(input: T[], selectionQuestion:
 
 	// Return the selected option in its original form
 	// Make sure to filter options by match before determining the selected option
-	const selected = options.findIndex(option => option.selected);
-	return selected === -1 ? input[0] : options[selected].text;
+	const selected = _options.findIndex(option => option.selected);
+	return selected === -1 ? options[0] : _options[selected].text;
 }
