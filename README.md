@@ -2,7 +2,7 @@
 
 *Easy script management with Bun*
 
-**bunmagic** is a [Bun](https://bun.sh) script manager to help you write, use, edit and even share Bun scripts quickly.
+**bunmagic** is a [Bun](https://bun.sh) script manager to help you create, use and manage Bun Shell scripts quickly.
 
 
 ## 🚀 Quick Start
@@ -44,7 +44,7 @@ Now you can run `lse json` to list all the json files in your current directory.
 
 Bunmagic is going to handle creating a binary and making sure it's executable for you.
 
-## 🧻 Documentation
+## 👾 Commands
 
  **Available commands:**
 | Command                      | Description                                                                 | Alias       |
@@ -78,7 +78,7 @@ However, there are a few global variables that are useful for writing CLI script
 [Bun.Shell](https://bun.sh/docs/runtime/shell) is already imported as `$` globally.
 
 ### `argv` - Arguments
-`argv` holds the arguments passed to your script already parsed by [`notMinimist](./src/globals/not-minimist.ts). It takes care of most of common use cases for you.
+`argv` holds the arguments passed to your script. They're parsed by [`notMinimist`](./src/globals/not-minimist.ts) utility function that's inspired by [Minimist](https://www.npmjs.com/package/minimist). It takes care of most of common use cases for you.
 
 ```ts
 // minimist-example.ts not-minimist something nice --with --flags -n 10 --and=more --equal-sign is-optional
@@ -104,7 +104,18 @@ console.log(Bun.argv);
 ]
 ```
 
-### `selection(options: string[], message: string)`
+### 🧰 Built-in Utilities
+
+#### Ansis (an alternative to Chalk)
+
+[ansis](https://www.npmjs.com/package/ansis) - A tiny library for colorizing terminal output. The interface is almost exactly the same as the one in [chalk](https://www.npmjs.com/package/chalk), but it's much smaller and faster:
+
+```ts
+ansis.red("This is red text");
+ansis.bold.red.bgGreen("This is bold red text on a green background");
+```
+
+#### `selection(options: string[], message: string)`
 `selection` is a helper function that takes an array of strings as options and a message and provides an interactive selection prompt.
 
 ```ts
@@ -112,7 +123,7 @@ const options = ["one", "two", "three"];
 const selected = await selection(options, "Select an option:");
 console.log(selected);
 ```
-### `cd(path: string)`
+#### `cd(path: string)`
 `cd` is a tiny helper function that changes the current working directory and resolves the tilde ( `~` ) to the home directory.
 
 `cd` is a wrapper around `$.cwd`:
@@ -121,33 +132,45 @@ console.log(selected);
 $.cwd(resolveTilde(path));
 ```
 
-### `ack(question: string, default: 'y' | 'n' = 'y')`
+#### `ack(question: string, default: 'y' | 'n' = 'y')`
 Out of the box, Bun provides `prompt()` inspired by the (`window.prompt`)[https://developer.mozilla.org/en-US/docs/Web/API/Window/prompt]. `ack` is a wrapper around that, but for `Yes` or `No` questions.
 
-### `isDirectory(path: string)`
+#### `isDirectory(path: string)`
 The `isDirectory` function is an asynchronous utility that checks if a given path points to a directory. It returns a promise that resolves to a boolean value: `true` if the path is a directory, and `false` otherwise.
 
 Due to Bun's current limitations in directly checking if a path is a directory, this function utilizes Node.js's `fs.stat` method to perform the check. If an error occurs during this process (e.g., if the path does not exist), the promise will resolve to `false`. Otherwise, it resolves based on whether the path points to a directory.
 
-### `ensureDirectory(path: string)`
+#### `ensureDirectory(path: string)`
 The `ensureDirectory` function is an asynchronous utility that ensures a given directory exists. If the directory does not exist, it will be created.
 
 This function is particularly useful when you need to make sure a directory is present before performing file operations that require the directory's existence.
 
-### `$HOME`
-The `$HOME` global variable in Bun provides the path to the current user's home directory. This variable is particularly useful when you need to access or modify files and directories located in the user's home directory.
+#### `$HOME`
+The `$HOME` global variable is a shortcut for `os.homedir()`. It holds the absolute path to the current user's home directory.
 
-### `glob(cwd: string, pattern: string = '*', options: GlobScanOptions = {})`
+#### `glob(cwd: string, pattern: string = '*', options: GlobScanOptions = {})`
 The `glob` function is an asynchronous utility that searches for files matching a specified pattern within a given directory (`cwd`). It returns a promise that resolves to an array of strings, each representing the absolute path to a file that matches the pattern.
 
 **Parameters**:
 - `cwd`: The current working directory in which to search for files.
 - `pattern`: The glob pattern to match files against. Defaults to `*`, which matches all files.
-- `options`: An optional `GlobScanOptions` object to customize the search behavior.
+- `options`: An optional (`GlobScanOptions`)[https://github.com/oven-sh/bun/blob/49ccad9367b0a30158dbb03ff00bc9a523d43c14/packages/bun-types/bun.d.ts#L4669-L4709] object to customize the search behavior, with the following properties:
+  - `cwd`: The root directory to start matching from. Defaults to `process.cwd()`.
+  - `dot`: Allow patterns to match entries that begin with a period (`.`). Defaults to `false`.
+  - `absolute`: Return the absolute path for entries. Defaults to `false`.
+  - `followSymlinks`: Indicates whether to traverse descendants of symbolic link directories. Defaults to `false`.
+  - `throwErrorOnBrokenSymlink`: Throw an error when a symbolic link is broken. Defaults to `false`.
+  - `onlyFiles`: Return only files. Defaults to `true`.
 
 **Returns**:
 A promise that resolves to an array of strings, where each string is the absolute path to a file that matches the specified pattern.
 
+### 🛠️ Custom Globals
+The `customGlobals` feature allows you to extend the global namespace with your own custom variables or functions. This is particularly useful for adding utilities or configurations that you frequently use across your scripts.
+
+To use `customGlobals`, create a file named `custom-globals.ts` in your `$HOME/.bunmagic` directory. In this file, you can export any JavaScript object, function, or variable that you wish to be available globally.
+
+For example, in your `custom-globals.ts` file, you might have:
 
 ## 🎨 Customization
 
@@ -173,3 +196,9 @@ VSCode supports both of these commands:
 
 So if you want your editor to work properly, make sure it can accept both a path to a single script file and a path to a directory. 
 
+
+## Credits
+
+This project is heavily inspired by [zx](https://github.com/google/zx). It paved the way for a new generation of shell scripting, and Bun Shell made it possible to take it to the next level.
+
+Bun Magic started out as [ZXB](https://github.com/pyronaur/zxb) - a project I built to manage `zx` scripts. But. Bun Magic is a love child of zx, zxb and Bun.
