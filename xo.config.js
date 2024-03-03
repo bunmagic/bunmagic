@@ -8,7 +8,12 @@ export default {
 		'quotes': [
 			'error',
 			'single',
-			{ avoidEscape: true },
+			{ avoidEscape: true, allowTemplateLiterals: true },
+		],
+		'@typescript-eslint/quotes': [
+			'error',
+			'single',
+			{ avoidEscape: true, allowTemplateLiterals: true },
 		],
 		// I like spacing, sosumi.
 		'object-curly-spacing': ['error', 'always'],
