@@ -26,7 +26,10 @@
 				"./src/lib/*"
 			],
 			"bunmagic/extras": [
-				"./src/extras/index.ts"
+				"./src/extras.ts"
+			],
+			"bunmagic/globals": [
+				"./src/globals.ts"
 			],
 		}
 	}
