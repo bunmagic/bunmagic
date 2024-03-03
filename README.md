@@ -1,13 +1,12 @@
 # 🪄 Bun Magic
-
-*Easy script management with Bun*
+Bun Magic simplifies shell scripting by providing a toolkit to create, use and manage scripts.
 
 **bunmagic** is a [Bun](https://bun.sh) script manager to help you create, use and manage Bun Shell scripts quickly.
 
 
 ## 🚀 Quick Start
 
-1. Make sure you have [Bun installed](https://bun.sh/):
+1. Make sure you have [Bun](https://bun.sh/) installed:
 
 ```
 curl -fsSL https://bun.sh/install | bash
@@ -75,14 +74,18 @@ console.log(cowsay.say({ text: 'Hello, Bunmagic!' }));
 However, there are a few global variables that are useful for writing CLI scripts that come bundled with Bunmagic:
 
 ### `$` Bun Shell
-[Bun.Shell](https://bun.sh/docs/runtime/shell) is already imported as `$` globally.
+Bun [Shell](https://bun.sh/docs/runtime/shell) is already imported as `$` globally.
 
 ### `argv` - Arguments
-`argv` holds the arguments passed to your script. They're parsed by [`notMinimist`](./src/globals/not-minimist.ts) utility function that's inspired by [Minimist](https://www.npmjs.com/package/minimist). It takes care of most of common use cases for you.
+`argv` holds the arguments passed to your script. They're parsed by [`notMinimist`](./src/globals/not-minimist.ts) - an utility function that's inspired by [Minimist](https://www.npmjs.com/package/minimist). It takes care of most of common use cases.
+
+
+```shell
+$ example something nice --with --flags -n 10 --and=more --equal-sign is-optional
+```
+Produces an object like this:
 
 ```ts
-// minimist-example.ts not-minimist something nice --with --flags -n 10 --and=more --equal-sign is-optional
-// Produces an object like this:
 {
   _: [ "something", "nice" ],
   with: true,
@@ -92,10 +95,10 @@ However, there are a few global variables that are useful for writing CLI script
   "equal-sign": "is-optional",
 }
 ```
-If you need more control over the arguments, you can use the `process.argv` array directly and parse the arguments using any `npm` package you like.
+If you need more control over the arguments, you can use the `Bun.argv` array directly and parse the arguments using any `npm` package you like.
 
+Using the same shell command above, the output of `Bun.argv` would be:
 ```ts
-// minimist-example.ts
 console.log(Bun.argv);
 [
   "/Users/user/.bun/bin/bun", "/Users/user/.bun/bin/bunmagic-exec", "/Users/user/.bunmagic/default/not-minimist.ts",
@@ -108,12 +111,30 @@ console.log(Bun.argv);
 
 #### Ansis (an alternative to Chalk)
 
-[ansis](https://www.npmjs.com/package/ansis) - A tiny library for colorizing terminal output. The interface is almost exactly the same as the one in [chalk](https://www.npmjs.com/package/chalk), but it's much smaller and faster:
+[ansis](https://www.npmjs.com/package/ansis) - is a small library for styling the terminal output. The interface is almost exactly the same as the one in [chalk](https://www.npmjs.com/package/chalk), but it's much smaller and faster:
 
 ```ts
 ansis.red("This is red text");
 ansis.bold.red.bgGreen("This is bold red text on a green background");
 ```
+
+#### `$HOME`
+The `$HOME` global variable is a shortcut for `os.homedir()`. It holds the absolute path to the current user's home directory.
+
+
+#### `cd(path: string)`
+`cd` is a wrapper around `$.cwd`, but it also resolves the tilde ( `~` ) to the home directory.
+
+```ts
+// These two are the exactly the same:
+$.cwd(resolveTilde(path))
+cd(path)
+```
+
+
+#### `ack(question: string, default: 'y' | 'n' = 'y')`
+Out of the box, Bun provides `prompt()` inspired by the (`window.prompt`)[https://developer.mozilla.org/en-US/docs/Web/API/Window/prompt]. `ack` is a wrapper around that, but for `Yes` or `No` questions.
+
 
 #### `selection(options: string[], message: string)`
 `selection` is a helper function that takes an array of strings as options and a message and provides an interactive selection prompt.
@@ -123,17 +144,7 @@ const options = ["one", "two", "three"];
 const selected = await selection(options, "Select an option:");
 console.log(selected);
 ```
-#### `cd(path: string)`
-`cd` is a tiny helper function that changes the current working directory and resolves the tilde ( `~` ) to the home directory.
 
-`cd` is a wrapper around `$.cwd`:
-
-```ts
-$.cwd(resolveTilde(path));
-```
-
-#### `ack(question: string, default: 'y' | 'n' = 'y')`
-Out of the box, Bun provides `prompt()` inspired by the (`window.prompt`)[https://developer.mozilla.org/en-US/docs/Web/API/Window/prompt]. `ack` is a wrapper around that, but for `Yes` or `No` questions.
 
 #### `isDirectory(path: string)`
 The `isDirectory` function is an asynchronous utility that checks if a given path points to a directory. It returns a promise that resolves to a boolean value: `true` if the path is a directory, and `false` otherwise.
@@ -145,8 +156,6 @@ The `ensureDirectory` function is an asynchronous utility that ensures a given d
 
 This function is particularly useful when you need to make sure a directory is present before performing file operations that require the directory's existence.
 
-#### `$HOME`
-The `$HOME` global variable is a shortcut for `os.homedir()`. It holds the absolute path to the current user's home directory.
 
 #### `glob(cwd: string, pattern: string = '*', options: GlobScanOptions = {})`
 The `glob` function is an asynchronous utility that searches for files matching a specified pattern within a given directory (`cwd`). It returns a promise that resolves to an array of strings, each representing the absolute path to a file that matches the pattern.
