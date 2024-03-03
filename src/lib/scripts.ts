@@ -1,6 +1,5 @@
 import {SUPPORTED_FILES, type Config} from './config';
 import {Script} from './script';
-import {slugify} from './utils';
 
 export type Router = {
 	type: 'router';
@@ -119,22 +118,17 @@ async function getScripts(files: string[], namespace?: string): Promise<ScriptLi
 		}
 
 		if (command.type === 'script') {
-			const commandSlug = slugify(command.slug);
-			if (map.has(commandSlug)) {
-				console.warn(`Warning: Duplicate command slug '${commandSlug}' detected. Skipping.`);
+			if (map.has(command.slug)) {
+				console.warn(`Warning: Duplicate command slug '${command.slug}' detected. Skipping.`);
 			} else {
-				map.set(commandSlug, command);
+				map.set(command.slug, command);
 			}
 
-			if (command.alias) {
-				for (const alias of command.alias) {
-					// @TODO - simplify - remove the need for this eslint ignore:
-					// eslint-disable-next-line max-depth
-					if (map.has(alias)) {
-						console.warn(`Warning: Alias '${alias}' conflicts with an existing command or alias. Skipping.`);
-					} else {
-						map.set(alias, command);
-					}
+			for (const alias of command.alias) {
+				if (map.has(alias)) {
+					console.warn(`Warning: Alias '${alias}' conflicts with an existing command or alias. Skipping.`);
+				} else {
+					map.set(alias, command);
 				}
 			}
 		}
