@@ -47,42 +47,20 @@ Bunmagic is going to handle creating a binary and making sure it's executable fo
 ## 🧻 Documentation
 
  **Available commands:**
-
- `bunmagic create <script-name>`
- Create a new script. Alias: `new`.
-
- `bunmagic edit [script-name]`
- Edit scripts. If no script name is specified, will open all scripts and the `~/.bunmagic` directory.
-
- `bunmagic remove <script-name>`
- Remove and unlink a script. Alias: `rm`.
-
- `bunmagic list`
- List all known scripts. Alias: `ls`.
-
- `bunmagic link`
- Add an additional directory to use as script source.
-
- `bunmagic unlink`
- Remove a directory from the script source list.
-
- `bunmagic update`
- Update bunmagic to the latest version.
-
- `bunmagic help`
- Get the full list of available commands.
-
- `bunmagic doctor`
- Check if bunmagic is set up correctly.
-
- `bunmagic reload [--force]`
- Reload your script files and ensure that they have an executable bin.
-
- `bunmagic version`
- Display the current version of bunmagic. Alias: `-v`.
-
- `bunmagic clean`
- Remove bin files from the bin directory that don't have a matching script.
+| Command                      | Description                                                                 | Alias       |
+|------------------------------|-----------------------------------------------------------------------------|-------------|
+| `bunmagic create <script-name>` | Create a new script.                                                        | `new`       |
+| `bunmagic edit [script-name]`   | Edit scripts. Opens all scripts and the `~/.bunmagic` directory if no name is specified. |             |
+| `bunmagic remove <script-name>` | Remove and unlink a script.                                                 | `rm`        |
+| `bunmagic list`                  | List all known scripts.                                                     | `ls`        |
+| `bunmagic link`                  | Add an additional directory to use as script source.                        |             |
+| `bunmagic unlink`                | Remove a directory from the script source list.                             |             |
+| `bunmagic update`                | Update bunmagic to the latest version.                                      |             |
+| `bunmagic help`                  | Get the full list of available commands.                                    |             |
+| `bunmagic doctor`                | Check if bunmagic is set up correctly.                                      |             |
+| `bunmagic reload [--force]`      | Reload your script files and ensure that they have an executable bin.       |             |
+| `bunmagic version`               | Display the current version of bunmagic.                                    | `-v`        |
+| `bunmagic clean`                 | Remove bin files from the bin directory that don't have a matching script.  |             |
 
 
 ## 🎨 Customization
