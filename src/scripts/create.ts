@@ -35,7 +35,7 @@ async function namespacedScriptPath(slug: string, namespace: string): Promise<Pa
 }
 
 async function scriptPath(slug: string): Promise<PartialScriptPath> {
-	const commandExists = await $`which ${slug}`;
+	const commandExists = await $`which ${slug}`.quiet();
 
 	// Check if a command with this name already exists on the system
 	if (commandExists.exitCode !== 1) {
