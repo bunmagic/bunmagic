@@ -62,7 +62,7 @@ function scriptFromExport(source: string, handle: Record<string, unknown>, names
 	});
 }
 
-async function describeFile(file: string, namespace?: string): Promise<Script | NotFound> {
+async function describeScript(file: string, namespace?: string): Promise<Script | NotFound> {
 	const content = await Bun.file(file).text();
 	const lines = content.split('\n');
 
@@ -81,27 +81,9 @@ async function describeFile(file: string, namespace?: string): Promise<Script | 
 	};
 }
 
-export async function getPathScripts(target: string, namespace?: string): Promise<Map<string, Script | NotFound >> {
-	const glob = new Bun.Glob(`*.{${SUPPORTED_FILES.join(',')}}`);
-	const files: string[] = [];
-	for await (const file of glob.scan({ onlyFiles: true, absolute: false, cwd: target })) {
-		if (file.startsWith('_')) {
-			if (argv.debug) {
-				console.log(`Ignoring: ${file}`);
-			}
-
-			continue;
-		}
-
-		files.push(path.join(target, file));
-	}
-
-	return getScripts(files, namespace);
-}
-
 async function getScripts(files: string[], namespace?: string): Promise<Map<string, Script | NotFound >> {
 	const validFiles = files.filter((file: string) => SUPPORTED_FILES.includes(path.extname(file).replace('.', '')));
-	const list = await Promise.all(validFiles.map(async value => describeFile(value, namespace)));
+	const list = await Promise.all(validFiles.map(async value => describeScript(value, namespace)));
 
 	const map = new Map<string, Script | NotFound >();
 
@@ -132,3 +114,20 @@ async function getScripts(files: string[], namespace?: string): Promise<Map<stri
 }
 
 
+export async function getPathScripts(target: string, namespace?: string): Promise<Map<string, Script | NotFound >> {
+	const glob = new Bun.Glob(`*.{${SUPPORTED_FILES.join(',')}}`);
+	const files: string[] = [];
+	for await (const file of glob.scan({ onlyFiles: true, absolute: false, cwd: target })) {
+		if (file.startsWith('_')) {
+			if (argv.debug) {
+				console.log(`Ignoring: ${file}`);
+			}
+
+			continue;
+		}
+
+		files.push(path.join(target, file));
+	}
+
+	return getScripts(files, namespace);
+}
