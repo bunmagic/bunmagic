@@ -211,4 +211,4 @@ So if you want your editor to work properly, make sure it can accept both a path
 
 This project is heavily inspired by [zx](https://github.com/google/zx). It paved the way for a new generation of shell scripting, and Bun Shell made it possible to take it to the next level.
 
-Bun Magic started out as [ZXB](https://github.com/pyronaur/zxb) - a project I built to manage `zx` scripts. But. Bun Magic is a love child of zx, zxb and Bun.
+Bun Magic started out as [zxb](https://github.com/pyronaur/zxb) - a project I built to manage `zx` scripts. But. Bun Magic is a love child of zx, zxb and Bun.
