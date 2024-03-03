@@ -40,7 +40,9 @@ const ls = await glob(process.cwd(), `*.${ext}`);
 console.log(ls.join("\n"));
 ```
 
-That's it!
+Now you can run `lse json` to list all the json files in your current directory.
+
+Bunmagic is going to handle creating a binary and making sure it's executable for you.
 
 ## 🧻 Documentation
 
