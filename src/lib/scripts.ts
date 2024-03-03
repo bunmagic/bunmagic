@@ -83,7 +83,7 @@ async function describeFile(file: string, namespace?: string): Promise<Script | 
 
 export async function getPathScripts(target: string, namespace?: string): Promise<Map<string, Script | NotFound >> {
 	const glob = new Bun.Glob(`*.{${SUPPORTED_FILES.join(',')}}`);
-	const files = [];
+	const files: string[] = [];
 	for await (const file of glob.scan({ onlyFiles: true, absolute: false, cwd: target })) {
 		if (file.startsWith('_')) {
 			if (argv.debug) {
