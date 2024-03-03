@@ -4,7 +4,7 @@ import type { Script } from '@lib/script';
 export const name = 'help';
 export const desc = 'Get the full list of available commands';
 
-export default async function (commands: Map<string, Script>) {
+export default async function (scripts: Map<string, Script>) {
 	const columns = new Columns(3);
 	columns.gap = 5;
 
@@ -16,7 +16,7 @@ export default async function (commands: Map<string, Script>) {
 	columns.log('');
 	columns.log(['script', 'args', 'description'].map(s => ansis.dim(s)) as [string, string, string]);
 	columns.log(['------', '----', '-----------'].map(s => ansis.dim(s)) as [string, string, string]);
-	for (const [name, command] of commands.entries()) {
+	for (const [name, command] of scripts.entries()) {
 		if (command.type !== 'script') {
 			continue;
 		}
