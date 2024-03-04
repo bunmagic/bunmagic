@@ -15,11 +15,6 @@ export async function $get(...properties: Parameters<typeof $>) {
 
 
 
-
-export function cd(path: string) {
-	$.cwd(resolveTilde(path));
-}
-
 export function ack(q: string, defaultAnswer: 'y' | 'n' = 'y') {
 	let yesOrNo = '[y/N]';
 	if (defaultAnswer === 'y') {

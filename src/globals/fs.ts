@@ -34,6 +34,15 @@ export async function ensureDirectory(path: string) {
 	return true;
 }
 
+export function cd(path: string) {
+	$.cwd(resolveTilde(path));
+}
+
+export async function cwd() {
+	// eslint-disable-next-line unicorn/no-await-expression-member
+	return (await $`pwd`.text()).trim();
+}
+
 
 export function resolveTilde(input: string) {
 	if (input.startsWith('~')) {
@@ -43,12 +52,17 @@ export function resolveTilde(input: string) {
 	return input;
 }
 
-export async function glob(cwd: string, pattern = '*', options: GlobScanOptions = {}) {
-	const defaultGlobOptions = {
+export async function glob(pattern = '*', options: GlobScanOptions = {}) {
+	const defaultGlobOptions: GlobScanOptions = {
 		onlyFiles: true,
 		absolute: true,
-		cwd,
 	};
+
+	if (!options.cwd) {
+		defaultGlobOptions.cwd = await cwd();
+	}
+
+
 	const glob = new Bun.Glob(pattern);
 	const files: string[] = [];
 	for await (const file of glob.scan({ ...defaultGlobOptions, ...options })) {
