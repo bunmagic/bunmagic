@@ -12,7 +12,7 @@ function template(name: string, scriptPath: string, exec: string): string {
 }
 
 export async function getBins(): Promise<string[]> {
-	return glob(PATHS.bins);
+	return glob('*', { cwd: PATHS.bins });
 }
 
 export async function ensureScriptBin(script: Script) {

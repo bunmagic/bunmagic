@@ -49,7 +49,7 @@ Now add in a bit script:
 
 ```js
 const ext = argv._[0];
-const ls = await glob(process.cwd(), `*.${ext}`);
+const ls = await glob(`*.${ext}`);
 console.log(ls.join("\n"));
 ```
 
