@@ -12,7 +12,7 @@ export async function removeSourceDirectory(target?: string): Promise<void> {
 			throw new Error('No source directories to remove.');
 		}
 
-		target = await selection(sourceDirectories, 'Select a directory to remove:');
+		target = await selection('Select a directory to remove:', sourceDirectories);
 	}
 
 	const fullPath = path.resolve(target);
