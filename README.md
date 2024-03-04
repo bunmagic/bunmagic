@@ -1,5 +1,6 @@
 # 🪄 Bun Magic
-> Creating shell scripts has never been this easy!
+
+Creating shell scripts has never been this easy!
 
 Bun Magic simplifies shell scripting by providing a toolkit to create, use and manage scripts.
 
@@ -8,7 +9,13 @@ This is how you create a `demo` command and import `cowsay` from npm, and delive
 
 ![demo](https://raw.githubusercontent.com/bunmagic/bunmagic/main/docs/assets/demo.gif)
 
+## 🧙‍♂️ Overview
 
+* **Create** new scripts with `bunmagic create <script-name>`.
+* **List** all known scripts with `bunmagic list`
+* **Edit** scripts with `bunmagic <script-name>`
+* Use the **built-in utilities** for common CLI tasks (e.g., `cd`, `ack`, `selection`, `isDirectory`, `ensureDirectory`, `glob`).
+* Leverage **Bun** to quickly build powerful scripts using all the features that bun provides - run shell commands, import npm packages, and more.
 
 ## 🚀 Install
 
@@ -28,16 +35,17 @@ bunx bunmagic install
 
 ### 🤖 Your first script
 
-Create a new **bunmagic** managed script by running.
+Let's create a simple script called **lse**.
 
-I'll create an ls command that will list files only by your specified extension. Call it **lse**.
-```
+```sh
 bunmagic lse
+# or
+bunmagic create lse
 ```
 
-This will create a `lse.mjs` file in your directory and link it up as a bin so that you can run it from anywhere as `lse` command.
+This will create a `lse.ts` file in bunmagic source directory and link it up as a bin so that you can run it from anywhere as `lse` command.
 
-Now add in a bit script magic:
+Now add in a bit script:
 
 ```js
 const ext = argv._[0];
@@ -52,6 +60,7 @@ Bunmagic is going to handle creating a binary and making sure it's executable fo
 ## 👾 Commands
 
  **Available commands:**
+
 | Command                      | Description                                                                 | Alias       |
 |------------------------------|-----------------------------------------------------------------------------|-------------|
 | `bunmagic create <script-name>` | Create a new script.                                                        | `new`       |
@@ -77,39 +86,43 @@ import cowsay from 'cowsay';
 console.log(cowsay.say({ text: 'Hello, Bunmagic!' }));
 ```
 
-However, there are a few global variables that are useful for writing CLI scripts that come bundled with Bunmagic:
+However, there are a few global variables that are useful for writing CLI scripts that come bundled with Bun Magic.
+
 
 ### `$` Bun Shell
-Bun [Shell](https://bun.sh/docs/runtime/shell) is already imported as `$` globally.
+
+Bun [Shell](https://bun.sh/docs/runtime/shell) is already imported as `$` globally. Use this to run all your shell commands as you would in Bun.
 
 ### `argv` - Arguments
-`argv` holds the arguments passed to your script. They're parsed by [`notMinimist`](./src/globals/not-minimist.ts) - an utility function that's inspired by [Minimist](https://www.npmjs.com/package/minimist). It takes care of most of common use cases.
+
+`argv` holds the arguments passed to your script. They're parsed by [`notMinimist`](./src/globals/not-minimist.ts) - a tiny utility that's inspired by [Minimist](https://www.npmjs.com/package/minimist), but with a smaller footprint.
 
 
 ```shell
-$ example something nice --with --flags -n 10 --and=more --equal-sign is-optional
+$ example one two --not=false --yes -n 10 --equals is-optional
 ```
+
 Produces an object like this:
 
 ```ts
 {
-  _: [ "something", "nice" ],
-  with: true,
-  flags: true,
+  _: [ "one", "two" ],
+  not: "false",
+  yes: true,
   n: 10,
-  and: "more",
-  "equal-sign": "is-optional",
+  equals: "is-optional",
 }
 ```
+
 If you need more control over the arguments, you can use the `Bun.argv` array directly and parse the arguments using any `npm` package you like.
 
 Using the same shell command above, the output of `Bun.argv` would be:
+
 ```ts
 console.log(Bun.argv);
 [
-  "/Users/user/.bun/bin/bun", "/Users/user/.bun/bin/bunmagic-exec", "/Users/user/.bunmagic/default/not-minimist.ts",
-  "not-minimist", "something", "nice", "--with", "--flags", "-n", "10", "--and=more", "--equal-sign",
-  "is-optional"
+  "/Users/user/.bun/bin/bun", "/Users/user/.bun/bin/bunmagic-exec", "/Users/user/.bunmagic/default/example.ts",
+  "example", "one", "two", "--not=false", "--yes", "-n", "10", "--equals", "is-optional"
 ]
 ```
 
@@ -124,70 +137,110 @@ ansis.red("This is red text");
 ansis.bold.red.bgGreen("This is bold red text on a green background");
 ```
 
-#### `$HOME`
-The `$HOME` global variable is a shortcut for `os.homedir()`. It holds the absolute path to the current user's home directory.
+#### $HOME
+
+Variable: `$HOME`
+
+The `$HOME` global variable is a shortcut for `os.homedir()`. It holds the absolute path to the current user's home directory. 
+
+#### resolveTilde
+
+Interface: `resolveTilde(path: string): string`
+
+If you need to quickly resolve a path that starts with a tilde ( `~` ), you can use the `resolveTilde` function. It replaces the tilde with the absolute path to the current user's home directory.
+
+```ts
+const resolvedPath = resolveTilde("~/my-file.txt");
+console.log(resolvedPath);
+// > /Users/user/my-file.txt
+```
 
 
-#### `cd(path: string)`
+#### cd
+
+Interface: `cd(path: string): void`
+
 `cd` is a wrapper around `$.cwd`, but it also resolves the tilde ( `~` ) to the home directory.
 
 ```ts
-// These two are the exactly the same:
-$.cwd(resolveTilde(path))
-cd(path)
+// All these are equivalent
+$.cwd(`${$HOME}/my-folder`)
+$.cwd(resolveTilde(`~/my-folder`))
+cd(`~/my-folder`)
 ```
 
 
-#### `ack(question: string, default: 'y' | 'n' = 'y')`
-Out of the box, Bun provides `prompt()` inspired by the (`window.prompt`)[https://developer.mozilla.org/en-US/docs/Web/API/Window/prompt]. `ack` is a wrapper around that, but for `Yes` or `No` questions.
+#### ack
+
+A prompt to ask a Yes or No question.
+
+Interface: `ack(message: string, default: 'y' | 'n'): Promise<boolean>`
+
+Out of the box, Bun provides [`prompt()`](https://developer.mozilla.org/en-US/docs/Web/API/Window/prompt) and [`confirm`](https://developer.mozilla.org/en-US/docs/Web/API/Window/confirm) functions Web APIs.
+
+`ack` works exactly like `confirm`, but allows you to change the default value to `y` or `n`.
 
 
-#### `selection(options: string[], message: string)`
-`selection` is a helper function that takes an array of strings as options and a message and provides an interactive selection prompt.
+#### selection
+
+Show a selection prompt that allows selecting an option from a list. It's an interactive CLI menu that can be navigated using arrow keys or numbers and has simple fuzzy search built-in.
+
+Interface: `selection(message: string, options: string[]): Promise<string>`
 
 ```ts
 const options = ["one", "two", "three"];
-const selected = await selection(options, "Select an option:");
-console.log(selected);
+const selected = await selection("Select an option:", options);
 ```
 
 
-#### `isDirectory(path: string)`
-The `isDirectory` function is an asynchronous utility that checks if a given path points to a directory. It returns a promise that resolves to a boolean value: `true` if the path is a directory, and `false` otherwise.
+### 🗄️ Filesystem Utilities
 
-Due to Bun's current limitations in directly checking if a path is a directory, this function utilizes Node.js's `fs.stat` method to perform the check. If an error occurs during this process (e.g., if the path does not exist), the promise will resolve to `false`. Otherwise, it resolves based on whether the path points to a directory.
+If you need to interact with the filesystem a lot, `fs-extra` is great, but I've only found that often I need only a few key functions.
 
-#### `ensureDirectory(path: string)`
-The `ensureDirectory` function is an asynchronous utility that ensures a given directory exists. If the directory does not exist, it will be created.
+That's why I've included only a handful of functions that I've found to be the most useful.
+
+#### isDirectory
+
+Interface: `isDirectory(path: string): Promise<boolean>`
+
+Due to Bun's ( v1.0.26 ) current limitations in directly checking if a path is a directory, this function utilizes Node.js's `fs.stat` method to perform the check. If an error occurs during this process (e.g., if the path does not exist), the promise will resolve to `false`. Otherwise, it resolves based on whether the path points to a directory.
+
+#### ensureDirectory
+
+Create a directory (recursively) if it doesn't exist.
+
+Interface: `ensureDirectory(path: string): Promise<void>`
 
 This function is particularly useful when you need to make sure a directory is present before performing file operations that require the directory's existence.
 
 
-#### `glob(cwd: string, pattern: string = '*', options: GlobScanOptions = {})`
-The `glob` function is an asynchronous utility that searches for files matching a specified pattern within a given directory (`cwd`). It returns a promise that resolves to an array of strings, each representing the absolute path to a file that matches the pattern.
+#### glob
 
-**Parameters**:
-- `cwd`: The current working directory in which to search for files.
-- `pattern`: The glob pattern to match files against. Defaults to `*`, which matches all files.
-- `options`: An optional [`GlobScanOptions`](https://github.com/oven-sh/bun/blob/49ccad9367b0a30158dbb03ff00bc9a523d43c14/packages/bun-types/bun.d.ts#L4669-L4709) object to customize the search behavior, with the following properties:
-  - `cwd`: The root directory to start matching from. Defaults to `process.cwd()`.
-  - `dot`: Allow patterns to match entries that begin with a period (`.`). Defaults to `false`.
-  - `absolute`: Return the absolute path for entries. Defaults to `false`.
-  - `followSymlinks`: Indicates whether to traverse descendants of symbolic link directories. Defaults to `false`.
-  - `throwErrorOnBrokenSymlink`: Throw an error when a symbolic link is broken. Defaults to `false`.
-  - `onlyFiles`: Return only files. Defaults to `true`.
+Interface: `glob(pattern: string = '*', options: GlobScanOptions = {}): Promise<string[]>` ( [`GlobScanOptions`](https://github.com/oven-sh/bun/blob/49ccad9367b0a30158dbb03ff00bc9a523d43c14/packages/bun-types/bun.d.ts#L4669-L4709) )
 
-**Returns**:
-A promise that resolves to an array of strings, where each string is the absolute path to a file that matches the specified pattern.
+This is a shortcut for [`new Bun.Glob()`](https://bun.sh/docs/api/glob) that allows you to quickly scan a directory and get a list of files that match a pattern. 
+
+**Mind The Path**:
+Bun.Glob() uses `process.cwd()` by default. If you change paths during the script, `Bun.Glob()` will always return the files relative to the original path. `glob()` will always use the current working directory.
+
+**Mind the Performance**:
+`glob()` is a great quick utility for smaller scripts, but it will scan the entire directory before resolving the promise. If large directories are involved, it's better to use `new Bun.Glob()` directly.
+
 
 ## 🎨 Customization
 
 ### Custom Globals
-The `customGlobals` feature allows you to extend the global namespace with your own custom variables or functions. This is particularly useful for adding utilities or configurations that you frequently use across your scripts.
 
-To use `customGlobals`, create a file named `custom-globals.ts` in your `$HOME/.bunmagic` directory. In this file, you can export any JavaScript object, function, or variable that you wish to be available globally.
 
-For example, to make `fs-extra` available in all your scripts by default, add this to  your `custom-globals.ts`:
+If there are any utilities that you'd like to reuse across your Bunmagic scripts, you can add configure them as custom globals.
+
+This is especially useful if you're migrating over from `zx` and have a lot of scripts that used some utilities that aren't bundled with Bunmagic, like `fs-extra`, `chalk`, etc.
+
+To define custom globals, create a file: `~/.bunmagic/custom-globals.ts`
+
+In this file, you can export any JavaScript object, function, or variable that you wish to be available globally and it will be assigned to `globalThis` in all your scripts.
+
+For example, to make `fs-extra` available in all your scripts by default, add this to your `custom-globals.ts`:
 
 ```ts
 export * as fs from 'fs-extra';
@@ -195,9 +248,9 @@ export * as fs from 'fs-extra';
 
 ### Code Editor
 
-`bunmagic` is going to try to use your `EDITOR` environment variable and fall back to **VSCode** as the editor when opening script files.
+`bunmagic` is going to try to use your `EDITOR` environment variable and fall back to `code` as the editor when opening script files.
 
-You must have [VSCode CLI Tools](https://code.visualstudio.com/docs/editor/command-line) installed for files to be opened automatically in VSCode.
+If you're using VSCode must have [VSCode CLI Tools](https://code.visualstudio.com/docs/editor/command-line) installed for files to be opened automatically in VSCode.
 
 In your shell configuration file, set an `EDITOR` environment variable:
 
@@ -207,13 +260,14 @@ export EDITOR="/usr/bin/vim"
 ```
  
 **Note:**
-VSCode supports both of these commands:
+VSCode supports both of these commands and Bunmagic will use them to open either a single script or a script directory:
+
 ```sh
-> code /path/to/scripts/my-script.mjs
+> code /path/to/scripts/my-script.ts
 > code /path/to/scripts
 ```
 
-So if you want your editor to work properly, make sure it can accept both a path to a single script file and a path to a directory. 
+If you want your editor to work properly, make sure it can accept both a path to a single script file and a path to a directory. 
 
 
 ## Credits
