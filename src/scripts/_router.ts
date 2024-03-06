@@ -4,8 +4,8 @@ import help from './help';
 import { create } from './create';
 import version from './version';
 
-export const router: Router['callback'] = async ({ exec, command, scripts }) => {
-	const input = argv._.map(t => slugify(t)).join(' ');
+export const router: Router['callback'] = async ({ name, exec, command, scripts }) => {
+	const input = [name, ...args].map(t => slugify(t)).join(' ');
 	if (argv.v || argv.version || input === 'version') {
 		await version();
 		return;
@@ -32,8 +32,6 @@ export const router: Router['callback'] = async ({ exec, command, scripts }) => 
 	}
 
 	try {
-		// Shift the first argument off the list and run the script.
-		argv._.shift();
 		await exec();
 	} catch (error) {
 		throw new Exit(error);

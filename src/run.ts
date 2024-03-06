@@ -24,7 +24,8 @@ export async function runNamespace(namespace: string, sourcePath: string) {
 	const scripts = await getPathScripts(sourcePath, namespace);
 	const router = await getRouter(sourcePath);
 
-	const name = slugify(argv._[0] ?? ``);
+	const name = slugify(argv._.shift() ?? ``);
+
 
 	try {
 		if (!router) {
