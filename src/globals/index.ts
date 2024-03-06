@@ -15,6 +15,8 @@ export * from './fs';
 
 
 export const argv = notMinimist(Bun.argv.slice(2) || []);
+export const args = argv._; // eslint-disable-line unicorn/prevent-abbreviations
+export const flags = { ...argv, _: undefined };
 export const $HOME = os.homedir();
 export {
 	ansis, ansis as chalk, os, $,

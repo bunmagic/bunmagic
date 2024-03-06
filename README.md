@@ -48,7 +48,7 @@ This will create a `lse.ts` file in bunmagic source directory and link it up as 
 Now add in a bit script:
 
 ```js
-const ext = argv._[0];
+const ext = args[0];
 const ls = await glob(`*.${ext}`);
 console.log(ls.join("\n"));
 ```
@@ -93,10 +93,17 @@ However, there are a few global variables that are useful for writing CLI script
 
 Bun [Shell](https://bun.sh/docs/runtime/shell) is already imported as `$` globally. Use this to run all your shell commands as you would in Bun.
 
-### `argv` - Arguments
+### Arguments
 
-`argv` holds the arguments passed to your script. They're parsed by [`notMinimist`](./src/globals/not-minimist.ts) - a tiny utility that's inspired by [Minimist](https://www.npmjs.com/package/minimist), but with a smaller footprint.
+Arguments passed to the script are available in 3 global variables:
 
+* `args` - an array of arguments without flags.
+* `flags` - an object with all the flags passed to the script.
+* `argv` - a minimist-like object with all the arguments and flags.
+
+Arguments are parsed by [`notMinimist`](./src/globals/not-minimist.ts) - a tiny utility that's inspired by [Minimist](https://www.npmjs.com/package/minimist), but with a smaller footprint.
+
+**Example:**
 
 ```shell
 $ example one two --not=false --yes -n 10 --equals is-optional
@@ -105,13 +112,19 @@ $ example one two --not=false --yes -n 10 --equals is-optional
 Produces an object like this:
 
 ```ts
-{
-  _: [ "one", "two" ],
+const args = [ "one", "two" ];
+const flags = {
   not: "false",
   yes: true,
   n: 10,
   equals: "is-optional",
 }
+
+// Minimist-like `argv` object:
+const argv = {
+  _: args
+  ...flags
+};
 ```
 
 If you need more control over the arguments, you can use the `Bun.argv` array directly and parse the arguments using any `npm` package you like.

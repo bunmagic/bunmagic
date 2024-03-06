@@ -9,6 +9,8 @@ declare global {
 	const ansis: typeof globals.ansis;
 	const path: typeof globals.path;
 	const argv: typeof globals.argv;
+	const args: typeof globals.args; // eslint-disable-line unicorn/prevent-abbreviations
+	const flags: typeof globals.flags;
 	const selection: typeof globals.selection;
 	const cd: typeof globals.cd;
 	const ack: typeof globals.ack;
