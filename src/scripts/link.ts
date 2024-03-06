@@ -41,7 +41,7 @@ export async function addSourceDirectory(target?: string) {
 }
 
 export default async function () {
-	const directory = argv._[0];
+	const directory = args[0];
 	if (directory && !await Bun.file(directory).exists() && !await isDirectory(directory)) {
 		console.log(
 			'The path you provided doesn\'t exist. Are you sure it\'s correct?',

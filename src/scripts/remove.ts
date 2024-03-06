@@ -49,13 +49,13 @@ async function removeScript(script: Script) {
 }
 
 export default async function () {
-	if (argv._.length === 0) {
+	if (args.length === 0) {
 		throw new Error(
 			`You must specify which script to remove.\n${usage}`,
 		);
 	}
 
-	const input = argv._.join(' ');
+	const input = args.join(' ');
 	const script = await findAny(input);
 
 	if (!script) {

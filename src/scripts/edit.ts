@@ -10,7 +10,7 @@ export const desc = 'Edit scripts. If no script name is specified, will open all
 export const usage = '[script-name]';
 
 export default async function () {
-	const slug = argv._.join(' ');
+	const slug = args.join(' ');
 	if (!slug) {
 		if (ack(`Slug not specified. Open ${ansis.bold('~/.bunmagic')} ?`)) {
 			return openEditor(PATHS.bunmagic);

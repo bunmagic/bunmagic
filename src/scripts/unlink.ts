@@ -47,7 +47,7 @@ async function cleanBins() {
 
 
 export default async function () {
-	const directory = argv._[0];
+	const directory = args[0];
 	const cwd = process.cwd();
 
 	const sources = await getSources();
