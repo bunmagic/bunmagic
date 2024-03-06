@@ -4,7 +4,7 @@ import {
 	findAny,
 	findNamespace,
 } from '@lib/sources';
-import { get } from '@lib/config';
+import { SUPPORTED_FILES, get } from '@lib/config';
 import { openEditor } from '@lib/utils';
 import { Script } from '@lib/script';
 import { ensureNamespaceBin, ensureScriptBin } from './reload';
@@ -59,18 +59,51 @@ async function scriptPath(slug: string): Promise<PartialScriptPath> {
 	return path.resolve(directory, slug) as PartialScriptPath;
 }
 
-export async function create(command: string) {
-	// Exception: don't create new bunmagic scripts via "bunmagic create bunmagic <command>" or "bunmagic <command>".
-	if (command.startsWith('bunmagic ')) {
-		command = command.replace('bunmagic ', '');
+async function getExtension(command: string): Promise<string> {
+	const parts = command.split('.').map(part => part.trim());
+
+	// If there's no extension, use the default
+	if (parts.length === 1) {
+		return get('extension');
 	}
 
-	const existing = await findAny(command);
+	// Check for invalid command names
+	if (parts.length > 2 || !parts[0] || !parts[1]) {
+		throw new Error(`Invalid command name: ${command}`);
+	}
+
+	const extension = parts[1];
+	if (!SUPPORTED_FILES.includes(extension)) {
+		throw new Error(`Unsupported file extension: ${extension}`);
+	}
+
+	if (ack(`Use "${ansis.bold(extension)}" as the extension?`)) {
+		return extension;
+	}
+
+
+	// @todo: double selection doesn't work
+	// return selection('Which extension to use?', SUPPORTED_FILES);
+	const result = prompt(`Enter the file extension for "${command}"`);
+	if (!result) {
+		throw new Error('No file extension provided');
+	}
+
+	return result;
+}
+
+export async function create(input: string, content = '') {
+	// Exception: don't create new bunmagic scripts via "bunmagic create bunmagic <command>" or "bunmagic <command>".
+	if (input.startsWith('bunmagic ')) {
+		input = input.replace('bunmagic ', '');
+	}
+
+	const existing = await findAny(input);
 
 	if (existing) {
 		const target = 'source' in existing ? existing.source : existing.dir;
-		const messageExists = `The command "${ansis.bold(command)}" already exists:`;
-		const messageEdit = `Would you like to edit "${ansis.bold(command)}" ?`;
+		const messageExists = `The command "${ansis.bold(input)}" already exists:`;
+		const messageEdit = `Would you like to edit "${ansis.bold(input)}" ?`;
 		if (ack(`${messageExists}\n${messageEdit}`, 'y')) {
 			return openEditor(target);
 		}
@@ -78,18 +111,25 @@ export async function create(command: string) {
 		return true;
 	}
 
-	const [slug, namespace] = commandFromString(command);
+	let [slug, namespace] = commandFromString(input);
+
+	// todo make this nicer
+	if (slug.includes('.')) {
+		slug = slug.split('.')[0];
+	}
+
+	const name = namespace ? `${namespace} ${slug}` : slug;
 	const partialPath = namespace
 		? await namespacedScriptPath(slug, namespace)
 		: await scriptPath(slug);
 
-	const extension = await get('extension');
+	const extension = await getExtension(input);
 	const binaryName = namespace ?? slug;
 	const editFilePath = `${partialPath}.${extension}`;
 	const targetPath = namespace ?? editFilePath;
 
 	console.log(ansis.dim(`Creating new script: ${editFilePath}`));
-	if (!ack(`Create new command "${ansis.bold(command)}" ? `)) {
+	if (!ack(`Create new command "${ansis.bold(name)}" ? `)) {
 		throw new Exit('Aborted');
 	}
 
@@ -111,6 +151,10 @@ export async function create(command: string) {
 	} else if (!namespace) {
 		console.log(`\n${ansis.red('▲')} Could not create a symlink to the script.`);
 		return false;
+	}
+
+	if (content) {
+		await Bun.write(editFilePath, content);
 	}
 
 	await openEditor(editFilePath);
