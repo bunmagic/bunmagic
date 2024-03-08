@@ -10,7 +10,7 @@ export { default as path } from 'node:path';
 export { notMinimist };
 
 export * from './utils';
-export { selection } from './selection';
+export { select } from './selection';
 export * from './fs';
 
 

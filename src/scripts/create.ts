@@ -49,7 +49,7 @@ async function scriptPath(slug: string): Promise<PartialScriptPath> {
 	let directory = directories[0];
 
 	if (directories.length > 1) {
-		directory = await selection('Which directory to use?', directories);
+		directory = await select('Which directory to use?', directories);
 	}
 
 	if (!directory) {

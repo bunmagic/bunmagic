@@ -125,7 +125,7 @@ async function searchOptions<T extends string>(query: string, options: Array<Opt
 	}
 }
 
-export async function selection<T extends string>(message: string, options: T[]): Promise<T> {
+export async function select<T extends string>(message: string, options: T[]): Promise<T> {
 	let query = ''; // Start with an empty query
 	const _options: Option<T>[] = options.map(text => ({
 		text,
