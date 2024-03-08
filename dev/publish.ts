@@ -11,7 +11,7 @@ if (ack('Increment version number?')) {
 	const packageJson = await Bun.file(packageFile).json<PackageJson>();
 
 	const increments: ReleaseType[] = ['prerelease', 'major', 'minor', 'patch'];
-	const increment = await selection('What kind of patch is this?', increments);
+	const increment = await select('What kind of patch is this?', increments);
 	const cv = semver.parse(packageJson.version);
 	if (!cv) {
 		throw new Error('Invalid version');

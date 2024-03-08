@@ -36,7 +36,7 @@ async function setupBinaryPath(binaryPath: string) {
 	const rcFiles = await availableRcFiles();
 
 	const availablePaths = [...rcFiles, 'Custom'];
-	let rcFile = await selection('Which file would you like to add bunmagic to?', availablePaths);
+	let rcFile = await select('Which file would you like to add bunmagic to?', availablePaths);
 
 	if (rcFile === 'Custom') {
 		const customFile = await require(async () => {
@@ -86,7 +86,7 @@ async function setupConfig(bmPath: string) {
 		return;
 	}
 
-	const defaultExtension = await selection<config.SupportedFiles>([...config.SUPPORTED_FILES], 'What file extension would you like to use for your scripts?');
+	const defaultExtension = await select<config.SupportedFiles>([...config.SUPPORTED_FILES], 'What file extension would you like to use for your scripts?');
 	const defaults: config.Config = {
 		extension: defaultExtension,
 	};

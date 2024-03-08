@@ -14,7 +14,7 @@ This is how you create a `demo` command and import `cowsay` from npm, and delive
 * **Create** new scripts with `bunmagic create <script-name>`.
 * **List** all known scripts with `bunmagic list`
 * **Edit** scripts with `bunmagic <script-name>`
-* Use the **built-in utilities** for common CLI tasks (e.g., `cd`, `ack`, `selection`, `isDirectory`, `ensureDirectory`, `glob`).
+* Use the **built-in utilities** for common CLI tasks (e.g., `cd`, `ack`, `select`, `isDirectory`, `ensureDirectory`, `glob`).
 * Leverage **Bun** to quickly build powerful scripts using all the features that bun provides - run shell commands, import npm packages, and more.
 
 ## 🚀 Install
@@ -194,15 +194,15 @@ Out of the box, Bun provides [`prompt()`](https://developer.mozilla.org/en-US/do
 `ack` works exactly like `confirm`, but allows you to change the default value to `y` or `n`.
 
 
-#### selection
+#### select
 
 Show a selection prompt that allows selecting an option from a list. It's an interactive CLI menu that can be navigated using arrow keys or numbers and has simple fuzzy search built-in.
 
-Interface: `selection(message: string, options: string[]): Promise<string>`
+Interface: `select(message: string, options: string[]): Promise<string>`
 
 ```ts
 const options = ["one", "two", "three"];
-const selected = await selection("Select an option:", options);
+const selected = await select("Select an option:", options);
 ```
 
 
