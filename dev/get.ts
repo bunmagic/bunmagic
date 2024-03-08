@@ -20,17 +20,3 @@ if (!(ack('Create new script from this content?'))) {
 
 const filename = url.split('/').pop() || 'untitled.ts';
 await create(filename, contents);
-
-// console.log(ansis.dim(`What would you like to call this script? (default: ${defaultSlug})`));
-// const slug = prompt('Script Name:', defaultSlug);
-
-// if (!slug) {
-// 	throw new Error('No script name provided');
-// }
-
-// const scriptName = `${slug}.${extension}`;
-// const target = path.join(directory, scriptName);
-
-// console.log(`Creating a new script: ${scriptName}`);
-// await Bun.file(target).write(contents);
-// console.log(ansis.green('Done!'));
