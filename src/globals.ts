@@ -11,7 +11,7 @@ declare global {
 	const argv: typeof globals.argv;
 	const args: typeof globals.args; // eslint-disable-line unicorn/prevent-abbreviations
 	const flags: typeof globals.flags;
-	const selection: typeof globals.select;
+	const select: typeof globals.select;
 	const cd: typeof globals.cd;
 	const ack: typeof globals.ack;
 	const isDirectory: typeof globals.isDirectory;
