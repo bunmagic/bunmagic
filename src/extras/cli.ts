@@ -56,7 +56,7 @@ async function * chunkStreamer5000(signal: AbortController['signal']) {
 	}
 }
 
-function streamChunks() {
+function stream() {
 	const controller = new AbortController();
 	const start = () => chunkStreamer5000(controller.signal);
 
@@ -75,5 +75,5 @@ export const CLI = {
 	showCursor,
 	clearFrame,
 	raw,
-	streamChunks,
+	stream,
 } as const;
