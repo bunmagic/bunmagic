@@ -36,6 +36,37 @@ async function clearFrame(frame: string, wipe = false) {
 	}
 }
 
+async function * chunkStreamer5000(signal: AbortController['signal']) {
+	process.stdin.setRawMode(true);
+	const reader = Bun.stdin.stream().getReader() as ReadableStreamDefaultReader<Uint8Array>;
+	try {
+		while (true) {
+			const { value, done } = await reader.read();
+			if (done || signal.aborted) {
+				break;
+			}
+
+			yield value;
+		}
+	} catch (error) {
+		console.error('Error in CLI.streamChunks:', error);
+	} finally {
+		reader.releaseLock();
+		process.stdin.setRawMode(false);
+	}
+}
+
+function streamChunks() {
+	const controller = new AbortController();
+	const start = () => chunkStreamer5000(controller.signal);
+
+	const stop = () => {
+		controller.abort();
+	};
+
+	return { start, stop };
+}
+
 export const CLI = {
 	stdout,
 	moveUp,
@@ -44,4 +75,5 @@ export const CLI = {
 	showCursor,
 	clearFrame,
 	raw,
+	streamChunks,
 } as const;
