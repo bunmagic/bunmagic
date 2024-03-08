@@ -81,15 +81,7 @@ async function getExtension(command: string): Promise<string> {
 		return extension;
 	}
 
-
-	// @todo: double selection doesn't work
-	// return selection('Which extension to use?', SUPPORTED_FILES);
-	const result = prompt(`Enter the file extension for "${command}"`);
-	if (!result) {
-		throw new Error('No file extension provided');
-	}
-
-	return result;
+	return select('Which extension to use?', SUPPORTED_FILES);
 }
 
 export async function create(input: string, content = '') {
