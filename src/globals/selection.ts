@@ -137,12 +137,14 @@ export async function selection<T extends string>(message: string, options: T[])
 	_options[0].selected = true;
 	let frame = renderFrame(message, _options, query);
 
+
 	await CLI.raw(true);
 	await CLI.hideCursor();
 	await CLI.stdout(frame);
 
-	for await (const chunk of Bun.stdin.stream()) {
-		const key = interpretKey(chunk as Uint8Array);
+	const stream = CLI.stream();
+	for await (const chunk of stream.start()) {
+		const key = interpretKey(chunk);
 
 		if (!key) {
 			continue;
@@ -202,6 +204,7 @@ export async function selection<T extends string>(message: string, options: T[])
 		await CLI.stdout(frame);
 	}
 
+	stream.stop();
 	await CLI.clearFrame(frame, true);
 	await CLI.raw(false);
 	await CLI.showCursor();
