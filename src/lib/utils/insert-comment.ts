@@ -1,4 +1,4 @@
-import parser from 'comment-parser';
+import * as parser from 'comment-parser';
 
 function transform(content: string) {
 	const updatedParsed = parser.parse(content);
@@ -6,24 +6,21 @@ function transform(content: string) {
 	return parser.stringify(transform(updatedParsed[0]));
 }
 
-export async function insertCommentLine(contents: string, line: string) {
+export async function insertCommentLine(contents: string, insert: string) {
 	let lines = transform(contents).split('\n');
 	if (lines.length === 1) {
-		const content = lines[0].replace(/\/\*\*(.*)\*\//, '$1');
+		const content = lines[0].replace(/\/\*{2}(.*?)\*{1,2}\//i, '$1');
 		lines = [
 			'/**',
 			` * ${content}`,
-			' * @url example.com',
+			` * ${insert}`,
 			' */',
 		];
 	} else {
-		lines = lines.slice(0, -2);
-		lines.push(line, ' */');
+		lines = lines.slice(0, -1);
+		lines.push(`* ${insert}`, '*/');
 	}
 
-	return transform(lines.join('\n'));
+	return transform(lines.map(l => l.trim()).join('\n'));
 }
 
-const contents = await Bun.file(import.meta.path).text();
-const line = `@url example.com`;
-console.log(await insertCommentLine(contents, line));
