@@ -7,6 +7,11 @@ async function readFirstComment(view: Uint8Array) {
 	let end = -1;
 
 	for (let index = 0; index < view.length - 2; index++) {
+		// If the comment start hasn't been found in the first 128 bytes, stop looking.
+		if (index > 126) {
+			return '';
+		}
+
 		if (view[index] === SLASH && view[index + 1] === STAR && view[index + 2] === STAR) {
 			start = index;
 			break;
