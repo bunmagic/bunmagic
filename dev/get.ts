@@ -37,7 +37,7 @@ if (!(ack('Create new script from this content?'))) {
 }
 
 let filename = url.pathname.split('/').pop() || 'untitled.ts';
-const { command, slug, namespace } = parseInput(filename);
+const { command, slug } = parseInput(filename);
 const existing = await findAny(slug);
 const commandName = ansis.bold(command);
 if (existing) {
