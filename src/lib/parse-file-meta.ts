@@ -2,7 +2,7 @@ import { parse } from 'comment-parser';
 
 const decoder = new TextDecoder();
 
-async function readFirstComment(view: Uint8Array) {
+export function readFirstComment(view: Uint8Array) {
 	const STAR = 42;
 	const SLASH = 47;
 	let start = -1;
@@ -49,7 +49,7 @@ async function parseFile(filePath: string): Promise<Properties | undefined> {
 	const file = Bun.file(filePath);
 	const buffer = await file.arrayBuffer();
 	const view = new Uint8Array(buffer);
-	const contents = await readFirstComment(view);
+	const contents = readFirstComment(view);
 	return parseContent(contents);
 }
 
