@@ -1,5 +1,7 @@
 import { parseInput } from '@lib/parse-input';
 import { findAny } from '@lib/sources';
+import { readFirstComment } from '@lib/parse-file-meta';
+import { insertCommentLine } from '@lib/utils/insert-comment';
 import { create } from '../src/scripts/create';
 
 let url = new URL(args[0]);
@@ -28,9 +30,6 @@ if (contentType && !contentType.includes('text/plain') && !contentType.includes(
 
 const contents = await response.text();
 console.log('Received:', contents.length, 'bytes:');
-console.log(ansis.dim('\n```\n'));
-console.log(ansis.gray(contents));
-console.log(ansis.dim('\n```\n'));
 
 if (!(ack('Create new script from this content?'))) {
 	throw new Exit('Aborted');
@@ -52,4 +51,12 @@ if (existing) {
 }
 
 
-await create(filename, contents);
+const array = new Uint8Array(Buffer.from(contents));
+const comment = readFirstComment(array);
+const noCommentContent = contents.replace(comment, '');
+const updatedComment = await insertCommentLine(comment, `@source ${url.toString()}`);
+const content = updatedComment + noCommentContent;
+
+console.log(ansis.gray(content));
+
+await create(filename, content);

@@ -1,6 +1,6 @@
 import * as parser from 'comment-parser';
 
-function transform(content: string) {
+export function transform(content: string) {
 	const updatedParsed = parser.parse(content);
 	const transform = parser.transforms.flow(parser.transforms.indent(1));
 	return parser.stringify(transform(updatedParsed[0])).trim();
