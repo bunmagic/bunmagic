@@ -1,17 +1,18 @@
 import {
-	commandFromString,
 	getSources,
 	findAny,
 	findNamespace,
 } from '@lib/sources';
 import { SUPPORTED_FILES, get } from '@lib/config';
-import { openEditor } from '@lib/utils';
+import { openEditor, slugify } from '@lib/utils';
 import { Script } from '@lib/script';
+import { parseInput } from '@lib/parse-input';
 import { ensureNamespaceBin, ensureScriptBin } from './reload';
 
 export const desc = 'Create a new script';
 export const usage = '<script-name>';
 export const alias = ['new'];
+
 
 export default async function () {
 	const slug = args.join(' ');
@@ -33,6 +34,19 @@ async function namespacedScriptPath(slug: string, namespace: string): Promise<Pa
 	// `createScript` has already checked that the command exists, there's no need to check again.
 	return path.resolve(source.dir, slug) as PartialScriptPath;
 }
+
+export async function getExtension(extension?: string): Promise<string> {
+	// If there's no extension, use the default
+	extension ||= await get('extension');
+
+	if (!SUPPORTED_FILES.includes(extension)) {
+		console.warn(`Extension "${ansis.bold(extension)}" is not supported.`);
+		return select('Which extension to use?', SUPPORTED_FILES);
+	}
+
+	return extension;
+}
+
 
 async function scriptPath(slug: string): Promise<PartialScriptPath> {
 	const commandExists = await $`which ${slug}`.quiet();
@@ -59,43 +73,21 @@ async function scriptPath(slug: string): Promise<PartialScriptPath> {
 	return path.resolve(directory, slug) as PartialScriptPath;
 }
 
-async function getExtension(command: string): Promise<string> {
-	const parts = command.split('.').map(part => part.trim());
-
-	// If there's no extension, use the default
-	if (parts.length === 1) {
-		return get('extension');
-	}
-
-	// Check for invalid command names
-	if (parts.length > 2 || !parts[0] || !parts[1]) {
-		throw new Error(`Invalid command name: ${command}`);
-	}
-
-	const extension = parts[1];
-	if (!SUPPORTED_FILES.includes(extension)) {
-		throw new Error(`Unsupported file extension: ${extension}`);
-	}
-
-	if (ack(`Use "${ansis.bold(extension)}" as the extension?`)) {
-		return extension;
-	}
-
-	return select('Which extension to use?', SUPPORTED_FILES);
-}
-
 export async function create(input: string, content = '') {
 	// Exception: don't create new bunmagic scripts via "bunmagic create bunmagic <command>" or "bunmagic <command>".
-	if (input.startsWith('bunmagic ')) {
+	if (slugify(input).startsWith('bunmagic ')) {
 		input = input.replace('bunmagic ', '');
 	}
 
-	const existing = await findAny(input);
+	const { command, slug, namespace, extension: rawExtension } = parseInput(input);
+	const extension = await getExtension(rawExtension);
 
+	// Look for an existing namespace or script
+	const existing = await findAny(slug);
 	if (existing) {
 		const target = 'source' in existing ? existing.source : existing.dir;
-		const messageExists = `The command "${ansis.bold(input)}" already exists:`;
-		const messageEdit = `Would you like to edit "${ansis.bold(input)}" ?`;
+		const messageExists = `"${ansis.bold(command)}" already exists:`;
+		const messageEdit = `Open in editor?`;
 		if (ack(`${messageExists}\n${messageEdit}`, 'y')) {
 			return openEditor(target);
 		}
@@ -103,25 +95,16 @@ export async function create(input: string, content = '') {
 		return true;
 	}
 
-	let [slug, namespace] = commandFromString(input);
-
-	// todo make this nicer
-	if (slug.includes('.')) {
-		slug = slug.split('.')[0];
-	}
-
-	const name = namespace ? `${namespace} ${slug}` : slug;
 	const partialPath = namespace
 		? await namespacedScriptPath(slug, namespace)
 		: await scriptPath(slug);
 
-	const extension = await getExtension(input);
 	const binaryName = namespace ?? slug;
 	const editFilePath = `${partialPath}.${extension}`;
 	const targetPath = namespace ?? editFilePath;
 
 	console.log(ansis.dim(`Creating new script: ${editFilePath}`));
-	if (!ack(`Create new command "${ansis.bold(name)}" ? `)) {
+	if (!ack(`Create new command "${ansis.bold(command)}" ? `)) {
 		throw new Exit('Aborted');
 	}
 
