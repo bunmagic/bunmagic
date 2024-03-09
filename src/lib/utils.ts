@@ -3,6 +3,7 @@ export function slugify(text: string) {
 		.replaceAll(/\s+/g, '-') // Replace spaces with -
 		.replaceAll(/[^\w-]+/g, '') // Remove all non-word chars
 		.replaceAll(/--+/g, '-') // Replace multiple - with single -
+		.trim()
 		.replace(/^-+/, '') // Trim - from start of text
 		.replace(/-+$/, ''); // Trim - from end of text
 }
@@ -11,7 +12,12 @@ export async function openEditor(path: string) {
 	const edit = Bun.env.EDITOR || 'code';
 
 	// If using VSCode, open in a new window
-	const result = await (edit === 'code' ? $`code -n ${path}` : $`${edit} ${path} > /dev/tty`);
+	let result;
+	if (edit === 'code' || edit === 'cursor') {
+		result = await $`code -n ${path}`.quiet();
+	} else {
+		result = await $`${edit} ${path} > /dev/tty`;
+	}
 
 	if (result.exitCode === 0) {
 		return true;
