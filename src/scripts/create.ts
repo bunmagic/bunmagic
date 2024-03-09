@@ -58,7 +58,6 @@ async function scriptPath(slug: string): Promise<PartialScriptPath> {
 	}
 
 	// Where to place the script?
-	console.log('Creating a new command: ' + slug);
 	const directories = await getSources().then(sources => sources.map(source => source.dir));
 	let directory = directories[0];
 
@@ -103,8 +102,8 @@ export async function create(input: string, content = '') {
 	const editFilePath = `${partialPath}.${extension}`;
 	const targetPath = namespace ?? editFilePath;
 
-	console.log(ansis.dim(`Creating new script: ${editFilePath}`));
-	if (!ack(`Create new command "${ansis.bold(command)}" ? `)) {
+	console.log();
+	if (!ack(`Create "${ansis.bold(editFilePath)}"?`)) {
 		throw new Exit('Aborted');
 	}
 
