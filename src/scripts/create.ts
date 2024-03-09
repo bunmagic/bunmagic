@@ -1,25 +1,26 @@
+/**
+ * Create a new script
+ * @usage <script-name>
+ * @alias new
+ */
 import {
-	commandFromString,
 	getSources,
 	findAny,
 	findNamespace,
 } from '@lib/sources';
-import { get } from '@lib/config';
-import { openEditor } from '@lib/utils';
+import { SUPPORTED_FILES, get } from '@lib/config';
+import { openEditor, slugify } from '@lib/utils';
 import { Script } from '@lib/script';
+import { parseInput } from '@lib/parse-input';
 import { ensureNamespaceBin, ensureScriptBin } from './reload';
 
-export const desc = 'Create a new script';
-export const usage = '<script-name>';
-export const alias = ['new'];
-
 export default async function () {
-	const slug = args.join(' ');
-	if (!slug) {
+	const input = args.join(' ');
+	if (!input) {
 		throw new Error('Scripts must have a name.');
 	}
 
-	return create(slug);
+	return create(input);
 }
 
 type PartialScriptPath = string & { __partialPath: true };
@@ -34,6 +35,19 @@ async function namespacedScriptPath(slug: string, namespace: string): Promise<Pa
 	return path.resolve(source.dir, slug) as PartialScriptPath;
 }
 
+export async function getExtension(extension?: string): Promise<string> {
+	// If there's no extension, use the default
+	extension ||= await get('extension');
+
+	if (!SUPPORTED_FILES.includes(extension)) {
+		console.warn(`Extension "${ansis.bold(extension)}" is not supported.`);
+		return select('Which extension to use?', SUPPORTED_FILES);
+	}
+
+	return extension;
+}
+
+
 async function scriptPath(slug: string): Promise<PartialScriptPath> {
 	const commandExists = await $`which ${slug}`.quiet();
 
@@ -44,7 +58,6 @@ async function scriptPath(slug: string): Promise<PartialScriptPath> {
 	}
 
 	// Where to place the script?
-	console.log('Creating a new command: ' + slug);
 	const directories = await getSources().then(sources => sources.map(source => source.dir));
 	let directory = directories[0];
 
@@ -59,18 +72,21 @@ async function scriptPath(slug: string): Promise<PartialScriptPath> {
 	return path.resolve(directory, slug) as PartialScriptPath;
 }
 
-export async function create(command: string) {
+export async function create(input: string, content = '') {
 	// Exception: don't create new bunmagic scripts via "bunmagic create bunmagic <command>" or "bunmagic <command>".
-	if (command.startsWith('bunmagic ')) {
-		command = command.replace('bunmagic ', '');
+	if (slugify(input).startsWith('bunmagic ')) {
+		input = input.replace('bunmagic ', '');
 	}
 
-	const existing = await findAny(command);
+	const { command, slug, namespace, extension: rawExtension } = parseInput(input);
+	const extension = await getExtension(rawExtension);
 
+	// Look for an existing namespace or script
+	const existing = await findAny(slug);
 	if (existing) {
 		const target = 'source' in existing ? existing.source : existing.dir;
-		const messageExists = `The command "${ansis.bold(command)}" already exists:`;
-		const messageEdit = `Would you like to edit "${ansis.bold(command)}" ?`;
+		const messageExists = `"${ansis.bold(command)}" already exists:`;
+		const messageEdit = `Open in editor?`;
 		if (ack(`${messageExists}\n${messageEdit}`, 'y')) {
 			return openEditor(target);
 		}
@@ -78,18 +94,16 @@ export async function create(command: string) {
 		return true;
 	}
 
-	const [slug, namespace] = commandFromString(command);
 	const partialPath = namespace
 		? await namespacedScriptPath(slug, namespace)
 		: await scriptPath(slug);
 
-	const extension = await get('extension');
 	const binaryName = namespace ?? slug;
 	const editFilePath = `${partialPath}.${extension}`;
 	const targetPath = namespace ?? editFilePath;
 
-	console.log(ansis.dim(`Creating new script: ${editFilePath}`));
-	if (!ack(`Create new command "${ansis.bold(command)}" ? `)) {
+	console.log();
+	if (!ack(`Create "${ansis.bold(editFilePath)}"?`)) {
 		throw new Exit('Aborted');
 	}
 
@@ -111,6 +125,10 @@ export async function create(command: string) {
 	} else if (!namespace) {
 		console.log(`\n${ansis.red('▲')} Could not create a symlink to the script.`);
 		return false;
+	}
+
+	if (content) {
+		await Bun.write(editFilePath, content);
 	}
 
 	await openEditor(editFilePath);

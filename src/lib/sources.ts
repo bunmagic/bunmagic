@@ -4,6 +4,7 @@ import {
 } from '@lib/scripts';
 import { get, type SourcePaths } from '@lib/config';
 import type { Script } from '@lib/script';
+import { parseInput } from './parse-input';
 
 export type Source = SourcePaths & {
 	scripts: Script[];
@@ -26,36 +27,23 @@ export async function getSources(): Promise<Array<Source>> {
 	return sources;
 }
 
-export function commandFromString(input: string): [string, string | undefined] {
-	const array = input.split(' ');
-	if (array.length === 1) {
-		return [array[0], undefined];
-	}
-
-	if (array.length === 2) {
-		return [array[1], array[0]];
-	}
-
-	throw new Error('A command should consist of 1 or 2 words.');
-}
-
 export async function findScript<T extends string>(query: T): Promise<Script | undefined> {
 	const sources = await getSources();
-	const [script, namespace] = commandFromString(query);
+	const { slug, namespace } = parseInput(query);
 
 	if (namespace) {
 		const source = sources.find(source => source.namespace === namespace);
 		if (source) {
-			const result = source.scripts.find(s => s.command === script);
+			const result = source.scripts.find(s => s.command === slug);
 			if (result) {
 				return result;
 			}
 		}
-	} else if (!namespace && script) {
+	} else if (!namespace && slug) {
 		// No namespace found. Maybe the source exists globally.
 		const noNsSources = sources.filter(source => !source.namespace);
 		for (const source of noNsSources) {
-			const result = source.scripts.find(s => s.command === script);
+			const result = source.scripts.find(s => s.command === slug);
 			if (result) {
 				return result;
 			}
@@ -65,9 +53,9 @@ export async function findScript<T extends string>(query: T): Promise<Script | u
 
 export async function findNamespace<T extends string>(query: T): Promise<Source | undefined> {
 	const sources = await getSources();
-	const [script, namespace] = commandFromString(query);
+	const { slug, namespace } = parseInput(query);
 
-	if (!namespace && script) {
+	if (!namespace && slug) {
 		// Check if maybe only the namespace was passed in
 		const source = sources.find((source): source is Source => source.namespace === query);
 		if (source) {

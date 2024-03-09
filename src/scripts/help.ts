@@ -1,8 +1,8 @@
+/**
+ * Get the full list of available commands.
+ */
 import { Columns } from '@lib/columns';
 import type { Script } from '@lib/script';
-
-export const name = 'help';
-export const desc = 'Get the full list of available commands';
 
 export default async function (scripts: Map<string, Script>) {
 	const columns = new Columns(3);

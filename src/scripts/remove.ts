@@ -1,12 +1,13 @@
+/**
+* Remove and unlink a script
+* @usage <script-name>
+* @alias rm
+*/
 import { Script } from '@lib/script';
 import { update } from '@lib/config';
 import {
 	getSources, findNamespace, type Source, findAny,
 } from '@lib/sources';
-
-export const desc = 'Remove and unlink a script';
-export const usage = '<script-name>';
-export const alias = ['rm'];
 
 async function removeNamespace(query: string) {
 	const source = await findNamespace(query);
