@@ -4,6 +4,7 @@ export default {
 	],
 	bracketSpacing: true,
 	rules: {
+		'unicorn/prefer-ternary': 0,
 		// Avoid converting backtick strings if they're used for escaping single or double quotes.
 		'quotes': [
 			'error',
