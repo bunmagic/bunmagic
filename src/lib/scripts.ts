@@ -7,9 +7,9 @@ async function describeScript(source: string, namespace?: string): Promise<Scrip
 	return new Script({
 		namespace,
 		source,
-		alias: meta.alias,
-		usage: meta.usage,
-		desc: meta.description,
+		alias: meta?.alias,
+		usage: meta?.usage,
+		desc: meta?.description,
 	});
 }
 
@@ -17,16 +17,16 @@ export async function getPathScripts(target: string, namespace?: string): Promis
 	const glob = new Bun.Glob(`*.{${SUPPORTED_FILES.join(',')}}`);
 	const scripts = new Map<string, Script>();
 	const descriptions: Promise<Script | false>[] = [];
-	for await (const file of glob.scan({ onlyFiles: true, absolute: false, cwd: target })) {
-		if (file.startsWith('_')) {
+	for await (const fileName of glob.scan({ onlyFiles: true, absolute: false, cwd: target })) {
+		if (fileName.startsWith('_')) {
 			if (argv.debug) {
-				console.log(`Ignoring: ${file}`);
+				console.log(`Ignoring: ${fileName}`);
 			}
 
 			continue;
 		}
 
-		descriptions.push(describeScript(path.join(target, file), namespace));
+		descriptions.push(describeScript(path.join(target, fileName), namespace));
 	}
 
 	for await (const script of descriptions) {
