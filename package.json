@@ -1,37 +1,38 @@
 {
-	"name": "bunmagic",
-	"dependencies": {
-		"ansis": "^2.1.0"
-	},
-	"devDependencies": {
-		"@types/bun": "latest",
-		"@types/fs-extra": "^11.0.4",
-		"@types/minimist": "^1.2.5",
-		"semver": "^7.6.0",
-		"xo": "latest"
-	},
-	"bin": {
-		"bunmagic": "src/bin/bunmagic.ts",
-		"bunmagic-exec": "src/bin/bunmagic-exec.ts",
-		"bunmagic-exec-namespace": "src/bin/bunmagic-exec-namespace.ts"
-	},
-	"scripts": {
-		"fix": "xo --fix",
-		"lint": "xo",
-		"test": "xo"
-	},
-	"module": "src/index.ts",
-	"type": "module",
-	"author": "pyronaur",
-	"license": "MIT",
-	"version": "1.0.4",
-	"main": "src/index.ts",
-	"exports": {
-		"./run": "./src/run.ts",
-		"./globals": "./src/globals.ts",
-		"./extras": "./src/extras/index.ts"
-	},
-	"peerDependencies": {
-		"typescript": "^5.0.0"
-	}
+  "name": "bunmagic",
+  "dependencies": {
+    "ansis": "^2.1.0",
+    "comment-parser": "^1.4.1"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/fs-extra": "^11.0.4",
+    "@types/minimist": "^1.2.5",
+    "semver": "^7.6.0",
+    "xo": "latest"
+  },
+  "bin": {
+    "bunmagic": "src/bin/bunmagic.ts",
+    "bunmagic-exec": "src/bin/bunmagic-exec.ts",
+    "bunmagic-exec-namespace": "src/bin/bunmagic-exec-namespace.ts"
+  },
+  "scripts": {
+    "fix": "xo --fix",
+    "lint": "xo",
+    "test": "xo"
+  },
+  "module": "src/index.ts",
+  "type": "module",
+  "author": "pyronaur",
+  "license": "MIT",
+  "version": "1.0.4",
+  "main": "src/index.ts",
+  "exports": {
+    "./run": "./src/run.ts",
+    "./globals": "./src/globals.ts",
+    "./extras": "./src/extras/index.ts"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  }
 }
