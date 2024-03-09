@@ -1,11 +1,11 @@
+/**
+ * Check if bunmagic is set up correctly
+ */
 import { getSources } from '@lib/sources';
 import { setupAlias } from '@lib/setup';
 import { addSourceDirectory } from './link';
 import { reloadBins } from './reload';
 
-/**
- * Check if bunmagic is set up correctly
- */
 type CheckCallback = () => Promise<{
 	level: Levels;
 	followup?: () => Promise<unknown>;
