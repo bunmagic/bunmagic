@@ -1,7 +1,8 @@
+/**
+ * Add an additional directory to use as script source.
+ */
 import * as config from '@lib/config';
 import { reloadBins } from './reload';
-
-export const desc = 'Add an additional directory to use as script source.';
 
 export async function addSourceDirectory(target?: string) {
 	const sources = (await config.get('sources')) || [];

@@ -1,3 +1,7 @@
+/**
+ * Edit scripts. If no script name is specified, will open all scripts and the ~/.bunmagic directory
+ * @usage "[script-name]"
+ */
 import {
 	findNamespace,
 	findScript,
@@ -5,9 +9,6 @@ import {
 import { openEditor } from '@lib/utils';
 import { PATHS } from '@lib/config';
 import { create } from './create';
-
-export const desc = 'Edit scripts. If no script name is specified, will open all scripts and the ~/.bunmagic directory';
-export const usage = '[script-name]';
 
 export default async function () {
 	const slug = args.join(' ');

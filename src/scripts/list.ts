@@ -1,9 +1,10 @@
+/**
+ * List all known scripts.
+ * @alias ls
+ */
 import {
 	getSources,
 } from '@lib/sources';
-
-export const desc = 'List all known scripts.';
-export const alias = ['ls'];
 
 export default async function () {
 	const sources = await getSources();

@@ -1,8 +1,9 @@
+/**
+ * Install bunmagic and set up your environment
+ */
 import * as config from '@lib/config';
 import { setupAlias } from '@lib/setup';
 import { addSourceDirectory } from './link';
-
-export const desc = 'Install bunmagic and set up your environment';
 
 async function require<T>(callback: () => Promise<T>, attempts = 3): Promise<T> {
 	while (attempts > 0) {
