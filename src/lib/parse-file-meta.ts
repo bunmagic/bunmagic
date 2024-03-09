@@ -1,5 +1,7 @@
 import { parse } from 'comment-parser';
 
+const decoder = new TextDecoder();
+
 async function readFirstComment(view: Uint8Array) {
 	const STAR = 42;
 	const SLASH = 47;
@@ -28,7 +30,7 @@ async function readFirstComment(view: Uint8Array) {
 	}
 
 	if (start !== -1 && end !== -1) {
-		return new TextDecoder().decode(view.subarray(start, end));
+		return decoder.decode(view.subarray(start, end));
 	}
 
 	return '';
@@ -43,7 +45,7 @@ type Properties = {
 	alias?: string[];
 };
 
-async function parseFile(filePath: string): Promise<Properties> {
+async function parseFile(filePath: string): Promise<Properties | undefined> {
 	const file = Bun.file(filePath);
 	const buffer = await file.arrayBuffer();
 	const view = new Uint8Array(buffer);
@@ -52,10 +54,13 @@ async function parseFile(filePath: string): Promise<Properties> {
 }
 
 async function parseContent(contents: string) {
-	const data = parse(contents);
+	if (contents.length === 0) {
+		return;
+	}
 
+	const data = parse(contents);
 	if (data.length === 0) {
-		return {};
+		return;
 	}
 
 	const result = data[0];
@@ -65,7 +70,11 @@ async function parseContent(contents: string) {
 		properties.description = result.description;
 	}
 
-	for (const tag of data[0].tags) {
+	if (!result.tags) {
+		return properties;
+	}
+
+	for (const tag of result.tags) {
 		switch (tag.tag) {
 			case 'name':
 				properties.name = tag.name;
