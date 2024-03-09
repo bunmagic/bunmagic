@@ -8,11 +8,10 @@ test('insert a comment line', async () => {
  * @name name
  **/`;
 
-	const line = '@url example.com';
 	const result = `/**
  * Description
- * @name  name
- * @url   example.com
+ * @name name
+ * @url example.com
  */`;
 
 	expect(await insertCommentLine(content, '@url example.com')).toEqual(result);
@@ -22,8 +21,8 @@ test('insert a comment line', async () => {
 test('rewrite a single comment line', async () => {
 	const content = `/** @name name */`;
 	const result = `/**
- * @name  name
- * @url   example.com
+ * @name name
+ * @url example.com
  */`;
 	expect(await insertCommentLine(content, '@url example.com')).toEqual(result);
 });
@@ -32,8 +31,8 @@ test('rewrite a single comment line', async () => {
 test('rewrite a single comment line with two trailing stars', async () => {
 	const content = `/** @name name **/`;
 	const result = `/**
- * @name  name
- * @url   example.com
+ * @name name
+ * @url example.com
  */`;
 	expect(await insertCommentLine(content, '@url example.com')).toEqual(result);
 });
@@ -47,9 +46,9 @@ test('insert a comment in a multi-line comment', async () => {
 
 	const result = `/**
  * Description
- * @name        name
- * @details     Some       detailed description here
- * @additional  Additional info
+ * @name name
+ * @details Some detailed description here
+ * @additional Additional info
  */`;
 
 	expect(await insertCommentLine(content, '@additional Additional info')).toEqual(result);
