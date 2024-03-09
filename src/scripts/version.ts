@@ -1,7 +1,8 @@
-export const name = 'version';
-export const desc = 'Display the current version of bunmagic';
-export const alias = ['-v'];
-
+/**
+* Display the current version of bunmagic
+* @usage version | -v
+* @alias -v
+*/
 type PackageJson = {
 	version: string;
 };

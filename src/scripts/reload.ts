@@ -1,9 +1,13 @@
+/**
+ * Reload your script files and ensure that they have an executable bin.
+ * Use `--force` if you want to force the creation of the bin files
+ * @usage "[--force]"
+ */
+
 import { PATHS } from '@lib/config';
 import type { Script } from '@lib/script';
 import { getSources } from '@lib/sources';
 
-export const desc = 'Reload your script files and ensure that they have an executable bin.';
-export const usage = '[--force]';
 
 function template(name: string, scriptPath: string, exec: string): string {
 	let output = '#!/bin/bash\n';

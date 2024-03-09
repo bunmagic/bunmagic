@@ -1,3 +1,8 @@
+/**
+ * Create a new script
+ * @usage <script-name>
+ * @alias new
+ */
 import {
 	getSources,
 	findAny,
@@ -8,11 +13,6 @@ import { openEditor, slugify } from '@lib/utils';
 import { Script } from '@lib/script';
 import { parseInput } from '@lib/parse-input';
 import { ensureNamespaceBin, ensureScriptBin } from './reload';
-
-export const desc = 'Create a new script';
-export const usage = '<script-name>';
-export const alias = ['new'];
-
 
 export default async function () {
 	const input = args.join(' ');

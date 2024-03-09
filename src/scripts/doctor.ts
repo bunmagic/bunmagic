@@ -3,8 +3,9 @@ import { setupAlias } from '@lib/setup';
 import { addSourceDirectory } from './link';
 import { reloadBins } from './reload';
 
-export const desc = 'Check if bunmagic is set up correctly';
-
+/**
+ * Check if bunmagic is set up correctly
+ */
 type CheckCallback = () => Promise<{
 	level: Levels;
 	followup?: () => Promise<unknown>;

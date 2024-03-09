@@ -1,11 +1,6 @@
-// let parser: CommentParser;
 import { type parse as Parser } from 'comment-parser';
 
-async function readFirstComment(filePath: string) {
-	const file = Bun.file(filePath);
-	const buffer = await file.arrayBuffer();
-	const view = new Uint8Array(buffer);
-
+async function readFirstComment(view: Uint8Array) {
 	const STAR = 42;
 	const SLASH = 47;
 	let start = -1;
@@ -37,6 +32,7 @@ async function readFirstComment(filePath: string) {
 type Properties = {
 	name?: string;
 	description?: string;
+	usage?: string;
 	source?: string;
 	slug?: string;
 	alias?: string[];
@@ -55,12 +51,15 @@ async function parseComments(content: string) {
 	return commentParser(content);
 }
 
-async function parseFile(file: string): Promise<Properties> {
-	const contents = await readFirstComment(file);
-	return parseContents(contents);
+async function parseFile(filePath: string): Promise<Properties> {
+	const file = Bun.file(filePath);
+	const buffer = await file.arrayBuffer();
+	const view = new Uint8Array(buffer);
+	const contents = await readFirstComment(view);
+	return parseContent(contents);
 }
 
-async function parseContents(contents: string) {
+async function parseContent(contents: string) {
 	const data = await parseComments(contents);
 
 	if (data.length === 0) {
@@ -85,6 +84,16 @@ async function parseContents(contents: string) {
 			case 'slug':
 				properties.slug = tag.name;
 				break;
+			case 'usage':
+				if (tag.name) {
+					properties.usage = tag.name;
+				}
+
+				if (tag.description) {
+					properties.usage += ` ${tag.description}`;
+				}
+
+				break;
 			case 'alias':
 				if (tag.name) {
 					if (properties.alias) {
@@ -105,7 +114,7 @@ async function parseContents(contents: string) {
 }
 
 
-export default {
-	file: parseFile,
-	contents: parseContents,
+export const parseHeader = {
+	fromFile: parseFile,
+	fromContent: parseContent,
 };

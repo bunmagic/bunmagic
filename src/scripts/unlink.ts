@@ -1,9 +1,11 @@
+/**
+ * Remove a directory from the script source list.
+ */
 import * as config from '@lib/config';
 import { getSources } from '@lib/sources';
 import { PATHS } from '@lib/config';
 import { reloadBins } from './reload';
 
-export const desc = 'Remove a directory from the script source list.';
 export async function removeSourceDirectory(target?: string): Promise<void> {
 	const sources = (await config.get('sources')) || [];
 	if (!target) {
