@@ -1,4 +1,4 @@
-import { type parse as Parser } from 'comment-parser';
+import { parse } from 'comment-parser';
 
 async function readFirstComment(view: Uint8Array) {
 	const STAR = 42;
@@ -38,19 +38,6 @@ type Properties = {
 	alias?: string[];
 };
 
-/**
- * Lazily load the comment parser, it might not be needed on every load.
- */
-let commentParser: typeof Parser;
-async function parseComments(content: string) {
-	if (!commentParser) {
-		const parser = await import('comment-parser');
-		commentParser = parser.parse;
-	}
-
-	return commentParser(content);
-}
-
 async function parseFile(filePath: string): Promise<Properties> {
 	const file = Bun.file(filePath);
 	const buffer = await file.arrayBuffer();
@@ -60,7 +47,7 @@ async function parseFile(filePath: string): Promise<Properties> {
 }
 
 async function parseContent(contents: string) {
-	const data = await parseComments(contents);
+	const data = parse(contents);
 
 	if (data.length === 0) {
 		return {};
