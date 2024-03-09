@@ -5,11 +5,11 @@ const sourcePath = args.shift();
 const namespace = args.shift();
 
 if (!sourcePath) {
-	throw new Error('Missing source path.');
+	throw new Exit('Missing source path.');
 }
 
 if (!namespace) {
-	throw new Error('Missing script namespace.');
+	throw new Exit('Missing script namespace.');
 }
 
 await runNamespace(namespace, sourcePath);

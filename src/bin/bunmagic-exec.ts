@@ -5,7 +5,7 @@ const scriptFile = args.shift();
 args.shift(); // Remove the script name.
 
 if (!scriptFile) {
-	throw new Error('No script specified.');
+	throw new Exit('No script specified.');
 }
 
 await run(scriptFile);
