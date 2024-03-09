@@ -15,12 +15,12 @@ export const alias = ['new'];
 
 
 export default async function () {
-	const slug = args.join(' ');
-	if (!slug) {
+	const input = args.join(' ');
+	if (!input) {
 		throw new Error('Scripts must have a name.');
 	}
 
-	return create(slug);
+	return create(input);
 }
 
 type PartialScriptPath = string & { __partialPath: true };
