@@ -7,6 +7,10 @@ export function transform(content: string) {
 }
 
 export async function insertCommentLine(contents: string, insert: string) {
+	if (!contents.trim()) {
+		return `/**\n * ${insert.trim()}\n */\n`;
+	}
+
 	let lines = transform(contents).split('\n');
 	if (lines.length === 1) {
 		const content = lines[0].replace(/\/\*{2}(.*?)\*{1,2}\//i, '$1');
