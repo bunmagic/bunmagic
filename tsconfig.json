@@ -14,7 +14,7 @@
 		"verbatimModuleSyntax": true,
 		"declaration": true,
 		"declarationDir": "types",
-		"emitDeclarationOnly": true
+		"emitDeclarationOnly": true,
 		/* Linting */
 		"skipLibCheck": true,
 		"strict": true,
