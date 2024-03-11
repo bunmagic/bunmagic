@@ -52,7 +52,7 @@ async function removeScript(script: Script) {
 export default async function () {
 	if (args.length === 0) {
 		throw new Error(
-			`You must specify which script to remove.\n${usage}`,
+			`You must specify which script to remove.`,
 		);
 	}
 
