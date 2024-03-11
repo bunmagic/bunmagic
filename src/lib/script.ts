@@ -1,5 +1,5 @@
 import { PATHS } from '@lib/config';
-import { slugify } from './utils';
+import { slugify } from '@lib/utils';
 
 export class Script {
 	public readonly type = 'script' as const;
