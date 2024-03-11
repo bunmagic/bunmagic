@@ -87,7 +87,7 @@ async function setupConfig(bmPath: string) {
 		return;
 	}
 
-	const defaultExtension = await select<config.SupportedFiles>([...config.SUPPORTED_FILES], 'What file extension would you like to use for your scripts?');
+	const defaultExtension = await select<config.SupportedFiles>('What file extension would you like to use for your scripts?', config.SUPPORTED_FILES);
 	const defaults: config.Config = {
 		extension: defaultExtension,
 	};
