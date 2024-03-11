@@ -29,7 +29,7 @@
 				"./src/extras.ts"
 			],
 			"bunmagic/globals": [
-				"./src/globals.ts"
+				"./src/globals/index.ts"
 			],
 		}
 	}

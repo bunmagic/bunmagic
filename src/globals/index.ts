@@ -1,23 +1,31 @@
-/* eslint-disable unicorn/prefer-export-from */
-// Importing each module
-import os from 'node:os';
-import ansis from 'ansis';
-import { $ } from 'bun';
-import { notMinimist } from './not-minimist';
+import * as globals from './import';
 
-export { $spinner } from './spinner';
-export { default as path } from 'node:path';
-export { notMinimist };
+Object.assign(globalThis, {
+	...globals,
+});
 
-export * from './utils';
-export { select } from './selection';
-export * from './fs';
+declare global {
+	const $: typeof globals.$;
+	const ansis: typeof globals.ansis;
+	const path: typeof globals.path;
+	const argv: typeof globals.argv;
+	const args: typeof globals.args; // eslint-disable-line unicorn/prevent-abbreviations
+	const flags: typeof globals.flags;
+	const select: typeof globals.select;
+	const cd: typeof globals.cd;
+	const ack: typeof globals.ack;
+	const isDirectory: typeof globals.isDirectory;
+	const ensureDirectory: typeof globals.ensureDirectory;
+	const notMinimist: typeof globals.notMinimist;
+	const Exit: typeof globals.Exit; // eslint-disable-line @typescript-eslint/naming-convention
+	const $HOME: typeof globals.$HOME;
+	const $get: typeof globals.$get;
+	const glob: typeof globals.glob;
+}
 
-
-export const argv = notMinimist(Bun.argv.slice(2) || []);
-export const args = argv._; // eslint-disable-line unicorn/prevent-abbreviations
-export const flags: Record<string, string | boolean | undefined> = { ...argv, _: undefined };
-export const $HOME = os.homedir();
-export {
-	ansis, ansis as chalk, os, $,
-};
+const customGlobalsFile = `${$HOME}/.bunmagic/custom-globals.ts`;
+if (await Bun.file(customGlobalsFile).exists()) {
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+	const customGlobals = await import(customGlobalsFile);
+	Object.assign(globalThis, customGlobals);
+}

@@ -29,7 +29,7 @@
   "main": "src/index.ts",
   "exports": {
     "./run": "./src/run.ts",
-    "./globals": "./src/globals.ts",
+    "./globals": "./src/globals/index.ts",
     "./extras": "./src/extras/index.ts"
   },
   "peerDependencies": {
