@@ -29,8 +29,9 @@
 	"version": "1.1.0",
 	"main": "src/index.ts",
 	"exports": {
+		".": "./src/index.ts",
 		"./run": "./src/run.ts",
-		"./globals": "./src/globals/index.ts",
+		"./globals": "./src/globals.ts",
 		"./extras": "./src/extras/index.ts"
 	},
 	"peerDependencies": {

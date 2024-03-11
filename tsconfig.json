@@ -21,17 +21,14 @@
 		"noFallthroughCasesInSwitch": true,
 		"forceConsistentCasingInFileNames": true,
 		"paths": {
-			"bunmagic/run": [
-				"./src/run.ts"
+			"bunmagic/*": [
+				"./src/*"
 			],
 			"@lib/*": [
 				"./src/lib/*"
 			],
 			"bunmagic/extras": [
 				"./src/extras.ts"
-			],
-			"bunmagic/globals": [
-				"./src/globals/index.ts"
 			],
 		}
 	}
