@@ -1,6 +1,6 @@
-// name: Publish
-// desc: Publishes the package to npm
-// usage: bmdev publish
+/**
+ * Publishes the package to npm
+ */
 import semver, { type ReleaseType } from 'semver';
 
 type PackageJson = {
@@ -28,6 +28,7 @@ if (ack('Increment version number?')) {
 if (ack('Do you want to publish this version?')) {
 	const projectPath = path.resolve(import.meta.dir, '..');
 	cd(projectPath);
+	await $`bun run --bun build`;
 	await $`npm publish > /dev/tty`;
 	console.log('Done!');
 }
