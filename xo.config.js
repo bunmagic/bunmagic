@@ -28,6 +28,7 @@ export default {
 		'import/extensions': 0,
 		// There's a lot of async loops here - allow await in loops.
 		'no-await-in-loop': 0,
+		'operator-linebreak': 0,
 		'@typescript-eslint/no-require-imports': 0,
 		// Allow exporting anonymous functions
 		'import/no-anonymous-default-export': 0,
