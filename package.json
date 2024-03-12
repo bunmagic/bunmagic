@@ -20,7 +20,7 @@
 		"fix": "xo --fix",
 		"lint": "xo",
 		"test": "xo",
-		"build": "tsc src/globals.ts --declaration --emitDeclarationOnly --outdir types --skipLibCheck"
+		"build": "tsc src/globals.ts --declaration --emitDeclarationOnly --outdir types --skipLibCheck --downlevelIteration"
 	},
 	"types": "types/index.d.ts",
 	"module": "src/index.ts",
