@@ -6,12 +6,12 @@ import version from './version';
 
 export const router: Router['callback'] = async ({ name, exec, command, scripts }) => {
 	const input = [name, ...args].map(t => slugify(t)).join(' ');
-	if (argv.v || argv.version || input === 'version') {
+	if (flags.v || flags.version || input === 'version') {
 		await version();
 		return;
 	}
 
-	if (argv.h || argv.help || input === 'help') {
+	if (flags.h || flags.help || input === 'help') {
 		await help(scripts);
 		return;
 	}

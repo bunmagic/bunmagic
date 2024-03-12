@@ -32,7 +32,7 @@ export async function runNamespace(namespace: string, sourcePath: string) {
 			throw new Error(`Couldn't load the router.`);
 		}
 
-		if (argv.debug) {
+		if (flags.debug) {
 			console.log(`Running ${ansis.bold(name)} via router: ${router.file}`);
 		}
 

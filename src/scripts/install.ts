@@ -117,7 +117,7 @@ export async function uninstall() {
 }
 
 export default async function setup() {
-	if (argv.remove || argv.uninstall || args[0] === 'remove' || args[0] === 'uninstall') {
+	if (flags.remove || flags.uninstall || args[0] === 'remove' || args[0] === 'uninstall') {
 		await uninstall();
 		return;
 	}

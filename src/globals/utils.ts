@@ -29,7 +29,7 @@ export function ack(q: string, defaultAnswer: 'y' | 'n' = 'y') {
 export class Exit extends Error {
 	constructor(error?: unknown) {
 		super();
-		if (argv.debug) {
+		if (flags.debug) {
 			console.error(error);
 		}
 
