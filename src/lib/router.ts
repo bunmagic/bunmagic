@@ -1,6 +1,6 @@
 import { Columns } from '@lib/columns';
+import { run } from 'bunmagic/run';
 import { create } from '../scripts/create';
-import help from '../scripts/help';
 import type { Script } from './script';
 import { SUPPORTED_FILES } from './config';
 
@@ -70,27 +70,51 @@ export const displayScripts = (scripts: Map<string, Script>) => {
 	columns.flushLog();
 };
 
+async function runWithFallback(scripts: Map<string, Script>, key: string, fallback: () => Promise<void>) {
+	if (scripts.has(key)) {
+		const target = scripts.get(key);
+		if (target) {
+			try {
+				await run(target.source);
+			} catch (error) {
+				throw new Exit(error);
+			}
+		}
+	} else {
+		await fallback();
+	}
+}
 
 const defaultRouter: Router['callback'] = async ({ namespace, name, exec, command, scripts }) => {
-	const input = `${namespace} ${name}`;
-
+	const input = `${namespace} ${name}`.trim();
 	// Offer to create utility if it doesn't exist.
-	if (name && !command) {
-		try {
-			await create(input);
-		} catch (error) {
-			throw new Exit(error);
-		}
-
+	if (
+		name && (
+			(name !== 'help' && !command)
+			||
+			(name === 'create' && !scripts.has('create'))
+		)
+	) {
+		await runWithFallback(scripts, 'create', async () => {
+			try {
+				await create(args[0] ? `${namespace} ${args[0]}` : input);
+			} catch (error) {
+				throw new Exit(error);
+			}
+		});
 		return;
 	}
 
 	if (flags.h || name === 'help' || !command) {
-		if (name && name !== 'help') {
-			console.log(ansis.yellow(`> Command not found: ${ansis.bold(input)}\n`));
-		}
+		await runWithFallback(scripts, 'help', async () => {
+			if (name && name !== 'help') {
+				console.log(ansis.yellow(`> Command not found: ${ansis.bold(input)}\n`));
+			}
 
-		displayScripts(scripts);
+			displayScripts(scripts);
+		});
+
+
 		return;
 	}
 
