@@ -23,6 +23,6 @@ declare class Spinner {
 }
 declare const $quiet: (strings: TemplateStringsArray, ...expressions: import("bun").ShellExpression[]) => import("bun").ShellPromise;
 type Callback<T> = ($: typeof $quiet, setLabel: Spinner['setLabel']) => Promise<T>;
-export declare function $spinner<T>(callback: Callback<T>, replaceConsole: boolean): Promise<T>;
-export declare function $spinner<T>(label: string, callback: Callback<T>, replaceConsole: boolean): Promise<T>;
+export declare function $spinner<T>(label: string, callback: Callback<T>): Promise<T>;
+export declare function $spinner<T>(callback: Callback<T>): Promise<T>;
 export {};

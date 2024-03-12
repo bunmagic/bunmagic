@@ -8,6 +8,7 @@ declare global {
     const args: typeof globals.args;
     const flags: typeof globals.flags;
     const select: typeof globals.select;
+    const $spinner: typeof globals.$spinner;
     const cd: typeof globals.cd;
     const ack: typeof globals.ack;
     const isDirectory: typeof globals.isDirectory;
