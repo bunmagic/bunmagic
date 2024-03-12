@@ -159,8 +159,8 @@ const $quiet = (...properties: Parameters<typeof $>) => $(...properties).quiet()
 
 type Callback<T> = ($: typeof $quiet, setLabel: Spinner['setLabel']) => Promise<T>;
 
-export async function $spinner<T>(callback: Callback<T>, replaceConsole: boolean): Promise<T>;
-export async function $spinner<T>(label: string, callback: Callback<T>, replaceConsole: boolean): Promise<T>;
+export async function $spinner<T>(label: string, callback: Callback<T>): Promise<T>;
+export async function $spinner<T>(callback: Callback<T>): Promise<T>;
 export async function $spinner<T>(...arguments_: unknown[]): Promise<T> {
 	let callback: Callback<T>;
 	const spinner = new Spinner();
