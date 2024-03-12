@@ -34,7 +34,7 @@ export async function findScript<T extends string>(query: T): Promise<Script | u
 	if (namespace) {
 		const source = sources.find(source => source.namespace === namespace);
 		if (source) {
-			const result = source.scripts.find(s => s.command === slug);
+			const result = source.scripts.find(s => s.slug === slug);
 			if (result) {
 				return result;
 			}
