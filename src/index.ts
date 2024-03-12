@@ -15,9 +15,8 @@ export { select } from './globals/selection';
 export * from './globals/fs';
 
 
-export const argv = notMinimist(Bun.argv.slice(2) || []);
-export const args = argv._; // eslint-disable-line unicorn/prevent-abbreviations
-export const flags: Record<string, string | boolean | undefined> = { ...argv, _: undefined };
+export const {args, flags} = notMinimist(Bun.argv.slice(2) || []);
+export const argv = { _: args, ...flags };
 export const $HOME = os.homedir();
 export {
 	ansis, ansis as chalk, os, $, path,

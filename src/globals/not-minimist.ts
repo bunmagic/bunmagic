@@ -8,7 +8,7 @@ type NmArgv = {
 	flags: Record<string, Flag>;
 	args: string[];
 };
-export function notMinimist(arguments_: string[]) {
+export function notMinimist(arguments_: string[]): NmArgv {
 	const output: NmArgv = {
 		flags: {},
 		args: [],
@@ -40,9 +40,5 @@ export function notMinimist(arguments_: string[]) {
 		}
 	}
 
-	// eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-	return {
-		_: output.args,
-		...output.flags,
-	} as Record< string, Flag > & { _: string[] };
+	return output;
 }
