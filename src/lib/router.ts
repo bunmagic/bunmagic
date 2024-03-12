@@ -1,3 +1,4 @@
+import { Columns } from '@lib/columns';
 import { create } from '../scripts/create';
 import help from '../scripts/help';
 import type { Script } from './script';
@@ -34,6 +35,41 @@ export type Router = {
 	callback: (route: Route) => Promise<void>;
 };
 
+export const displayScripts = (scripts: Map<string, Script>) => {
+	const columns = new Columns(3);
+	columns.gap = 5;
+	columns.buffer();
+	columns.log('');
+	columns.log(['script', 'args', 'description'].map(s => ansis.dim(s)) as [string, string, string]);
+	columns.log(['------', '----', '-----------'].map(s => ansis.dim(s)) as [string, string, string]);
+	for (const [name, script] of scripts.entries()) {
+		if (script.type !== 'script') {
+			continue;
+		}
+
+		if (script.alias.includes(name)) {
+			continue;
+		}
+
+		if (Bun.file(script.source).name?.startsWith('_')) {
+			continue;
+		}
+
+		let description = script.desc || '';
+		if (script.alias.length > 0) {
+			description += ansis.dim(` (alias: ${script.alias.join(', ')})`);
+		}
+
+		columns.log([
+			ansis.bold(script.slug),
+			ansis.gray(script.usage || ''),
+			description,
+		]);
+	}
+
+	columns.flushLog();
+};
+
 
 const defaultRouter: Router['callback'] = async ({ namespace, name, exec, command, scripts }) => {
 	const input = `${namespace} ${name}`;
@@ -54,7 +90,7 @@ const defaultRouter: Router['callback'] = async ({ namespace, name, exec, comman
 			console.log(ansis.yellow(`> Command not found: ${ansis.bold(input)}\n`));
 		}
 
-		await help(scripts);
+		displayScripts(scripts);
 		return;
 	}
 
