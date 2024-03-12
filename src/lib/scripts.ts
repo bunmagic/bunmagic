@@ -19,7 +19,7 @@ export async function getPathScripts(target: string, namespace?: string): Promis
 	const descriptions: Promise<Script | false>[] = [];
 	for await (const fileName of glob.scan({ onlyFiles: true, absolute: false, cwd: target })) {
 		if (fileName.startsWith('_')) {
-			if (argv.debug) {
+			if (flags.debug) {
 				console.log(`Ignoring: ${fileName}`);
 			}
 

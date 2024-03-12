@@ -109,8 +109,8 @@ class Spinner {
 			output += ' ';
 			const debugMessage = ansis.dim(' (Use --debug to see the full error stack.)');
 			const errorMessage = this.error.message.replace('Error: ', '');
-			output += `${ansis.red(errorMessage)}${argv.debug ? '' : debugMessage}`;
-			if (argv.debug && this.error.stack) {
+			output += `${ansis.red(errorMessage)}${flags.debug ? '' : debugMessage}`;
+			if (flags.debug && this.error.stack) {
 				const padSize = this.label?.length ? this.label.length + 3 : 0;
 				const padding = ' '.repeat(padSize);
 				const paddedStack = this.error.stack.split('\n').map(line => `${padding}${line.trim()}`).join('\n');

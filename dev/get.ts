@@ -6,8 +6,6 @@ import { create } from '../src/scripts/create';
 
 let url = new URL(args[0]);
 
-console.log(url);
-
 if (url.host === 'github.com') {
 	const rawUrlPath = url.pathname.replace(`/blob/`, '/');
 	url = new URL(`https://raw.githubusercontent.com${rawUrlPath}`);
@@ -58,5 +56,6 @@ const updatedComment = await insertCommentLine(comment, `@source ${url.toString(
 const content = updatedComment + noCommentContent;
 
 console.log(ansis.gray(content));
+
 
 await create(filename, content);

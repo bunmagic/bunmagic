@@ -22,7 +22,7 @@ export async function getBins(): Promise<string[]> {
 export async function ensureScriptBin(script: Script) {
 	const exec = 'bunmagic-exec';
 
-	if (argv.force === true && await Bun.file(script.bin).exists()) {
+	if (flags.force === true && await Bun.file(script.bin).exists()) {
 		console.log(`Removing ${ansis.bold(script.slug)} script bin file`);
 		await $`rm ${script.bin}`;
 	}
@@ -53,7 +53,7 @@ export async function ensureNamespaceBin(binaryName: string, targetPath: string)
 	const exec = 'bunmagic-exec-namespace';
 	const binaryPath = path.join(PATHS.bins, binaryName);
 
-	if (argv.force === true && await Bun.file(binaryPath).exists()) {
+	if (flags.force === true && await Bun.file(binaryPath).exists()) {
 		console.log(`Removing ${ansis.bold(binaryName)} namespace bin file`);
 		await $`rm ${binaryPath}`;
 	}
@@ -74,7 +74,7 @@ export async function ensureNamespaceBin(binaryName: string, targetPath: string)
 export async function reloadBins() {
 	let count = 0;
 	for (const source of await getSources()) {
-		if (argv.symlink === true) {
+		if (flags.symlink === true) {
 			const directory = source.dir;
 			const linkPath = path.join(PATHS.bunmagic, 'sources', path.basename(directory));
 			if (directory.startsWith(PATHS.bunmagic)) {

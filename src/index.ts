@@ -15,9 +15,16 @@ export { select } from './globals/selection';
 export * from './globals/fs';
 
 
-export const {args, flags} = notMinimist(Bun.argv.slice(2) || []);
-export const argv = { _: args, ...flags };
+const { args, flags } = notMinimist(Bun.argv.slice(2) || []);
+const argv = { _: args, ...flags };
 export const $HOME = os.homedir();
 export {
-	ansis, ansis as chalk, os, $, path,
+	$,
+	path,
+	ansis,
+	ansis as chalk,
+	os,
+	args,
+	argv,
+	flags,
 };

@@ -49,7 +49,7 @@ const defaultRouter: Router['callback'] = async ({ namespace, name, exec, comman
 		return;
 	}
 
-	if (argv.h || name === 'help' || !command) {
+	if (flags.h || name === 'help' || !command) {
 		if (name && name !== 'help') {
 			console.log(ansis.yellow(`> Command not found: ${ansis.bold(input)}\n`));
 		}
@@ -94,7 +94,7 @@ export async function getRouter(sourcePath: string): Promise<Router> {
 
 			throw new Error(`Tried to load router from ${file}, but it didn't export a router.`);
 		} catch (error) {
-			if (argv.debug) {
+			if (flags.debug) {
 				console.warn(`Error loading "${file}":\n`, error);
 			}
 		}
