@@ -22,15 +22,16 @@
 		"noFallthroughCasesInSwitch": true,
 		"forceConsistentCasingInFileNames": true,
 		"paths": {
-			"bunmagic/*": [
-				"./src/*"
-			],
 			"@lib/*": [
 				"./src/lib/*"
+			],
+			"bunmagic/*": [
+				"./src/*"
 			]
 		},
 	},
 	"include": [
-		"./src/*"
+		"./src/**/*",
+		"./dev/*"
 	],
 }
