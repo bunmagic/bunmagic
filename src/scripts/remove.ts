@@ -63,12 +63,12 @@ export default async function () {
 		throw new Exit(`Can't find script or namespace "${input}"`);
 	}
 
-	if (script.namespace) {
-		return removeNamespace(input);
-	}
-
 	if (script instanceof Script) {
 		return removeScript(script);
+	}
+
+	if (script.namespace) {
+		return removeNamespace(input);
 	}
 
 	throw new Exit('Unknown script type');
