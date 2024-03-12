@@ -20,8 +20,9 @@
 		"fix": "xo --fix",
 		"lint": "xo",
 		"test": "xo",
-		"build": "tsc"
+		"build": "tsc src/globals.ts --declaration --emitDeclarationOnly --outdir types --skipLibCheck"
 	},
+	"types": "types/index.d.ts",
 	"module": "src/index.ts",
 	"type": "module",
 	"author": "pyronaur",

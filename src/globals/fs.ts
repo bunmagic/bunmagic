@@ -1,4 +1,4 @@
-import fs from 'node:fs';
+import * as fs from 'node:fs';
 import type { GlobScanOptions } from 'bun';
 
 export async function isDirectory(path: string) {

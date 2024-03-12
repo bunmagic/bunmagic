@@ -1,6 +1,6 @@
-import { CLI } from 'bunmagic/extras';
 import { $ } from 'bun';
 import ansis from 'ansis';
+import { CLI } from '../extras';
 
 class Spinner {
 	private static spinners: Spinner[] = [];
