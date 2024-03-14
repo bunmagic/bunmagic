@@ -11,7 +11,7 @@ export { $spinner } from './globals/spinner';
 export { notMinimist };
 
 export * from './globals/utils';
-export { select } from './globals/selection';
+export { select, getPassword } from './globals/selection';
 export * from './globals/fs';
 
 
