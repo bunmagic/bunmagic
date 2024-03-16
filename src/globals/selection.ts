@@ -234,6 +234,21 @@ export async function select<T extends string>(
 	return selected === -1 ? options[0] : _options[selected].text;
 }
 
+export async function autoselect< T extends string >(
+	message: string,
+	options: T[],
+	flag: string
+): Promise< T > {
+	// Override the selection if the flag is set
+	if ( flags && flag in flags && flags[ flag ] ) {
+		return flag as T;
+	}
+	if ( options.length === 1 ) {
+		return options[ 0 ];
+	}
+	return await select( message, options );
+}
+
 export async function getPassword(message: string): Promise<string> {
 	let password = '';
 
