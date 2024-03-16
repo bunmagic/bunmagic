@@ -241,7 +241,7 @@ export async function autoselect< T extends string >(
 ): Promise< T > {
 	// Override the selection if the flag is set
 	if ( flags && flag in flags && flags[ flag ] ) {
-		return flag as T;
+		return flags[flag] as T;
 	}
 	if ( options.length === 1 ) {
 		return options[ 0 ];
