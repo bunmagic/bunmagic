@@ -15,7 +15,7 @@ export class Columns<T extends number, Row extends string | string[]> {
 		private readonly config: ColumnConfig[] = fixedLengthArray(columnCount, 'auto'),
 	) {}
 
-	log(data: Row) {
+	public log(data: Row) {
 		this.rows.push(data);
 		if (!this.isBuffering) {
 			console.log(this.render());
