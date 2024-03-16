@@ -1,16 +1,10 @@
-
-type GrowToSize<T, N extends number, A extends T[]> =
-  A['length'] extends N ? A : GrowToSize<T, N, [...A, T]>;
-
-// eslint-disable-next-line @typescript-eslint/ban-types
-export type FixedArray<T, N extends number> = T[] & GrowToSize<T, N, []>;
 type ColumnConfig = 'auto' | '' | number | `${number}%`;
 
-function fixedLengthArray<T, N extends number>(length: N, fill: T): FixedArray<T, N> {
-	return Array.from({ length }, () => fill) as FixedArray<T, N>;
+function fixedLengthArray<T>(length: number, fill: T): T[] {
+	return Array.from({ length }, () => fill);
 }
 
-export class Columns<T extends number, Row extends string | FixedArray<string, T>> {
+export class Columns<T extends number, Row extends string | string[]> {
 	public indent = 2;
 	public gap = 2;
 	private readonly rows: Row[] = [];
@@ -18,7 +12,7 @@ export class Columns<T extends number, Row extends string | FixedArray<string, T
 
 	constructor(
 		private readonly columnCount: T,
-		private readonly config: FixedArray<ColumnConfig, T> = fixedLengthArray(columnCount, 'auto'),
+		private readonly config: ColumnConfig[] = fixedLengthArray(columnCount, 'auto'),
 	) {}
 
 	log(data: Row) {
@@ -187,7 +181,7 @@ export class Columns<T extends number, Row extends string | FixedArray<string, T
 		return output;
 	}
 
-	private getColumnWidths(): FixedArray<number, T> {
+	private getColumnWidths() {
 		const rows = this.rows.filter(row => typeof row !== 'string') as string[][];
 		const widths = Array.from({ length: this.columnCount }, () => 0);
 		for (const row of rows) {
@@ -203,6 +197,6 @@ export class Columns<T extends number, Row extends string | FixedArray<string, T
 			}
 		}
 
-		return widths as FixedArray<number, T>;
+		return widths;
 	}
 }
