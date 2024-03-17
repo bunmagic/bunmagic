@@ -51,8 +51,8 @@ type Meta = { name: string; description: string };
 type Properties = {
 	name: string;
 	description: string;
+	usage: string;
 	meta: {
-		usage: Meta[];
 		flags: Meta[];
 		subcommands: Meta[];
 	};
@@ -77,8 +77,8 @@ async function parseContent(contents: string) {
 	const properties: Properties = {
 		name: '',
 		description: '',
+		usage: '',
 		meta: {
-			usage: [],
 			flags: [],
 			subcommands: [],
 		},
@@ -106,7 +106,7 @@ async function parseContent(contents: string) {
 				properties.slug = tag.name;
 				break;
 			case 'usage':
-				properties.meta.usage.push({ name: tag.name, description: tag.description });
+				properties.usage = `${tag.name} ${tag.description}`;
 
 				break;
 			case 'alias':

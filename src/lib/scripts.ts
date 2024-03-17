@@ -7,6 +7,7 @@ async function describeScript(source: string, namespace?: string): Promise<Scrip
 	return new Script({
 		namespace,
 		source,
+		usage: meta?.usage,
 		alias: meta?.alias,
 		desc: meta?.description,
 		meta: meta?.meta,
