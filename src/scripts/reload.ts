@@ -1,7 +1,7 @@
 /**
  * Reload your script files and ensure that they have an executable bin.
  * Use `--force` if you want to force the creation of the bin files
- * @usage "[--force]"
+ * @usage [[--force]]
  */
 
 import { PATHS } from '@lib/config';

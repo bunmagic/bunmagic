@@ -1,6 +1,6 @@
 /**
  * Edit scripts. If no script name is specified, will open all scripts and the ~/.bunmagic directory
- * @usage "[script-name]"
+ * @usage [[script-name]]
  */
 import {
 	findNamespace,
