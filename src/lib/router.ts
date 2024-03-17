@@ -65,6 +65,18 @@ export const displayScripts = (scripts: Map<string, Script>) => {
 			ansis.gray(script.usage || ''),
 			description,
 		]);
+
+		if (script.meta) {
+			for (const meta of Object.values(script.meta)) {
+				for (const { name, description } of meta) {
+					columns.log([
+						'',
+						ansis.dim(name),
+						ansis.dim(description),
+					]);
+				}
+			}
+		}
 	}
 
 	columns.flushLog();

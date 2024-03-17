@@ -1,3 +1,4 @@
+
 import { parse } from 'comment-parser';
 
 const decoder = new TextDecoder();
@@ -36,14 +37,7 @@ export function readFirstComment(view: Uint8Array) {
 	return '';
 }
 
-type Properties = {
-	name?: string;
-	description?: string;
-	usage?: string;
-	source?: string;
-	slug?: string;
-	alias?: string[];
-};
+
 
 async function parseFile(filePath: string): Promise<Properties | undefined> {
 	const file = Bun.file(filePath);
@@ -53,6 +47,19 @@ async function parseFile(filePath: string): Promise<Properties | undefined> {
 	return parseContent(contents);
 }
 
+type Meta = { name: string; description: string };
+type Properties = {
+	name: string;
+	description: string;
+	meta: {
+		usage: Meta[];
+		flags: Meta[];
+		subcommands: Meta[];
+	};
+	source: string;
+	slug: string;
+	alias: string[];
+};
 async function parseContent(contents: string) {
 	if (contents.length === 0) {
 		return;
@@ -67,7 +74,18 @@ async function parseContent(contents: string) {
 
 	const result = data[0];
 
-	const properties: Properties = {};
+	const properties: Properties = {
+		name: '',
+		description: '',
+		meta: {
+			usage: [],
+			flags: [],
+			subcommands: [],
+		},
+		source: '',
+		slug: '',
+		alias: [],
+	};
 	if (result.description) {
 		properties.description = result.description;
 	}
@@ -88,26 +106,26 @@ async function parseContent(contents: string) {
 				properties.slug = tag.name;
 				break;
 			case 'usage':
-				if (tag.name) {
-					properties.usage = tag.name;
-				}
-
-				if (tag.description) {
-					properties.usage += ` ${tag.description}`;
-				}
+				properties.meta.usage.push({ name: tag.name, description: tag.description });
 
 				break;
 			case 'alias':
 				if (tag.name) {
-					if (properties.alias) {
-						properties.alias.push(tag.name);
-					} else {
-						properties.alias = [tag.name];
-					}
+					properties.alias.push(tag.name);
 				}
 
 				break;
+			case 'flag':
+				properties.meta.flags.push({ name: tag.name, description: tag.description });
+				break;
+			case 'cmd':
+			case 'command':
+			case 'subcommand':
+				if (tag.name) {
+					properties.meta.subcommands.push({ name: tag.name, description: tag.description });
+				}
 
+				break;
 			default:
 				break;
 		}

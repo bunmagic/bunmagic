@@ -44,6 +44,8 @@ export class Script {
 
 	namespace: string | undefined;
 
+	meta?: Record<string, Array<{ name: string; description: string }>>;
+
 	constructor({
 		source,
 		namespace,
@@ -51,6 +53,7 @@ export class Script {
 		desc,
 		usage,
 		alias,
+		meta,
 	}: {
 		source: string;
 		namespace?: string;
@@ -58,6 +61,7 @@ export class Script {
 		desc?: string;
 		usage?: string;
 		alias?: string[];
+		meta?: Record<string, Array<{ name: string; description: string }>>;
 	}) {
 		this.source = source;
 		this.slug = slugify(slug ?? path.parse(source).name);
@@ -67,6 +71,7 @@ export class Script {
 		this.usage = usage;
 		this.alias = alias ?? [];
 		this.namespace = namespace;
+		this.meta = meta;
 	}
 
 	/**

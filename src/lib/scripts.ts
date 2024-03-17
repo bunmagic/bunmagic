@@ -8,8 +8,8 @@ async function describeScript(source: string, namespace?: string): Promise<Scrip
 		namespace,
 		source,
 		alias: meta?.alias,
-		usage: meta?.usage,
 		desc: meta?.description,
+		meta: meta?.meta,
 	});
 }
 
