@@ -21,7 +21,22 @@ export class Columns<T extends number, Row extends string | string[]> {
 		} else {
 			const lines = data.map(column => column.split('\n'));
 			for (let index = 0; index < Math.max(...lines.map(l => l.length)); index++) {
-				const row = lines.map(line => line[index] || '');
+				const row = lines.map(line => {
+					if (line[index] === undefined) {
+						return '';
+					}
+
+					let content = line[index];
+					if (index > 0) {
+						// Preserve control characters (ansi colors, etc.), but remove leading tabs.
+						// Still allow for leading spaces to allow intentional custom indentation.
+						// eslint-disable-next-line no-control-regex
+						content = content.replaceAll(/^(\u001B\[[\d;]*m)*\t+/g, '$1');
+					}
+
+					return content;
+				});
+				// Push the row to the rows array
 				this.rows.push(row as Row);
 			}
 		}
