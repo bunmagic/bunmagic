@@ -16,7 +16,16 @@ export class Columns<T extends number, Row extends string | string[]> {
 	) {}
 
 	public log(data: Row) {
-		this.rows.push(data);
+		if (typeof data === 'string') {
+			this.rows.push(data);
+		} else {
+			const lines = data.map(column => column.split('\n'));
+			for (let index = 0; index < Math.max(...lines.map(l => l.length)); index++) {
+				const row = lines.map(line => line[index] || '');
+				this.rows.push(row as Row);
+			}
+		}
+
 		if (!this.isBuffering) {
 			console.log(this.render());
 			this.rows.length = 0;

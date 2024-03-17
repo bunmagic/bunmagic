@@ -58,7 +58,9 @@ async function parseContent(contents: string) {
 		return;
 	}
 
-	const data = parse(contents);
+	const data = parse(contents, {
+		spacing: 'preserve',
+	});
 	if (data.length === 0) {
 		return;
 	}
