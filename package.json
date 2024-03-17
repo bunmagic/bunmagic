@@ -27,7 +27,7 @@
   "type": "module",
   "author": "pyronaur",
   "license": "MIT",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "main": "src/index.ts",
   "exports": {
     ".": "./src/index.ts",
