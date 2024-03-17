@@ -4,7 +4,9 @@
  * Might be all that we need.
  */
 type Flag = string | number | boolean | undefined;
-export declare function notMinimist(arguments_: string[]): Record<string, Flag> & {
-    _: string[];
+type NmArgv = {
+    flags: Record<string, Flag>;
+    args: string[];
 };
+export declare function notMinimist(arguments_: string[]): NmArgv;
 export {};

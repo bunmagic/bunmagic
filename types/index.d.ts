@@ -9,12 +9,11 @@ import { notMinimist } from './globals/not-minimist';
 export { $spinner } from './globals/spinner';
 export { notMinimist };
 export * from './globals/utils';
-export { select } from './globals/selection';
+export { select, autoselect, getPassword } from './globals/selection';
 export * from './globals/fs';
-export declare const argv: Record<string, string | number | boolean> & {
+declare const args: string[], flags: Record<string, string | number | boolean>;
+declare const argv: {
     _: string[];
 };
-export declare const args: string[];
-export declare const flags: Record<string, string | boolean | undefined>;
 export declare const $HOME: string;
-export { ansis, ansis as chalk, os, $, path, };
+export { $, path, ansis, ansis as chalk, os, args, argv, flags, };
