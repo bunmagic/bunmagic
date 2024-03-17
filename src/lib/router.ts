@@ -60,11 +60,25 @@ export const displayScripts = (scripts: Map<string, Script>) => {
 			description += ansis.dim(` (alias: ${script.alias.join(', ')})`);
 		}
 
+		const usage = script.usage || { name: '', description: '' };
+		if( usage?.name && usage?.description ) {
+			columns.log([
+				ansis.bold(script.slug),
+				'',
+				description,
+			]);
+			columns.log([
+				'',
+				ansis.dim(usage.name),
+				ansis.dim(usage.description),
+			]);
+		} else {
 		columns.log([
 			ansis.bold(script.slug),
-			ansis.gray(script.usage || ''),
+			ansis.gray(script.usage?.name || ''),
 			description,
 		]);
+	}
 
 		if (script.meta) {
 			for (const meta of Object.values(script.meta)) {

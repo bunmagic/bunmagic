@@ -34,7 +34,7 @@ export class Script {
 	 * A usage example of the command.
 	 * Used in the help command.
 	 */
-	usage: string | undefined;
+	usage: { name: string; description: string } | undefined;
 
 	/**
 	 * A list of aliases for the command.
@@ -59,7 +59,7 @@ export class Script {
 		namespace?: string;
 		slug?: string;
 		desc?: string;
-		usage?: string;
+		usage?: { name: string; description: string };
 		alias?: string[];
 		meta?: Record<string, Array<{ name: string; description: string }>>;
 	}) {
