@@ -1,3 +1,5 @@
+import ansis from 'ansis';
+
 type ColumnConfig = 'auto' | '' | number | `${number}%`;
 
 function fixedLengthArray<T>(length: number, fill: T): T[] {

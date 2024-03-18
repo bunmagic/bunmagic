@@ -1,6 +1,6 @@
-import '../globals'; // eslint-disable-line import/no-unassigned-import
+import '../../globals'; // eslint-disable-line import/no-unassigned-import
 import { expect, test } from 'bun:test';
-import { parseInput } from './parse-input';
+import { parseInput } from '../parse-input';
 
 
 test('parse input with single word', () => {

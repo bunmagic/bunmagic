@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'bun:test';
-import { parseHeader, readFirstComment } from './parse-file-meta';
+import { parseHeader, readFirstComment } from '../parse-file-meta';
 
 const parseContent = parseHeader.fromContent;
 
