@@ -52,10 +52,7 @@ type Properties = {
 	name: string;
 	description: string;
 	usage: Meta;
-	meta: {
-		flags: Meta[];
-		subcommands: Meta[];
-	};
+	meta: Record<string, Meta[]>;
 	source: string;
 	slug: string;
 	alias: string[];
@@ -78,14 +75,12 @@ async function parseContent(contents: string) {
 		name: '',
 		description: '',
 		usage: { name: '', description: '' },
-		meta: {
-			flags: [],
-			subcommands: [],
-		},
 		source: '',
 		slug: '',
 		alias: [],
+		meta: {},
 	};
+
 	if (result.description) {
 		properties.description = result.description;
 	}
@@ -94,41 +89,29 @@ async function parseContent(contents: string) {
 		return properties;
 	}
 
-	for (const tag of result.tags) {
-		switch (tag.tag) {
-			case 'name':
-				properties.name = tag.name;
-				break;
-			case 'source':
-				properties.source = tag.name;
-				break;
-			case 'slug':
-				properties.slug = tag.name;
-				break;
-			case 'usage':
-				properties.usage = { name: tag.name, description: tag.description };
-
-				break;
-			case 'alias':
-				if (tag.name) {
-					properties.alias.push(tag.name);
-				}
-
-				break;
-			case 'flag':
-				properties.meta.flags.push({ name: tag.name, description: tag.description });
-				break;
-			case 'cmd':
-			case 'command':
-			case 'subcommand':
-				if (tag.name) {
-					properties.meta.subcommands.push({ name: tag.name, description: tag.description });
-				}
-
-				break;
-			default:
-				break;
+	for (const spec of result.tags) {
+		let tag = spec.tag;
+		if (tag === 'name' || tag === 'source' || tag === 'slug') {
+			properties[tag] = `${spec.name} ${spec.description}`.trim();
+			continue;
 		}
+
+		if (tag === 'usage') {
+			properties.usage = { name: spec.name, description: spec.description };
+			continue;
+		}
+
+		if (tag === 'alias') {
+			properties.alias.push(spec.name);
+			continue;
+		}
+
+		if (tag === 'flag') {
+			tag = 'flags';
+		}
+
+		properties.meta[tag] ||= [];
+		properties.meta[tag].push({ name: spec.name, description: spec.description });
 	}
 
 	return properties;

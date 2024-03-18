@@ -26,6 +26,7 @@ describe('parseContent', () => {
        * @name [Test Command]
        * @usage <arg> test
        * @alias t
+	   * @alias other
        * @flag --option Description of the option
 	   * @flag [[--optional]] Description of the option
        * @subcommand sub Description of the subcommand
@@ -43,11 +44,13 @@ describe('parseContent', () => {
 					{ name: '--option', description: 'Description of the option' },
 					{ name: '[--optional]', description: 'Description of the option' },
 				],
-				subcommands: [{ name: 'sub', description: 'Description of the subcommand' }],
+				subcommand: [
+					{ name: 'sub', description: 'Description of the subcommand' },
+				],
 			},
 			source: 'test.ts',
 			slug: 'test-command',
-			alias: ['t'],
+			alias: ['t', 'other'],
 		});
 	});
 
@@ -63,10 +66,7 @@ describe('parseContent', () => {
 			name: 'Test Command',
 			description: 'This is a test command',
 			usage: { name: '', description: '' },
-			meta: {
-				flags: [],
-				subcommands: [],
-			},
+			meta: {},
 			source: '',
 			slug: '',
 			alias: [],
