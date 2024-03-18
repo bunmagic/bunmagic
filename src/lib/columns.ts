@@ -181,7 +181,7 @@ export class Columns<T extends number, Row extends string | string[]> {
 			const widthLimit = widths[column];
 			const contentWidth = ansis.strip(content).length;
 			if (contentWidth > widthLimit) {
-				const wrapAt = this.nearestWrap(content, widthLimit);
+				const wrapAt = this.nearestWrap(content, widthLimit, 1);
 				const wrappedContent = content.slice(0, wrapAt);
 				output += wrappedContent;
 				output += '\n';
