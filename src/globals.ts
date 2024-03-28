@@ -4,6 +4,8 @@ import * as globals from './index';
 
 Object.assign(globalThis, {
 	...globals,
+	// Allow explicit globals reference via `bunmagic` prefix.
+	bunmagic: globals
 });
 
 declare global {
