@@ -30,6 +30,8 @@ declare global {
 	const glob: typeof globals.glob;
 	const openEditor: typeof globals.openEditor;
 	const slugify: typeof globals.slugify;
+	const resolveTilde: typeof globals.resolveTilde;
+	const cwd: typeof globals.cwd;
 }
 
 // export type ExtendedGlobal = typeof globalThis;
