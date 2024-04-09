@@ -8,7 +8,6 @@ import { getSources } from '@lib/sources';
 
 async function linkSource(source: string, target: string) {
 	console.log(ansis.green.dim(` Linking: ${ansis.reset(source)}\n To:      ${ansis.reset(target)}\n`));
-	console.log(`ln -s ${source} ${target}`);
 	await $`ln -s ${source} ${target}`;
 }
 
@@ -32,8 +31,13 @@ export default async function symlinkSources() {
 	await ensureDirectory(target);
 
 	for (const source of dirs) {
-		console.log(source);
 		if (source.startsWith(PATHS.bunmagic)) {
+			console.log(ansis.yellow.dim(` Skipping: ${ansis.reset(source)}\n`));
+			continue;
+		}
+		const dirName = path.basename(source);
+		const targetPath = path.join(target, dirName);
+		if( await isDirectory(targetPath)) {
 			console.log(ansis.yellow.dim(` Skipping: ${ansis.reset(source)}\n`));
 			continue;
 		}
