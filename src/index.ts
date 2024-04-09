@@ -7,7 +7,7 @@ import { $ } from 'bun';
 import { notMinimist } from './globals/not-minimist';
 
 export { $spinner } from './globals/spinner';
-
+export { openEditor, slugify } from './lib/utils';
 export { notMinimist };
 
 export * from './globals/utils';

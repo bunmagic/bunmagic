@@ -28,6 +28,8 @@ declare global {
 	const $HOME: typeof globals.$HOME;
 	const $get: typeof globals.$get;
 	const glob: typeof globals.glob;
+	const openEditor: typeof globals.openEditor;
+	const slugify: typeof globals.slugify;
 }
 
 // export type ExtendedGlobal = typeof globalThis;
