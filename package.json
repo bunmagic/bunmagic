@@ -1,7 +1,7 @@
 {
   "name": "bunmagic",
   "dependencies": {
-    "ansis": "^2.1.0",
+    "ansis": "^3.0.3",
     "comment-parser": "^1.4.1"
   },
   "devDependencies": {
