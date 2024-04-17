@@ -49,7 +49,7 @@ export async function getExtension(extension?: string): Promise<string> {
 
 
 async function scriptPath(slug: string): Promise<PartialScriptPath> {
-	const commandExists = await $`which ${slug}`.quiet();
+	const commandExists = await $`which ${slug}`.nothrow().quiet();
 
 	// Check if a command with this name already exists on the system
 	if (commandExists.exitCode !== 1) {
