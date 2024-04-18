@@ -27,7 +27,7 @@ export function ack(q: string, defaultAnswer: 'y' | 'n' = 'y') {
 }
 
 export class Exit extends Error {
-	constructor(error?: unknown) {
+	constructor (error?: unknown) {
 		super();
 		if (flags.debug) {
 			console.error(error);
@@ -43,7 +43,7 @@ export class Exit extends Error {
 		}
 
 		const message = error instanceof Error ? error.message : error;
-		console.log(`\n${ansis.red.bold('(!)')}`, message);
+		console.log(`\n ${ansis.yellow.bold('»')}`, typeof message === 'string' ? ansis.yellow(message) : message);
 
 		this.exit(1);
 	}
