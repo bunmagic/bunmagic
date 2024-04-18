@@ -155,7 +155,12 @@ class Spinner {
 }
 
 // eslint-disable-next-line @typescript-eslint/promise-function-async
-const $quiet = (...properties: Parameters<typeof $>) => $(...properties).quiet();
+const $quiet = (...properties: Parameters<typeof $>) => {
+	if( flags.debug ) {
+		return $(...properties);
+	}
+	return $(...properties).quiet();
+}
 
 type Callback<T> = ($: typeof $quiet, setLabel: Spinner['setLabel']) => Promise<T>;
 
