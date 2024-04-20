@@ -21,6 +21,7 @@ declare global {
 	const $spinner: typeof globals.$spinner;
 	const cd: typeof globals.cd;
 	const ack: typeof globals.ack;
+	const ask: typeof globals.ask;
 	const isDirectory: typeof globals.isDirectory;
 	const ensureDirectory: typeof globals.ensureDirectory;
 	const notMinimist: typeof globals.notMinimist;
