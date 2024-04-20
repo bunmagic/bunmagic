@@ -37,10 +37,11 @@ async function clearLine() {
 }
 
 async function clearUp(count = 1) {
-	for (let i = 0; i < count; i++) {
+	for (let index = 0; index < count; index++) {
 		await clearLine();
 		await moveUp(1);
 	}
+
 	await moveDown(count);
 }
 
@@ -68,7 +69,7 @@ async function clearFrame(frame: string, wipe = false) {
 	}
 }
 
-async function* chunkStreamer5000(signal: AbortController['signal']) {
+async function * chunkStreamer5000(signal: AbortController['signal']) {
 	process.stdin.setRawMode(true);
 	const reader = Bun.stdin.stream().getReader() as ReadableStreamDefaultReader<Uint8Array>;
 	try {
