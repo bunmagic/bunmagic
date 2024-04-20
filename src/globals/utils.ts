@@ -1,5 +1,3 @@
-import { CLI } from 'bunmagic/extras';
-
 /**
  * Run a shell command and return the result as text,
  * even if it's an error.
@@ -13,11 +11,6 @@ export async function $get(...properties: Parameters<typeof $>) {
 	return result.stderr.toString();
 }
 
-export function cliMarkdown(input: string) {
-	input = input.replace(/\*\*(.*?)\*\*/g, (_, match) => ansis.bold(match));
-	input = input.replace(/__(.*?)__/g, (_, match) => ansis.dim(match));
-	return input;
-}
 
 export function ack(q: string, defaultAnswer: 'y' | 'n' = 'y') {
 	let yesOrNo = '[y/N]';
@@ -30,19 +23,6 @@ export function ack(q: string, defaultAnswer: 'y' | 'n' = 'y') {
 	answer ||= defaultAnswer;
 
 	return answer.toLowerCase() === 'y';
-}
-
-export function ask(q: string, defaultAnswer: string = ''): string {
-	const question = `${ansis.dim('▷ ')}${cliMarkdown(q)}`;
-	console.log(question);
-	const result = prompt(ansis.yellowBright('…')) ?? defaultAnswer;
-	CLI.moveUp(1);
-	CLI.clearLines(2);
-	CLI.moveDown(1);
-
-	const displayAnswer = result ? ansis.green(result) : ansis.dim.italic('\'\'');
-	console.log(ansis.dim(question.replace('▷', '▶︎')) + ansis.dim(': ') + displayAnswer);
-	return result;
 }
 
 export class Exit extends Error {

@@ -10,10 +10,38 @@ async function moveDown(count = 1) {
 	await stdout(`\u001B[${count}B`);
 }
 
+async function moveRight(count = 1) {
+	await stdout(`\u001B[${count}C`);
+}
+
+async function moveLeft(count = 1) {
+	await stdout(`\u001B[${count}D`);
+}
+
 async function clearLines(count = 1) {
 	await moveUp(count);
 	await stdout('\r');
 	await stdout('\u001B[2K'.repeat(count));
+}
+
+async function replaceLine(...messages: string[]) {
+	await clearLine();
+	await stdout(messages.join(' ') + '\n');
+}
+
+async function clearLine() {
+	await stdout('\r');
+	await stdout(' '.repeat(process.stdout.columns));
+	await stdout('\r');
+	await stdout('\u001B[2K');
+}
+
+async function clearUp(count = 1) {
+	for (let i = 0; i < count; i++) {
+		await clearLine();
+		await moveUp(1);
+	}
+	await moveDown(count);
 }
 
 async function hideCursor() {
@@ -40,7 +68,7 @@ async function clearFrame(frame: string, wipe = false) {
 	}
 }
 
-async function * chunkStreamer5000(signal: AbortController['signal']) {
+async function* chunkStreamer5000(signal: AbortController['signal']) {
 	process.stdin.setRawMode(true);
 	const reader = Bun.stdin.stream().getReader() as ReadableStreamDefaultReader<Uint8Array>;
 	try {
@@ -75,7 +103,12 @@ export const CLI = {
 	stdout,
 	moveUp,
 	moveDown,
+	moveRight,
+	moveLeft,
 	clearLines,
+	clearLine,
+	replaceLine,
+	clearUp,
 	hideCursor,
 	showCursor,
 	clearFrame,

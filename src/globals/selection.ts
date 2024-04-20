@@ -202,8 +202,8 @@ export async function select<T extends string>(
 			}
 		} else if (
 			typeof input === 'number' &&
-      input > 0 &&
-      input <= _options.length
+			input > 0 &&
+			input <= _options.length
 		) {
 			const index = input - 1;
 			if (_options[index]) {
@@ -234,17 +234,17 @@ export async function select<T extends string>(
 	return selected === -1 ? options[0] : _options[selected].text;
 }
 
-export async function autoselect< T extends string >(
+export async function autoselect<T extends string>(
 	message: string,
 	options: T[],
 	flag: string
-): Promise< T > {
+): Promise<T> {
 	// Override the selection if the flag is set
-	if ( flags && flag in flags && flags[ flag ] ) {
+	if (flags && flag in flags && flags[flag]) {
 		return flags[flag] as T;
 	}
-	if ( options.length === 1 ) {
-		return options[ 0 ];
+	if (options.length === 1) {
+		return options[0];
 	}
 	return await select( message, options );
 }
@@ -272,7 +272,7 @@ export async function getPassword(message: string): Promise<string> {
 
 			if (
 				(input.key === 'backspace' || input.key === 'delete') &&
-        password.length > 0
+				password.length > 0
 			) {
 				await CLI.stdout('\b \b');
 				password = password.slice(0, -1);
@@ -288,4 +288,113 @@ export async function getPassword(message: string): Promise<string> {
 
 	stream.stop();
 	return password;
+}
+
+
+function cliMarkdown(input: string) {
+	input = input.replaceAll(/\*\*(.*?)\*\*/g, (_, match: string) => ansis.bold(match));
+	input = input.replaceAll(/__(.*?)__/g, (_, match: string) => ansis.dim(match));
+	return input;
+}
+
+type HandleAskResponse = 'required' | 'use_default' | ((answer: string | undefined) => Promise<string>);
+export async function ask(q: string, defaultAnswer = '', handle: HandleAskResponse = 'use_default'): Promise<string> {
+	if (handle === 'required') {
+		handle = async answer => {
+			if (!answer?.trim()) {
+				throw new Error('Non-empty string required.');
+			}
+
+			return answer;
+		};
+	}
+
+	if (handle === 'use_default') {
+		handle = async answer => answer ?? defaultAnswer;
+	}
+
+	q = cliMarkdown(q);
+	const display = (text: string) => text || '\'\'';
+
+	const stream = CLI.stream();
+	let answer = '';
+	stream.start();
+	console.log(ansis.yellow('»') + ansis.reset(` ${q}: `));
+
+	const defaultValue = ansis.dim.italic(`${display(defaultAnswer)}`);
+	const inputFlag = ansis.yellowBright('…');
+	const inputPrompt = `${inputFlag} ${defaultValue} ${'\b'.repeat(ansis.strip(defaultValue).length)}`;
+
+	await CLI.stdout(inputPrompt);
+	await CLI.hideCursor();
+
+
+	for await (const chunk of stream.start()) {
+		const input = interpretKey(chunk);
+		if (!input) {
+			continue;
+		}
+
+		if (typeof input === 'object') {
+			if (input.key === 'return') {
+				try {
+					const result = await handle(answer);
+					const displayAnswer = result ? ansis.green(result) : ansis.dim.greenBright('\'\'');
+					await CLI.moveUp(1);
+					await CLI.replaceLine(ansis.green('✔︎'), ansis.dim(q + ':'), ansis.dim('"') + displayAnswer + ansis.dim('"'));
+					await CLI.showCursor();
+					break;
+				} catch (error: unknown) {
+					let message = 'Invalid response.';
+					// eslint-disable-next-line max-depth
+					if (typeof error === 'object' && error !== null && 'message' in error) {
+						message = (error as { message: string }).message;
+					}
+
+					await CLI.moveUp(1);
+					await CLI.replaceLine(ansis.red('✖'), q, ansis.yellow(message));
+					await CLI.moveDown();
+					await CLI.stdout(inputPrompt);
+					await CLI.hideCursor();
+					await CLI.moveLeft(answer.length);
+					answer = '';
+				}
+			}
+
+			if (input.key === 'interrupt') {
+				await CLI.moveUp(1);
+				await CLI.replaceLine(ansis.dim(`» ${q}: Canceled`));
+				await CLI.showCursor();
+				throw new Exit(0);
+			}
+
+			if (
+				(input.key === 'backspace' || input.key === 'delete') &&
+				answer.length > 0
+			) {
+				await CLI.showCursor();
+				await CLI.stdout('\b \b');
+				answer = answer.slice(0, -1);
+				if (answer === '') {
+					await CLI.clearLine();
+					await CLI.hideCursor();
+					await CLI.stdout(inputPrompt);
+				}
+			}
+
+			if (input.key === ' ') {
+				answer += ' ';
+				await CLI.showCursor();
+				await CLI.clearLine();
+				await CLI.stdout(`${ansis.yellowBright('…')} ${display(answer)}`);
+			}
+		} else if (typeof input === 'number' || typeof input === 'string') {
+			answer += `${input}`;
+			await CLI.showCursor();
+			await CLI.clearLine();
+			await CLI.stdout(`${ansis.yellowBright('…')} ${display(answer)}`);
+		}
+	}
+
+	return answer;
 }
