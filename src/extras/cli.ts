@@ -6,6 +6,10 @@ async function moveUp(count = 1) {
 	await stdout(`\u001B[${count}A`);
 }
 
+async function moveDown(count = 1) {
+	await stdout(`\u001B[${count}B`);
+}
+
 async function clearLines(count = 1) {
 	await moveUp(count);
 	await stdout('\r');
@@ -70,6 +74,7 @@ function stream() {
 export const CLI = {
 	stdout,
 	moveUp,
+	moveDown,
 	clearLines,
 	hideCursor,
 	showCursor,
