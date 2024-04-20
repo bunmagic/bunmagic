@@ -317,6 +317,7 @@ export async function ask(q: string, defaultAnswer = '', handle: HandleAskRespon
 
 	q = cliMarkdown(q);
 	const display = (text: string) => text || '\'\'';
+	const columns = process.stdout.columns;
 
 	const stream = CLI.stream();
 	let answer = '';
@@ -393,13 +394,13 @@ export async function ask(q: string, defaultAnswer = '', handle: HandleAskRespon
 				answer += ' ';
 				await CLI.showCursor();
 				await CLI.clearLine();
-				await CLI.stdout(`${ansis.yellowBright('…')} ${display(answer)}`);
+				await CLI.stdout(`${ansis.yellowBright('…')} ${display(answer.slice(-columns + 2))}`);
 			}
 		} else if (typeof input === 'number' || typeof input === 'string') {
 			answer += `${input}`;
 			await CLI.showCursor();
 			await CLI.clearLine();
-			await CLI.stdout(`${ansis.yellowBright('…')} ${display(answer)}`);
+			await CLI.stdout(`${ansis.yellowBright('…')} ${display(answer.slice(-columns + 2))}`);
 		}
 	}
 
