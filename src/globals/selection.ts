@@ -237,23 +237,25 @@ export async function select<T extends string>(
 export async function autoselect<T extends string>(
 	message: string,
 	options: T[],
-	flag: string
+	flag: string,
 ): Promise<T> {
 	// Override the selection if the flag is set
 	if (flags && flag in flags && flags[flag]) {
 		return flags[flag] as T;
 	}
+
 	if (options.length === 1) {
 		return options[0];
 	}
-	return await select( message, options );
+
+	return select(message, options);
 }
 
 export async function getPassword(message: string): Promise<string> {
 	let password = '';
 
 	const stream = CLI.stream();
-	CLI.stdout(`${message}`);
+	await CLI.stdout(`${message}`);
 	for await (const chunk of stream.start()) {
 		const input = interpretKey(chunk);
 		if (!input) {
@@ -278,10 +280,10 @@ export async function getPassword(message: string): Promise<string> {
 				password = password.slice(0, -1);
 			}
 		} else if (typeof input === 'number') {
-			CLI.stdout('*');
+			await CLI.stdout('*');
 			password += `${input}`;
 		} else if (typeof input === 'string') {
-			CLI.stdout('*'.repeat(input.length));
+			await CLI.stdout('*'.repeat(input.length));
 			password += input;
 		}
 	}
