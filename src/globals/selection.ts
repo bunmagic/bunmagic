@@ -342,8 +342,13 @@ export async function ask(q: string, defaultAnswer = '', handle: HandleAskRespon
 				try {
 					const result = await handle(answer);
 					const displayAnswer = result ? ansis.green(result) : ansis.dim.greenBright('\'\'');
+					// On success: clear current line in case the next print is shorter than the current one
+					await CLI.clearLine();
+
+					// Also clear & replace line above
 					await CLI.moveUp(1);
 					await CLI.replaceLine(ansis.green('✔︎'), ansis.dim(q + ':'), ansis.dim('"') + displayAnswer + ansis.dim('"'));
+
 					await CLI.showCursor();
 					break;
 				} catch (error: unknown) {
