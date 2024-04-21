@@ -36,7 +36,7 @@ export type Router = {
 };
 
 export const displayScripts = (scripts: Map<string, Script>) => {
-	const columns = new Columns(3);
+	const columns = new Columns(3, [9, 14, 'auto']);
 	columns.gap = 5;
 	columns.buffer();
 	columns.log('');
@@ -57,11 +57,11 @@ export const displayScripts = (scripts: Map<string, Script>) => {
 
 		let description = script.desc || '';
 		if (script.alias.length > 0) {
-			description += ansis.dim(` (alias: ${script.alias.join(', ')})`);
+			description += ' ' + ansis.dim(`(alias: ${script.alias.join(', ')})`);
 		}
 
 		const usage = script.usage || { name: '', description: '' };
-		if( usage?.name && usage?.description ) {
+		if (usage?.name && usage?.description) {
 			columns.log([
 				ansis.bold(script.slug),
 				'',
@@ -73,12 +73,12 @@ export const displayScripts = (scripts: Map<string, Script>) => {
 				ansis.dim(usage.description),
 			]);
 		} else {
-		columns.log([
-			ansis.bold(script.slug),
-			ansis.gray(script.usage?.name || ''),
-			description,
-		]);
-	}
+			columns.log([
+				ansis.bold(script.slug),
+				ansis.gray(script.usage?.name || ''),
+				description,
+			]);
+		}
 
 		if (script.meta) {
 			for (const meta of Object.values(script.meta)) {
