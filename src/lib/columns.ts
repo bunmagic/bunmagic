@@ -71,6 +71,7 @@ export class Columns<T extends number, Row extends string | string[]> {
 
 	public render() {
 		const rows: string[] = [];
+		const widths = this.calculateColumnWidths();
 		for (const row of this.rows) {
 			let output = '';
 			if (typeof row === 'string') {
@@ -82,7 +83,7 @@ export class Columns<T extends number, Row extends string | string[]> {
 			}
 
 			if (Array.isArray(row)) {
-				output += this.renderRow(row);
+				output += this.renderRow(row, widths);
 			}
 
 			rows.push(output);
@@ -122,89 +123,127 @@ export class Columns<T extends number, Row extends string | string[]> {
 	}
 
 	private calculateColumnWidths() {
-		const autoWidths = this.getColumnWidths();
+		const autoWidths = this.fitWidths(this.getColumnWidths());
 		const maxCols = (process.stdout.columns || 80) - this.indent;
 
 		const widths = Array.from({ length: this.columnCount }, () => 0);
 		// Loop over the automatically set widths
-		for (let [index, width] of autoWidths.entries()) {
+		for (const [index, width] of autoWidths.entries()) {
 			const config = this.config[index];
-
 
 			// If the column is set to auto or an empty string, skip it
 			if (config === 'auto' || config === '') {
 				widths[index] = width;
+				continue; // Skip further processing
 			}
 
 			// Calculate the percentage width
 			if (typeof config === 'string' && config.endsWith('%')) {
 				const percentage = Number(config.slice(0, -1));
-				width = Math.floor(maxCols * (percentage / 100));
-			}
-
-			if (typeof config === 'number') {
-				width = config;
+				widths[index] = Math.floor(maxCols * (percentage / 100));
+			} else if (typeof config === 'number') {
+				widths[index] = config;
 			}
 
 			// Make sure that the column can fit
 			if (width > maxCols) {
-				width = Math.floor(maxCols / this.columnCount);
+				widths[index] = Math.floor(maxCols / this.columnCount);
 			}
 
 			widths[index] = width;
 		}
 
-
-		const totalGap = this.indent + (this.gap * (this.columnCount - 1));
-		const totalWidth = widths.reduce((accumulator, width) => accumulator + width, 0) + totalGap;
-
-		if (totalWidth > maxCols) {
-			const maxWidth = Math.max(...widths);
-			const maxWidthIndex = widths.indexOf(maxWidth);
-			const adjustment = totalWidth - maxCols;
-			widths[maxWidthIndex] = maxWidth - adjustment;
-		}
-
-		return widths;
+		return this.fitWidths(widths);
 	}
 
-	private renderRow(columns: string[]) {
-		let output = '';
-		if (this.indent > 0) {
-			output += ' '.repeat(this.indent);
+	private fitWidths(widths: number[]): number[] {
+		const adjustedWidths = [...widths];
+		const maxCols = (process.stdout.columns || 80) - this.indent * 2;
+		const availableWidth = maxCols - this.indent - (this.gap * (this.columnCount - 1));
+
+		// Calculate the total width of fixed and percentage columns
+		let fixedWidth = 0;
+		let percentageWidth = 0;
+		for (let index = 0; index < this.columnCount; index++) {
+			const config = this.config[index];
+			if (typeof config === 'number') {
+				adjustedWidths[index] = Math.min(config, availableWidth);
+				fixedWidth += adjustedWidths[index];
+			} else if (typeof config === 'string' && config.endsWith('%')) {
+				const percentage = Number(config.slice(0, -1));
+				const columnWidth = Math.floor(availableWidth * (percentage / 100));
+				adjustedWidths[index] = columnWidth;
+				percentageWidth += columnWidth;
+			}
 		}
 
-		for (const [column, content] of (columns).entries()) {
-			if (this.gap > 0 && column > 0 && column <= this.columnCount) {
-				output += ' '.repeat(this.gap);
+		// Distribute the remaining width among 'auto' columns based on their content width
+		const remainingWidth = availableWidth - fixedWidth - percentageWidth;
+		const autoColumnIndices = this.config.map((config, index) => (config === 'auto' || config === '') ? index : -1).filter(index => index !== -1);
+		let distributedWidth = 0;
+		for (const columnIndex of autoColumnIndices) {
+			const contentWidth = widths[columnIndex];
+			if (distributedWidth + contentWidth <= remainingWidth) {
+				adjustedWidths[columnIndex] = contentWidth;
+				distributedWidth += contentWidth;
+			} else {
+				adjustedWidths[columnIndex] = remainingWidth - distributedWidth;
+				break;
 			}
+		}
 
-			const widths = this.calculateColumnWidths();
+		// Distribute any remaining width equally among the remaining 'auto' columns
+		const remainingAutoWidth = remainingWidth - distributedWidth;
+		const remainingAutoColumns = autoColumnIndices.filter(index => adjustedWidths[index] === 0);
+		const equalWidth = Math.floor(remainingAutoWidth / remainingAutoColumns.length);
+		for (const columnIndex of remainingAutoColumns) {
+			adjustedWidths[columnIndex] = equalWidth;
+		}
+
+		return adjustedWidths;
+	}
+
+	private renderRow(columns: string[], widths: number[]): string {
+		let row = '';
+		const leftovers = Array.from({ length: columns.length }, () => '');
+		for (const [column, content] of columns.entries()) {
 			const widthLimit = widths[column];
 			const contentWidth = ansis.strip(content).length;
-			if (contentWidth > widthLimit) {
-				const wrapAt = this.nearestWrap(content, widthLimit, 1);
-				const wrappedContent = content.slice(0, wrapAt);
-				output += wrappedContent;
-				output += '\n';
 
-				const remainingContent = content.slice(wrapAt);
-				const columnsLeft = column;
-				const columnsRight = this.columnCount - column - 1;
-				const columnsToWrap = [
-					...fixedLengthArray(columnsLeft, ''),
-					remainingContent,
-					...fixedLengthArray(columnsRight, ''),
-				];
-				output += this.renderRow(columnsToWrap) + '\n';
+			if (contentWidth > widthLimit) {
+				const rawContent = ansis.strip(content);
+				const rawContentPos = content.indexOf(rawContent);
+
+				// Attempt to preserve color codes for fully colored entries
+				if (rawContentPos > 0) {
+					const colorCode = content.slice(0, rawContentPos);
+					const resetCode = content.slice(content.lastIndexOf(rawContent) + rawContent.length + colorCode.length);
+					const wrapAt = this.nearestWrap(rawContent, widthLimit, 1);
+					const visibleContent = rawContent.slice(0, wrapAt).trim();
+					const remainingContent = rawContent.replace(visibleContent, '').trim();
+					leftovers[column] = colorCode + remainingContent + resetCode;
+					row += visibleContent + resetCode + ' '.repeat(this.gap);
+				} else {
+					// If no color codes are found, just split the content
+					const wrapAt = this.nearestWrap(content, widthLimit, 1);
+					const visibleContent = content.slice(0, wrapAt);
+					const remainingContent = content.replace(visibleContent, '');
+					leftovers[column] = remainingContent;
+					row += visibleContent + ' '.repeat(this.gap);
+				}
 			} else {
-				const width = widthLimit - contentWidth;
-				output += content;
-				output += ' '.repeat(width);
+				row += content + ' '.repeat(widthLimit - contentWidth) + ' '.repeat(this.gap);
 			}
 		}
 
-		return output;
+		if (leftovers.some(content => content.trim() !== '')) {
+			const result = this.renderRow(leftovers, widths);
+			if (result.trim() !== '') {
+				row += '\n' + result;
+			}
+		}
+
+		return row;
 	}
 
 	private getColumnWidths() {
