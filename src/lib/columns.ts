@@ -243,7 +243,7 @@ export class Columns<T extends number, Row extends string | string[]> {
 					row += `${visibleContent}${trailingGap}`;
 				}
 			} else {
-				row += `${content} ${' '.repeat(widthLimit - contentWidth)}${trailingGap}`;
+				row += `${content}${' '.repeat(widthLimit - contentWidth)}${trailingGap}`;
 			}
 		}
 
