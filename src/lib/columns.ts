@@ -207,6 +207,11 @@ export class Columns<T extends number, Row extends string | string[]> {
 	private renderRow(columns: string[], widths: number[]): string {
 		let row = '';
 		const leftovers = Array.from({ length: columns.length }, () => '');
+
+		if (widths.some(value => value <= 0)) {
+			return columns.join('\n');
+		}
+
 		for (const [column, content] of columns.entries()) {
 			const widthLimit = widths[column];
 			const contentWidth = ansis.strip(content).length;
@@ -240,6 +245,7 @@ export class Columns<T extends number, Row extends string | string[]> {
 		}
 
 		if (leftovers.some(content => content.trim() !== '')) {
+			// console.log(`Content ${row}`, `Leftovers`, {leftovers, widths});
 			const result = this.renderRow(leftovers, widths);
 			if (result.trim() !== '') {
 				row += '\n' + result;

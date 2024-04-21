@@ -168,3 +168,19 @@ test('a tiny terminal width', () => {
 		+ '\n' + whitespace(2) + whitespace(6) + whitespace(2) + 'o'.repeat(6),
 	);
 });
+
+test('give up on columns if the terminal is too narrow and content too wide', () => {
+	process.stdout.columns = 10;
+	const columns = new Columns(2, [10, 'auto']).buffer();
+	const twenty = 'x'.repeat(10);
+	const thirty = 'o'.repeat(30);
+	const col1 = pad(twenty);
+	const col2 = pad(thirty);
+	columns.log(row(col1, col2));
+
+	const result = columns.flush();
+
+	expect(result).toBe(`x`.repeat(10) + '\n' + 'o'.repeat(30));
+});
+
+
