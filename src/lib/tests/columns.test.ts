@@ -148,3 +148,23 @@ test('2 columns, 2 rows', () => {
 	);
 });
 
+test('a tiny terminal width', () => {
+	process.stdout.columns = 10;
+	const columns = new Columns(2, [10, 20]).buffer();
+	const twenty = 'x'.repeat(20);
+	const thirty = 'o'.repeat(30);
+	const col1 = pad(twenty);
+	const col2 = pad(thirty);
+
+	columns.log(row(col1, col2));
+	const result = columns.flush();
+
+	expect(result).toBe(
+		whitespace(2) + 'x'.repeat(6)
+		+ whitespace(2) + 'o'.repeat(6)
+		+ '\n' + whitespace(2) + 'x'.repeat(6) + whitespace(2) + 'o'.repeat(6)
+		+ '\n' + whitespace(2) + 'x'.repeat(6) + whitespace(2) + 'o'.repeat(6)
+		+ '\n' + whitespace(2) + 'x'.repeat(2) + whitespace(6) + 'o'.repeat(6)
+		+ '\n' + whitespace(2) + whitespace(6) + whitespace(2) + 'o'.repeat(6),
+	);
+});
