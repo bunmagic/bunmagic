@@ -14,6 +14,7 @@ export declare class Columns<T extends number, Row extends string | string[]> {
     render(): string;
     private nearestWrap;
     private calculateColumnWidths;
+    private fitWidths;
     private renderRow;
     private getColumnWidths;
 }

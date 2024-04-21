@@ -1,4 +1,5 @@
 /// <reference types="bun-types" />
+/// <reference types="bun-types" />
 declare class Spinner {
     private static spinners;
     private static linesRendered;

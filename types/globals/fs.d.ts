@@ -1,4 +1,5 @@
 /// <reference types="bun-types" />
+/// <reference types="bun-types" />
 import type { GlobScanOptions } from 'bun';
 export declare function isDirectory(path: string): Promise<unknown>;
 export declare function ensureDirectory(path: string): Promise<boolean>;

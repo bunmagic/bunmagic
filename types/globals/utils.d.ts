@@ -8,4 +8,4 @@ export declare class Exit extends Error {
     constructor(error?: unknown);
     private exit;
 }
-export declare const sleep: (ms: number) => Promise<unknown>;
+export declare const sleep: (ms: number) => Promise<void>;
