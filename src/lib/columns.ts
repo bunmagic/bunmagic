@@ -12,10 +12,10 @@ export class Columns<T extends number, Row extends string | string[]> {
 	private readonly rows: Row[] = [];
 	private isBuffering = false;
 
-	constructor (
+	constructor(
 		private readonly columnCount: T,
 		private readonly config: ColumnConfig[] = fixedLengthArray(columnCount, 'auto'),
-	) { }
+	) {}
 
 	public log(data: Row) {
 		if (typeof data === 'string') {
@@ -212,7 +212,7 @@ export class Columns<T extends number, Row extends string | string[]> {
 		const widthSum = widths.reduce((sum, width) => sum + width, 0);
 		const columnSum = this.calculateColumnWidths().reduce((sum, width) => sum + width, 0);
 		if (widths.some(value => value <= 0) || widthSum / columnSum <= 0.48) {
-			return columns.join('\n') + '\n' + ansis.dim('┈'.repeat(process.stdout.columns || 80)) + '\n';
+			return `${columns.join('\n')}\n${ansis.dim('┈'.repeat(process.stdout.columns || 80))}\n`;
 		}
 
 		for (const [column, content] of columns.entries()) {
@@ -232,18 +232,18 @@ export class Columns<T extends number, Row extends string | string[]> {
 					const visibleContent = rawContent.slice(0, wrapAt);
 					const remainingContent = rawContent.replace(visibleContent, '');
 
-					leftovers[column] = colorCode + remainingContent + resetCode;
-					row += visibleContent + trailingGap + resetCode;
+					leftovers[column] = `${colorCode}${remainingContent}${resetCode}`;
+					row += `${visibleContent}${trailingGap}${resetCode}`;
 				} else {
 					// If no color codes are found, just split the content
 					const wrapAt = this.nearestWrap(content, widthLimit, 1);
 					const visibleContent = content.slice(0, wrapAt);
 					const remainingContent = content.replace(visibleContent, '');
 					leftovers[column] = remainingContent;
-					row += visibleContent + trailingGap;
+					row += `${visibleContent}${trailingGap}`;
 				}
 			} else {
-				row += content + ' '.repeat(widthLimit - contentWidth) + trailingGap;
+				row += `${content} ${' '.repeat(widthLimit - contentWidth)}${trailingGap}`;
 			}
 		}
 
@@ -251,11 +251,11 @@ export class Columns<T extends number, Row extends string | string[]> {
 			// console.log(`Content ${row}`, `Leftovers`, {leftovers, widths});
 			const result = this.renderRow(leftovers, widths);
 			if (result.trim() !== '') {
-				row += '\n' + result;
+				row += `\n${result}`;
 			}
 		}
 
-		return ' '.repeat(this.indent) + row;
+		return `${' '.repeat(this.indent)}${row}`;
 	}
 
 	private getColumnWidths() {
@@ -277,3 +277,4 @@ export class Columns<T extends number, Row extends string | string[]> {
 		return widths;
 	}
 }
+
