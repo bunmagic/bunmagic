@@ -24,7 +24,7 @@ export type ConfigKey = keyof Config;
 
 async function config(): Promise<Config> {
 	try {
-		return await Bun.file(PATHS.config).json<Config>();
+		return await Bun.file(PATHS.config).json() as Config;
 	} catch {
 		return {
 			extension: 'ts',
