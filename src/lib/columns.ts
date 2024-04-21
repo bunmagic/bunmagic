@@ -210,6 +210,7 @@ export class Columns<T extends number, Row extends string | string[]> {
 		for (const [column, content] of columns.entries()) {
 			const widthLimit = widths[column];
 			const contentWidth = ansis.strip(content).length;
+			const trailingGap = column === this.columnCount - 1 ? '' : ' '.repeat(this.gap);
 
 			if (contentWidth > widthLimit) {
 				const rawContent = ansis.strip(content);
@@ -224,17 +225,16 @@ export class Columns<T extends number, Row extends string | string[]> {
 					const remainingContent = rawContent.replace(visibleContent, '');
 
 					leftovers[column] = colorCode + remainingContent + resetCode;
-					row += visibleContent + resetCode;
+					row += visibleContent + trailingGap + resetCode;
 				} else {
 					// If no color codes are found, just split the content
 					const wrapAt = this.nearestWrap(content, widthLimit, 1);
 					const visibleContent = content.slice(0, wrapAt);
 					const remainingContent = content.replace(visibleContent, '');
 					leftovers[column] = remainingContent;
-					row += visibleContent;
+					row += visibleContent + trailingGap;
 				}
 			} else {
-				const trailingGap = column === this.columnCount - 1 ? '' : ' '.repeat(this.gap);
 				row += content + ' '.repeat(widthLimit - contentWidth) + trailingGap;
 			}
 		}

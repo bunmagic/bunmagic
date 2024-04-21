@@ -128,3 +128,23 @@ test('Two Columns with a line wrap', () => {
 		+ '\n' + whitespace(2 + 10 + 2) + col2l2.get(10),
 	);
 });
+
+
+test('2 columns, 2 rows', () => {
+	const columns = new Columns(2, [10, 20]).buffer();
+	const twenty = 'x'.repeat(20);
+	const thirty = 'o'.repeat(30);
+	const col1 = pad(twenty);
+	const col2 = pad(thirty);
+
+	columns.log(row(col1, col2));
+	const result = columns.flush();
+
+	expect(result).toBe(
+		whitespace(2) + 'x'.repeat(10)
+		+ whitespace(2) + 'o'.repeat(20)
+		+ '\n' + whitespace(2) + 'x'.repeat(10)
+		+ whitespace(2) + 'o'.repeat(10) + whitespace(10),
+	);
+});
+
