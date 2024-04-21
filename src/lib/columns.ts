@@ -12,10 +12,10 @@ export class Columns<T extends number, Row extends string | string[]> {
 	private readonly rows: Row[] = [];
 	private isBuffering = false;
 
-	constructor(
+	constructor (
 		private readonly columnCount: T,
 		private readonly config: ColumnConfig[] = fixedLengthArray(columnCount, 'auto'),
-	) {}
+	) { }
 
 	public log(data: Row) {
 		if (typeof data === 'string') {
@@ -74,6 +74,7 @@ export class Columns<T extends number, Row extends string | string[]> {
 		const widths = this.calculateColumnWidths();
 		for (const row of this.rows) {
 			let output = '';
+
 			if (typeof row === 'string') {
 				if (this.indent > 0) {
 					output += ' '.repeat(this.indent);
@@ -158,8 +159,8 @@ export class Columns<T extends number, Row extends string | string[]> {
 
 	private fitWidths(widths: number[]): number[] {
 		const adjustedWidths = [...widths];
-		const maxCols = (process.stdout.columns || 80) - this.indent * 2;
-		const availableWidth = maxCols - this.indent - (this.gap * (this.columnCount - 1));
+		const maxCols = (process.stdout.columns || 80) - this.indent;
+		const availableWidth = maxCols - (this.gap * (this.columnCount - 1));
 
 		// Calculate the total width of fixed and percentage columns
 		let fixedWidth = 0;
@@ -215,24 +216,26 @@ export class Columns<T extends number, Row extends string | string[]> {
 				const rawContentPos = content.indexOf(rawContent);
 
 				// Attempt to preserve color codes for fully colored entries
-				if (rawContentPos > 0) {
+				if (rawContent !== content && rawContentPos > 0) {
 					const colorCode = content.slice(0, rawContentPos);
 					const resetCode = content.slice(content.lastIndexOf(rawContent) + rawContent.length + colorCode.length);
 					const wrapAt = this.nearestWrap(rawContent, widthLimit, 1);
-					const visibleContent = rawContent.slice(0, wrapAt).trim();
-					const remainingContent = rawContent.replace(visibleContent, '').trim();
+					const visibleContent = rawContent.slice(0, wrapAt);
+					const remainingContent = rawContent.replace(visibleContent, '');
+
 					leftovers[column] = colorCode + remainingContent + resetCode;
-					row += visibleContent + resetCode + ' '.repeat(this.gap);
+					row += visibleContent + resetCode;
 				} else {
 					// If no color codes are found, just split the content
 					const wrapAt = this.nearestWrap(content, widthLimit, 1);
 					const visibleContent = content.slice(0, wrapAt);
 					const remainingContent = content.replace(visibleContent, '');
 					leftovers[column] = remainingContent;
-					row += visibleContent + ' '.repeat(this.gap);
+					row += visibleContent;
 				}
 			} else {
-				row += content + ' '.repeat(widthLimit - contentWidth) + ' '.repeat(this.gap);
+				const trailingGap = column === this.columnCount - 1 ? '' : ' '.repeat(this.gap);
+				row += content + ' '.repeat(widthLimit - contentWidth) + trailingGap;
 			}
 		}
 
@@ -243,7 +246,7 @@ export class Columns<T extends number, Row extends string | string[]> {
 			}
 		}
 
-		return row;
+		return ' '.repeat(this.indent) + row;
 	}
 
 	private getColumnWidths() {

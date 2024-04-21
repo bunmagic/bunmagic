@@ -122,8 +122,9 @@ test('Two Columns with a line wrap', () => {
 	const col2l2 = pad('__________');
 	columns.log(row(col1, pad(col2l1, col2l2)));
 	const result = columns.flush();
+
 	expect(result).toBe(
 		whitespace(2) + col1.get() + whitespace(2) + col2l1.get()
-		+ '\n' + whitespace(2 + 10 + 2) + col2l2.get(10) + '\n',
+		+ '\n' + whitespace(2 + 10 + 2) + col2l2.get(10),
 	);
 });
