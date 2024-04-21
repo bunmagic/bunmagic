@@ -71,7 +71,7 @@ export class Columns<T extends number, Row extends string | string[]> {
 
 	public render() {
 		const rows: string[] = [];
-		const widths = this.calculateColumnWidths();
+		const widths = this.fitWidths(this.calculateColumnWidths());
 		for (const row of this.rows) {
 			let output = '';
 
@@ -124,7 +124,7 @@ export class Columns<T extends number, Row extends string | string[]> {
 	}
 
 	private calculateColumnWidths() {
-		const autoWidths = this.fitWidths(this.getColumnWidths());
+		const autoWidths = this.getColumnWidths();
 		const maxCols = (process.stdout.columns || 80) - this.indent;
 
 		const widths = Array.from({ length: this.columnCount }, () => 0);
@@ -154,7 +154,7 @@ export class Columns<T extends number, Row extends string | string[]> {
 			widths[index] = width;
 		}
 
-		return this.fitWidths(widths);
+		return widths;
 	}
 
 	private fitWidths(widths: number[]): number[] {
@@ -208,8 +208,11 @@ export class Columns<T extends number, Row extends string | string[]> {
 		let row = '';
 		const leftovers = Array.from({ length: columns.length }, () => '');
 
-		if (widths.some(value => value <= 0)) {
-			return columns.join('\n');
+		// If the terminal isn't wide enough - give up on column
+		const widthSum = widths.reduce((sum, width) => sum + width, 0);
+		const columnSum = this.calculateColumnWidths().reduce((sum, width) => sum + width, 0);
+		if (widths.some(value => value <= 0) || widthSum / columnSum <= 0.48) {
+			return columns.join('\n') + '\n' + ansis.dim('┈'.repeat(process.stdout.columns || 80)) + '\n';
 		}
 
 		for (const [column, content] of columns.entries()) {
