@@ -1,7 +1,8 @@
 import { CLI } from '../extras';
 
 type Option<T extends string> = {
-	text: T;
+	label: string;
+	value: T;
 	visible: boolean;
 	selected: boolean;
 	matches: number[];
@@ -79,22 +80,22 @@ function renderFrame(
 	// Filter and process options based on fuzzy search
 	const filteredOptions = options.map((option, index) => {
 		const prefix = option.selected ? ansis.greenBright(' ⦿') : ansis.dim(' ⦾');
-		let text = option.text;
+		let label = option.label;
 		if (query.length > 0) {
-			text = '';
-			for (const letter of option.text) {
-				text += option.matches.includes(option.text.indexOf(letter))
+			label = '';
+			for (const letter of option.label) {
+				label += option.matches.includes(option.label.indexOf(letter))
 					? ansis.bold(letter)
 					: letter;
 			}
 
 			if (query.length > 0 && !option.visible) {
-				text = ansis.dim(text);
+				label = ansis.dim(label);
 			}
 		}
 
 		const number = ansis.dim.gray(`[${index + 1}]`);
-		const line = `${number}${prefix} ${text} `;
+		const line = `${number}${prefix} ${label} `;
 
 		return line;
 	});
@@ -118,7 +119,7 @@ async function searchOptions<T extends string>(
 	options: Array<Option<T>>,
 ) {
 	const matches = options.map(option =>
-		fuzzyMatch(option.text.toLowerCase(), query.toLowerCase()),
+		fuzzyMatch(option.label.toLowerCase(), query.toLowerCase()),
 	);
 	for (const [index, option] of options.entries()) {
 		option.matches = matches[index];
@@ -137,11 +138,12 @@ async function searchOptions<T extends string>(
 
 export async function select<T extends string>(
 	message: string,
-	options: T[],
+	options: T[] | { value: T; label: string }[],
 ): Promise<T> {
 	let query = ''; // Start with an empty query
 	const _options: Option<T>[] = options.map(text => ({
-		text,
+		label: typeof text === 'string' ? text : text.label,
+		value: typeof text === 'string' ? text : text.value,
 		visible: true,
 		selected: false,
 		matches: [],
@@ -231,7 +233,8 @@ export async function select<T extends string>(
 	// Return the selected option in its original form
 	// Make sure to filter options by match before determining the selected option
 	const selected = _options.findIndex(option => option.selected);
-	return selected === -1 ? options[0] : _options[selected].text;
+	const defaultOption = _options[0].value;
+	return selected === -1 ? defaultOption : _options[selected].value;
 }
 
 export async function autoselect<T extends string>(
