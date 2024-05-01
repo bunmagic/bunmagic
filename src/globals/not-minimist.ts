@@ -8,6 +8,51 @@ type NmArgv = {
 	flags: Record<string, Flag>;
 	args: string[];
 };
+
+function isFlag(argument: string): boolean {
+	return argument.startsWith('-');
+}
+
+function isNumeric(value: string): boolean {
+	return !Number.isNaN(Number.parseInt(value, 10));
+}
+
+function parseValue(value: string | undefined): Flag {
+	if (!value) {
+		return true;
+	}
+
+	if (isNumeric(value)) {
+		return Number.parseInt(value, 10);
+	}
+
+	return value;
+}
+
+function isFlagWithValue(argument: string): boolean {
+	return isFlag(argument) && argument.includes('=');
+}
+
+function getKeyFromArgument(argument: string): string {
+	if (isFlagWithValue(argument)) {
+		return argument.split('=')[0].replace(/^--?/, '');
+	}
+
+	return argument.replace(/^--?/, '');
+}
+
+function getValueFromArgument(argument: string, nextArgument?: string): string | undefined {
+	if (isFlagWithValue(argument)) {
+		return argument.split('=')[1] || '';
+	}
+
+	if (nextArgument && !isFlag(nextArgument)) {
+		return nextArgument;
+	}
+
+	return undefined;
+}
+
 export function notMinimist(argv: string[]): NmArgv {
 	const output: NmArgv = {
 		flags: {},
@@ -15,26 +60,16 @@ export function notMinimist(argv: string[]): NmArgv {
 	};
 
 	for (let index = 0; index < argv.length; index++) {
-		let value: string | number | boolean | undefined;
 		const argument = argv[index];
-		if (argument.startsWith('-')) {
-			const [key, rawValue] = argument.replace(/^--?/, '').split('=');
-			value = rawValue;
-			if (value === undefined) {
-				const nextArgument = argv[index + 1];
-				if (nextArgument && !nextArgument.startsWith('-')) {
-					value = nextArgument;
-					index++;
-				} else {
-					value = true;
-				}
-			}
 
-			if (typeof value !== 'boolean' && !Number.isNaN(Number.parseInt(value, 10))) {
-				value = Number.parseInt(value, 10);
-			}
+		if (isFlag(argument)) {
+			const key = getKeyFromArgument(argument);
+			const value = getValueFromArgument(argument, argv[index + 1]);
+			output.flags[key] = parseValue(value);
 
-			output.flags[key] = value;
+			if (!isFlagWithValue(argument) && value !== undefined) {
+				index++;
+			}
 		} else {
 			output.args.push(argument);
 		}
