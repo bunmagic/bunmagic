@@ -8,20 +8,20 @@ type NmArgv = {
 	flags: Record<string, Flag>;
 	args: string[];
 };
-export function notMinimist(arguments_: string[]): NmArgv {
+export function notMinimist(argv: string[]): NmArgv {
 	const output: NmArgv = {
 		flags: {},
 		args: [],
 	};
 
-	for (let index = 0; index < arguments_.length; index++) {
+	for (let index = 0; index < argv.length; index++) {
 		let value: string | number | boolean | undefined;
-		const argument = arguments_[index];
+		const argument = argv[index];
 		if (argument.startsWith('-')) {
 			const [key, rawValue] = argument.replace(/^--?/, '').split('=');
 			value = rawValue;
 			if (value === undefined) {
-				const nextArgument = arguments_[index + 1];
+				const nextArgument = argv[index + 1];
 				if (nextArgument && !nextArgument.startsWith('-')) {
 					value = nextArgument;
 					index++;
@@ -42,3 +42,4 @@ export function notMinimist(arguments_: string[]): NmArgv {
 
 	return output;
 }
+
