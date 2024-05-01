@@ -17,7 +17,7 @@ export function notMinimist(arguments_: string[]): NmArgv {
 	for (let index = 0; index < arguments_.length; index++) {
 		let value: string | number | boolean | undefined;
 		const argument = arguments_[index];
-		if (argument.startsWith('--') || argument.startsWith('-')) {
+		if (argument.startsWith('-')) {
 			const [key, rawValue] = argument.replace(/^--?/, '').split('=');
 			value = rawValue;
 			if (value === undefined) {
