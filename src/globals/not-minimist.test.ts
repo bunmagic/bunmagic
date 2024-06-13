@@ -18,8 +18,10 @@ describe('notMinimist', () => {
 	});
 
 	it('should parse flags with numeric values', () => {
-		const result = notMinimist(['--number=123']);
+		const result = notMinimist(['--number=123', '--number2=0', '--number3', '123']);
 		expect(result.flags.number).toBe(123);
+		expect(result.flags.number2).toBe(0);
+		expect(result.flags.number3).toBe(123);
 	});
 
 	it('should handle mixed arguments and flags correctly', () => {
@@ -28,6 +30,24 @@ describe('notMinimist', () => {
 			flags: { flag: 'arg2', key: 'value', number: 123 },
 			args: ['arg1'],
 		});
+	});
+
+	it('should parse various types of boolean flags', () => {
+		const result = notMinimist(
+			[
+				'--true1',
+				'--true2=true',
+				'--true3',
+				'true',
+				'--false1=false',
+				'--false2',
+				'false',
+			]);
+		expect(result.flags.true1).toBe(true);
+		expect(result.flags.true2).toBe(true);
+		expect(result.flags.true3).toBe(true);
+		expect(result.flags.false1).toBe(false);
+		expect(result.flags.false2).toBe(false);
 	});
 
 	it('should override flags that appear multiple times with the last value', () => {
