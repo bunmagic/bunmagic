@@ -3,76 +3,55 @@
  * Produces pretty similar output though.
  * Might be all that we need.
  */
-type Flag = string | number | boolean | undefined;
-type NmArgv = {
-	flags: Record<string, Flag>;
+type StructuredArguments = {
+	flags: Record<string, string | number | boolean | undefined>;
 	args: string[];
 };
 
-function isFlag(argument: string): boolean {
-	return argument.startsWith('-');
-}
+function castValue(value: string) {
+	if (!Number.isNaN(Number.parseInt(value, 10))) {
+		return Number.parseInt(value, 10);
+	}
 
-function isNumeric(value: string): boolean {
-	return !Number.isNaN(Number.parseInt(value, 10));
-}
-
-function parseValue(value: string | undefined): Flag {
-	if (!value) {
+	if (value === 'true') {
 		return true;
 	}
 
-	if (isNumeric(value)) {
-		return Number.parseInt(value, 10);
+	if (value === 'false') {
+		return false;
 	}
 
 	return value;
 }
 
-function isFlagWithValue(argument: string): boolean {
-	return isFlag(argument) && argument.includes('=');
-}
-
-function getKey(argument: string): string {
-	if (isFlagWithValue(argument)) {
-		return argument.split('=')[0].replace(/^--?/, '');
-	}
-
-	return argument.replace(/^--?/, '');
-}
-
-function getValue(argument: string, nextArgument?: string): string | undefined {
-	if (isFlagWithValue(argument)) {
-		return argument.split('=')[1] || '';
-	}
-
-	if (nextArgument && !isFlag(nextArgument)) {
-		return nextArgument;
-	}
-}
-
-export function notMinimist(argv: string[]): NmArgv {
-	const output: NmArgv = {
+export function notMinimist(input: string[]): StructuredArguments {
+	const output: StructuredArguments = {
 		flags: {},
 		args: [],
 	};
 
-	for (let index = 0; index < argv.length; index++) {
-		const argument = argv[index];
-
-		if (isFlag(argument)) {
-			const key = getKey(argument);
-			const value = getValue(argument, argv[index + 1]);
-			output.flags[key] = parseValue(value);
-
-			if (!isFlagWithValue(argument) && value !== undefined) {
-				index++;
-			}
-		} else {
-			output.args.push(argument);
+	for (let index = 0; index < input.length; index++) {
+		const chunk = input[index];
+		if (!chunk.startsWith('-')) {
+			output.args.push(chunk);
+			continue;
 		}
+
+		const [key, value] = chunk.replace(/^--?/, '').split('=');
+		if (value) {
+			output.flags[key] = castValue(value);
+			continue;
+		}
+
+		const chunkAhead = input[index + 1];
+		if (chunkAhead && !chunkAhead.startsWith('-')) {
+			output.flags[key] = castValue(chunkAhead);
+			index++;
+			continue;
+		}
+
+		output.flags[key] = true;
 	}
 
 	return output;
 }
-
