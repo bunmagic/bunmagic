@@ -33,7 +33,7 @@ function isFlagWithValue(argument: string): boolean {
 	return isFlag(argument) && argument.includes('=');
 }
 
-function getKeyFromArgument(argument: string): string {
+function getKey(argument: string): string {
 	if (isFlagWithValue(argument)) {
 		return argument.split('=')[0].replace(/^--?/, '');
 	}
@@ -41,7 +41,7 @@ function getKeyFromArgument(argument: string): string {
 	return argument.replace(/^--?/, '');
 }
 
-function getValueFromArgument(argument: string, nextArgument?: string): string | undefined {
+function getValue(argument: string, nextArgument?: string): string | undefined {
 	if (isFlagWithValue(argument)) {
 		return argument.split('=')[1] || '';
 	}
@@ -49,8 +49,6 @@ function getValueFromArgument(argument: string, nextArgument?: string): string |
 	if (nextArgument && !isFlag(nextArgument)) {
 		return nextArgument;
 	}
-
-	return undefined;
 }
 
 export function notMinimist(argv: string[]): NmArgv {
@@ -63,8 +61,8 @@ export function notMinimist(argv: string[]): NmArgv {
 		const argument = argv[index];
 
 		if (isFlag(argument)) {
-			const key = getKeyFromArgument(argument);
-			const value = getValueFromArgument(argument, argv[index + 1]);
+			const key = getKey(argument);
+			const value = getValue(argument, argv[index + 1]);
 			output.flags[key] = parseValue(value);
 
 			if (!isFlagWithValue(argument) && value !== undefined) {
