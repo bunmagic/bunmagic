@@ -9,7 +9,7 @@ type StructuredArguments = {
 };
 
 function castValue(value: string) {
-	if (!Number.isNaN(Number.parseInt(value, 10))) {
+	if (/^-?\d+$/.test(value)) {
 		return Number.parseInt(value, 10);
 	}
 
