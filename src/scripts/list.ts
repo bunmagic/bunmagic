@@ -39,7 +39,12 @@ export default async function listScripts() {
 			const formattedSlug = `${symbol} ${displaySlug}`;
 
 			if (target && (script.slug === target || script.alias.includes(target))) {
-				displayScriptInfo(columns, { ...script, slug: formattedSlug });
+				displayScriptInfo(columns, {
+					...script,
+					slug: formattedSlug,
+					filename: script.filename,
+					dir: source.dir,
+				});
 			} else {
 				columns.log([
 					ansis.bold(formattedSlug),
