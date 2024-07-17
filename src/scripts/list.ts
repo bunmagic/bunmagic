@@ -1,15 +1,32 @@
 /**
  * List all known scripts.
+ * @usage [[filter]]  Optional that fuzzy matches sources paths.
  * @alias ls
+ * @flag [[--info|-i]] Display more information about each script.
  */
 import path from 'node:path';
 import { getSources } from '@lib/sources';
 import ansis from 'ansis';
 import { displayScriptInfo, setupScriptColumns } from '@lib/display-utils';
+import fuzzysort from 'fuzzysort';
+
+async function getSourcesToDisplay(target?: string) {
+	const sources = await getSources();
+
+	if (!target) {
+		return sources;
+	}
+
+	const results = fuzzysort.go(target, sources, {
+		keys: ['dir', 'namespace'],
+	});
+
+	return results.map(r => r.obj);
+}
 
 export default async function listScripts() {
-	const target = args[0] || null;
-	const sources = await getSources();
+	const target = args[0];
+	const sources = await getSourcesToDisplay(target);
 
 	for (const source of sources) {
 		const basename = path.basename(source.dir);
@@ -38,7 +55,7 @@ export default async function listScripts() {
 			const displaySlug = source.namespace ? `${source.namespace} ${script.slug}` : script.slug;
 			const formattedSlug = `${symbol} ${displaySlug}`;
 
-			if (target && (script.slug === target || script.alias.includes(target))) {
+			if (sources.length === 1 || flags.i || flags.info) {
 				displayScriptInfo(columns, {
 					...script,
 					slug: formattedSlug,
