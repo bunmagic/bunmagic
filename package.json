@@ -2,7 +2,8 @@
   "name": "bunmagic",
   "dependencies": {
     "ansis": "^3.1.1",
-    "comment-parser": "^1.4.1"
+    "comment-parser": "^1.4.1",
+    "fuzzysort": "^3.0.2"
   },
   "devDependencies": {
     "@types/bun": "^1.1.0",
