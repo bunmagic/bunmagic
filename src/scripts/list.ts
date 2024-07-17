@@ -6,9 +6,9 @@ import path from 'node:path';
 import { getSources } from '@lib/sources';
 import ansis from 'ansis';
 import { displayScriptInfo, setupScriptColumns } from '@lib/display-utils';
-import type { Script } from '@lib/script';
 
 export default async function listScripts() {
+	const target = args[0] || null;
 	const sources = await getSources();
 
 	for (const source of sources) {
@@ -20,9 +20,6 @@ export default async function listScripts() {
 		columns.log(ansis.gray.dim('–').repeat(process.stdout.columns * 0.8));
 		columns.log('');
 		columns.log(`${ansis.yellow.bold('◈ ' + name)}: ${ansis.dim.yellow(source.dir)}`);
-		columns.log('');
-		columns.log(['  script', 'args', 'description'].map(s => ansis.dim(s)) as [string, string, string]);
-		columns.log(['  ------', '----', '-----------'].map(s => ansis.dim(s)) as [string, string, string]);
 
 		for (const script of source.scripts) {
 			if (script.slug.startsWith('_')) {
@@ -41,10 +38,17 @@ export default async function listScripts() {
 			const displaySlug = source.namespace ? `${source.namespace} ${script.slug}` : script.slug;
 			const formattedSlug = `${symbol} ${displaySlug}`;
 
-			displayScriptInfo(columns, { ...script, slug: formattedSlug } as Script);
+			if (target && (script.slug === target || script.alias.includes(target))) {
+				displayScriptInfo(columns, { ...script, slug: formattedSlug });
+			} else {
+				columns.log([
+					ansis.bold(formattedSlug),
+					script.desc || '',
+				]);
+			}
 
 			if (!hasBinaryFile) {
-				columns.log(['', '', ansis.red('▲ script executable missing')]);
+				columns.log(['', ansis.red('▲ script executable missing')]);
 			}
 		}
 
