@@ -3,10 +3,9 @@
  * Produces pretty similar output though.
  * Might be all that we need.
  */
-type Flag = string | number | boolean | undefined;
-type NmArgv = {
-    flags: Record<string, Flag>;
+type StructuredArguments = {
+    flags: Record<string, string | number | boolean | undefined>;
     args: string[];
 };
-export declare function notMinimist(arguments_: string[]): NmArgv;
+export declare function notMinimist(input: string[]): StructuredArguments;
 export {};
