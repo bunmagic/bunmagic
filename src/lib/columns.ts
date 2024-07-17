@@ -6,7 +6,7 @@ function fixedLengthArray<T>(length: number, fill: T): T[] {
 	return Array.from({ length }, () => fill);
 }
 
-export class Columns<T extends number, Row extends string | string[]> {
+export class Columns<T extends number = number, Row extends string | string[] = string | string[]> {
 	public indent = 2;
 	public gap = 2;
 	private readonly rows: Row[] = [];

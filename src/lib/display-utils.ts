@@ -2,7 +2,7 @@ import { Columns } from '@lib/columns';
 import ansis from 'ansis';
 import type { Script } from './script';
 
-export function displayScriptInfo(columns: Columns<string, [string, string]>, script: Script) {
+export function displayScriptInfo(columns: Columns, script: Script) {
 	let description = script.desc || '';
 	if (script.alias.length > 0) {
 		description += ' ' + ansis.dim(`(alias: ${script.alias.join(', ')})`);
