@@ -11,7 +11,7 @@ export const router: Router['callback'] = async ({ name, exec, command, scripts 
 		return;
 	}
 
-	if (flags.h || flags.help || input === 'help') {
+	if (input === 'help' || (args.length === 0 && (flags.h || flags.help))) {
 		await help(scripts);
 		return;
 	}
