@@ -6,12 +6,16 @@ import version from './version';
 
 export const router: Router['callback'] = async ({ name, exec, command, scripts }) => {
 	const input = [name, ...args].map(t => slugify(t)).join(' ');
-	if (flags.v || flags.version || input === 'version') {
+
+	// Don't take over flags too eagerly:
+	const noArguments = (check?: string | number | boolean) => args.length === 0 && check;
+
+	if (input === 'version' || noArguments(flags.v || flags.version)) {
 		await version();
 		return;
 	}
 
-	if (input === 'help' || (args.length === 0 && (flags.h || flags.help))) {
+	if (input === 'help' || noArguments(flags.h || flags.help)) {
 		await help(scripts);
 		return;
 	}
