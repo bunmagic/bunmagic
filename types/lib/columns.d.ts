@@ -1,5 +1,5 @@
 type ColumnConfig = 'auto' | '' | number | `${number}%`;
-export declare class Columns<T extends number, Row extends string | string[]> {
+export declare class Columns<T extends number = number, Row extends string | string[] = string | string[]> {
     private readonly columnCount;
     private readonly config;
     indent: number;
