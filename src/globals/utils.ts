@@ -41,10 +41,30 @@ export class Exit extends Error {
 			this.exit(1);
 		}
 
+		if (typeof error === 'object' && error !== null && 'stdout' in error && 'stderr' in error) {
+			// This is likely a Bun shell output object
+			// eslint-disable-next-line @typescript-eslint/ban-types
+			const { stdout, stderr } = error as { stdout: Buffer; stderr: Buffer };
+
+			if (stdout.length > 0) {
+				console.log(`\n ${ansis.yellow.bold('»')} Command ${ansis.bold('stdout')}:`);
+				console.log(ansis.dim(this.indent(stdout.toString().trim())));
+			}
+
+			if (stderr.length > 0) {
+				console.log(`\n ${ansis.red.bold('»')} Command ${ansis.bold('stderr')}:`);
+				console.log(ansis.dim(this.indent(stderr.toString().trim())));
+			}
+		}
+
 		const message = error instanceof Error ? error.message : error;
 		console.log(`\n ${ansis.yellow.bold('»')}`, typeof message === 'string' ? ansis.yellow(message) : message);
 
 		this.exit(1);
+	}
+
+	private indent(text: string) {
+		return text.split('\n').map(line => `  ${line}`).join('\n');
 	}
 
 	private exit(code: number) {
@@ -54,6 +74,4 @@ export class Exit extends Error {
 }
 
 
-export const sleep = async (ms: number) => {
-	return Bun.sleep(ms);
-}
+export const sleep = async (ms: number) => Bun.sleep(ms);
