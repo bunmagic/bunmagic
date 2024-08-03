@@ -79,7 +79,7 @@ function renderFrame(
 
 	// Filter and process options based on fuzzy search
 	const filteredOptions = options.map((option, index) => {
-		const prefix = option.selected ? ansis.greenBright(' ⦿') : ansis.dim(' ⦾');
+		const prefix = option.selected ? ansis.greenBright(' ⦿') : ansis.dim(' ⦾');
 		let label = option.label;
 		if (query.length > 0) {
 			label = '';
