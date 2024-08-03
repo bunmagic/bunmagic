@@ -57,6 +57,7 @@ async function symlinkBunmagic(target: string) {
 	await linkSource(bunmagicDirectory, target);
 	await linkSource(`${bunmagicDirectory}/types`, target);
 	await linkSource(`${bunmagicDirectory}/tsconfig.sources.json`, path.join(target, 'tsconfig.json'));
+	await linkSource(`${bunmagicDirectory}/node_modules`, path.join(target, 'types/node_modules'));
 }
 
 export default async function symlinkSources() {
