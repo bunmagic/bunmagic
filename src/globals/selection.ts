@@ -62,7 +62,7 @@ function interpretKey(
 		}
 	}
 
-	if (/^[\p{L}\p{N}\p{Emoji}\p{Punctuation}\p{Symbol}]+$/u.test(sequence)) {
+	if (/^[\p{L}\p{N}\p{Emoji}\p{Punctuation}\p{Symbol}\s]+$/u.test(sequence)) {
 		return sequence;
 	}
 
