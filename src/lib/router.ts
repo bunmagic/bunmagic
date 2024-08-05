@@ -36,7 +36,7 @@ export type Router = {
 };
 
 export const displayScripts = (scripts: Map<string, Script>) => {
-	const columns = new Columns(3, [9, 14, 'auto']);
+	const columns = new Columns(3, ['auto', 'auto', 'auto']);
 	columns.gap = 5;
 	columns.buffer();
 	columns.log('');
