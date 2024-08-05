@@ -6,6 +6,7 @@ export declare function $get(...properties: Parameters<typeof $>): Promise<strin
 export declare function ack(q: string, defaultAnswer?: 'y' | 'n'): boolean;
 export declare class Exit extends Error {
     constructor(error?: unknown);
+    private indent;
     private exit;
 }
 export declare const sleep: (ms: number) => Promise<void>;
