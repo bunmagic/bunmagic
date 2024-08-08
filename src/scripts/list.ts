@@ -5,28 +5,46 @@
  * @flag [[--info|-i]] Display more information about each script.
  */
 import path from 'node:path';
-import { getSources } from '@lib/sources';
+import { getSources, type Source } from '@lib/sources';
 import ansis from 'ansis';
 import { displayScriptInfo, setupScriptColumns } from '@lib/display-utils';
 import fuzzysort from 'fuzzysort';
 
-async function getSourcesToDisplay(target?: string) {
+async function getSourcesToDisplay(query: string[]): Promise<Source[]> {
 	const sources = await getSources();
 
-	if (!target) {
+	if (query.length === 0) {
 		return sources;
 	}
 
-	const results = fuzzysort.go(target, sources, {
-		keys: ['dir', 'namespace'],
-	});
+	const searchableData = sources.flatMap(r =>
+		r.scripts.map(script => ({
+			script,
+			searchString: [script.slug, script.desc].filter(Boolean).join(' '),
+		})),
+	);
 
-	return results.map(r => r.obj);
+	const results = fuzzysort.go(query.join(' '), searchableData, {
+		keys: ['searchString'],
+	});
+	const groupedResults: Record<string, Source> = {};
+	for (const result of results) {
+		const { script } = result.obj;
+		const namespace = script.namespace;
+		const key = namespace || 'global';
+		groupedResults[key] ||= {
+			namespace: namespace || undefined,
+			dir: script.dir,
+			scripts: [],
+		};
+		groupedResults[key].scripts.push(script);
+	}
+
+	return Object.values(groupedResults);
 }
 
 export default async function listScripts() {
-	const target = args[0];
-	const sources = await getSourcesToDisplay(target);
+	const sources = await getSourcesToDisplay(args);
 
 	for (const source of sources) {
 		const basename = path.basename(source.dir);
