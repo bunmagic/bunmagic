@@ -2,7 +2,7 @@
 import {
 	getPathScripts,
 } from '@lib/scripts';
-import { get, type SourcePaths } from '@lib/config';
+import { update, get, type SourcePaths } from '@lib/config';
 import type { Script } from '@lib/script';
 import { parseInput } from './parse-input';
 
@@ -15,7 +15,29 @@ export async function getSources(): Promise<Array<Source>> {
 		throw new Error('No sources defined.');
 	}
 
-	const sources = Promise.all(sourceConfig.map(async source => {
+	const validSources = await Promise.all(sourceConfig.map(async source => {
+		if (source.dir && !await isDirectory(source.dir)) {
+			console.warn(`Path ${source.dir} does not exist`);
+			if (ack(`Remove ${source.dir} from sources?`)) {
+				console.log(`Removing ${source.dir} from sources`);
+				return null;
+			}
+		}
+
+		return source;
+	}));
+
+	const filteredSources = validSources.filter((source): source is SourcePaths => source !== null);
+
+	if (filteredSources.length !== sourceConfig.length) {
+		await update('sources', filteredSources);
+	}
+
+	if (filteredSources.length === 0) {
+		throw new Error('No valid sources remaining.');
+	}
+
+	const sources = Promise.all(filteredSources.map(async source => {
 		const scripts = await getPathScripts(source.dir, source.namespace);
 		return {
 			dir: source.dir,
