@@ -9,7 +9,8 @@ import { parseInput } from './parse-input';
 export type Source = SourcePaths & {
 	scripts: Script[];
 };
-export async function getSources(): Promise<Array<Source>> {
+
+async function getValidSources(): Promise<Array<SourcePaths>> {
 	const sourceConfig = await get('sources');
 	if (!sourceConfig) {
 		throw new Error('No sources defined.');
@@ -37,7 +38,12 @@ export async function getSources(): Promise<Array<Source>> {
 		throw new Error('No valid sources remaining.');
 	}
 
-	const sources = Promise.all(filteredSources.map(async source => {
+	return filteredSources;
+}
+
+export async function getSources(): Promise<Array<Source>> {
+	const validatedSources = await getValidSources();
+	const sources = Promise.all(validatedSources.map(async source => {
 		const scripts = await getPathScripts(source.dir, source.namespace);
 		return {
 			dir: source.dir,
