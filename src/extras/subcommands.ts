@@ -27,19 +27,29 @@ class Subcommands<
 	public get commands(): Name[] {
 		return Object.keys(this._commands) as Name[];
 	}
+
+	public maybeHelp() {
+		if (flags.help) {
+			console.log('Available commands:');
+			for (const command of this.commands) {
+				console.log(ansis.cyan(`  • ${command as string}`));
+			}
+
+			throw new Exit(0);
+		}
+
+		return this;
+	}
 }
 
 /**
  * TypeScript doesn't support partial type inference,
  * So we need to use a factory function to create the subcommands.
  */
-function subcommandFactory<Arguments extends unknown[] = unknown[], ReturnValue = void>() {
+export function subcommandFactory<Arguments extends unknown[] = unknown[], ReturnValue = void>() {
 	return <Name extends string, Config extends Record<Name, Subcommand<Arguments, ReturnValue>>>(
 		commands: Config,
 	) => new Subcommands(commands);
 }
 
-export default {
-	subcommandFactory,
-	subcommands: subcommandFactory(),
-};
+export const subcommands = subcommandFactory();
