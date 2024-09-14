@@ -2,7 +2,7 @@ type Subcommand<Arguments extends unknown[] = unknown[], ReturnValue = void> = (
 declare class Subcommands<Callback, Config extends Record<string, Callback>, Name extends keyof Config = keyof Config> {
     private readonly _commands;
     constructor(commands: Config);
-    get<N extends Name>(commandName: N): Config[N];
+    get<N extends Name>(commandName?: N): Config[N];
     get<F extends Name>(commandName: string | undefined, fallback: F): Config[F];
     get commands(): Name[];
     maybeHelp(): this;

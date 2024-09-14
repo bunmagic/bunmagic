@@ -10,7 +10,8 @@ class Subcommands<
 		this._commands = commands;
 	}
 
-	public get<N extends Name>(commandName: N): Config[N];
+	public get<N extends Name>(commandName?: string): Config[N];
+	public get<N extends Name>(commandName?: N): Config[N];
 	public get<F extends Name>(commandName: string | undefined, fallback: F): Config[F];
 	public get<N extends Name, F extends Name>(commandName?: N, fallback?: F): Config[Name] {
 		if (commandName && commandName in this._commands) {
