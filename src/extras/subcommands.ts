@@ -1,4 +1,4 @@
-type Subcommand<Arguments extends unknown[] = unknown[], ReturnValue = void> = (...parameters: Arguments) => Promise<ReturnValue>;
+type Subcommand<Arguments, ReturnValue> = (...parameters: Arguments[]) => Promise<ReturnValue>;
 
 class Subcommands<
 	Callback,
@@ -10,7 +10,14 @@ class Subcommands<
 		this._commands = commands;
 	}
 
-	public get<N extends Name>(commandName?: string): Config[N];
+	public name(commandName: string): Name {
+		if (commandName in this._commands) {
+			return commandName as Name;
+		}
+
+		throw new Error(`Invalid command. Valid commands are: ${Object.keys(this._commands).join(', ')}`);
+	}
+
 	public get<N extends Name>(commandName?: N): Config[N];
 	public get<F extends Name>(commandName: string | undefined, fallback: F): Config[F];
 	public get<N extends Name, F extends Name>(commandName?: N, fallback?: F): Config[Name] {
@@ -47,8 +54,14 @@ class Subcommands<
  * TypeScript doesn't support partial type inference,
  * So we need to use a factory function to create the subcommands.
  */
-export function subcommandFactory<Arguments extends unknown[] = unknown[], ReturnValue = void>() {
-	return <Name extends string, Config extends Record<Name, Subcommand<Arguments, ReturnValue>>>(
+export function subcommandFactory<
+	Arguments = unknown[],
+	ReturnValue = void,
+>() {
+	return <
+		Name extends string,
+		Config extends Record<Name, Subcommand<Arguments, ReturnValue>>,
+	>(
 		commands: Config,
 	) => new Subcommands(commands);
 }
