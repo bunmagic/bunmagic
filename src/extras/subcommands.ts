@@ -1,4 +1,4 @@
-type Subcommand<Arguments, ReturnValue> = (...parameters: Arguments[]) => Promise<ReturnValue>;
+type Subcommand<Arguments = unknown[], ReturnValue = void> = (...parameters: Arguments[]) => Promise<ReturnValue>;
 
 class Subcommands<
 	Callback,
@@ -6,7 +6,7 @@ class Subcommands<
 	Name extends keyof Config = keyof Config,
 > {
 	private readonly _commands: Config;
-	constructor(commands: Config) {
+	constructor (commands: Config) {
 		this._commands = commands;
 	}
 
@@ -66,4 +66,4 @@ export function subcommandFactory<
 	) => new Subcommands(commands);
 }
 
-export const subcommands = subcommandFactory();
+export const subcommands = subcommandFactory<never>();
