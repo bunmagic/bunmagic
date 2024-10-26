@@ -25,7 +25,7 @@ class Subcommands<
 			return this._commands[commandName];
 		}
 
-		if (fallback && fallback in this._commands) {
+		if (fallback && fallback in this._commands && commandName === undefined) {
 			return this._commands[fallback];
 		}
 
