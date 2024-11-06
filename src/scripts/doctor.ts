@@ -16,27 +16,32 @@ let issueCount = 0;
 const followups: Array<() => Promise<unknown>> = [];
 
 async function check(message: string, callback: CheckCallback) {
-	const result = await callback();
-	if (result.level === 'ok') {
-		console.log(`✅ ${message}`);
-	}
+	try {
+		const result = await callback();
+		if (result.level === 'ok') {
+			console.log(`✅ ${message}`);
+		}
 
-	if (result.level === 'error' || result.level === 'fatal') {
-		issueCount++;
-		console.log(`❌ ${message}`);
-	}
+		if (result.level === 'error' || result.level === 'fatal') {
+			issueCount++;
+			console.log(`❌ ${message}`);
+		}
 
-	if (result.level === 'warning') {
-		issueCount++;
-		console.log(`⚠️ ${message}`);
-	}
+		if (result.level === 'warning') {
+			issueCount++;
+			console.log(`⚠️ ${message}`);
+		}
 
-	if (result.level === 'fatal') {
-		throw new Exit(`Abort. Cannot continue without fixing "${message}"`);
-	}
+		if (result.level === 'fatal') {
+			throw new Exit(`Abort. Cannot continue without fixing "${message}"`);
+		}
 
-	if (result.followup) {
-		followups.push(result.followup);
+		if (result.followup) {
+			followups.push(result.followup);
+		}
+	} catch (error) {
+		console.error(`Error checking ${message}`);
+		console.error(error);
 	}
 }
 
