@@ -236,4 +236,31 @@ describe('SAF', () => {
 			.rejects
 			.toThrow(`Failed to find a safe path for ${path.join(TEST_DIR, baseName)}`);
 	});
+
+	test('bytes method returns correct binary content', async () => {
+		const saf = getTestFile('binary_file.bin');
+		const buffer = new Uint8Array([0x00, 0xFF, 0x7E, 0x80]);
+		await saf.write(buffer);
+		const bytes = await saf.bytes();
+		expect(bytes).toEqual(buffer);
+	});
+
+	test('toString method returns correct file path', () => {
+		const saf = getTestFile('string_test.txt');
+		expect(saf.toString()).toBe(saf.path);
+	});
+
+	test('static prepare creates SAF instance with safe path when target exists', async () => {
+		const existingFilePath = path.join(TEST_DIR, 'existing_file.txt');
+		await SAF.from(TEST_DIR, 'existing_file.txt').write('Existing content');
+
+		const preparedSAF = await SAF.prepare(existingFilePath);
+		expect(preparedSAF.path).toBe(path.join(TEST_DIR, 'existing_file_1.txt'));
+	});
+
+	test('static prepare creates SAF instance with original path when target does not exist', async () => {
+		const newFilePath = path.join(TEST_DIR, 'new_file.txt');
+		const preparedSAF = await SAF.prepare(newFilePath);
+		expect(preparedSAF.path).toBe(newFilePath);
+	});
 });
