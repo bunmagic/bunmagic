@@ -6,6 +6,8 @@ export default {
 	rules: {
 		'unicorn/prefer-ternary': 0,
 		'unicorn/switch-case-braces': 0,
+		'n/file-extension-in-import': 0,
+		'unicorn/prevent-abbreviations': 0,
 		// Avoid converting backtick strings if they're used for escaping single or double quotes.
 		'quotes': [
 			'error',
@@ -61,15 +63,6 @@ export default {
 				format: [
 					'PascalCase',
 				],
-			},
-		],
-		// It's a CLI application, `bin` is a common abbreviation for `binary`
-		'unicorn/prevent-abbreviations': [
-			'error',
-			{
-				allowList: {
-					bin: true,
-				},
 			},
 		],
 		// `prompt` and `confirm` are useful for CLI applications
