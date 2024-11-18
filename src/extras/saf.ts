@@ -103,7 +103,7 @@ export class SAF {
 	}
 
 
-	public async json<T>(data?: T): Promise<T> {
+	public async json<T = unknown>(data?: T): Promise<T> {
 		if (data === undefined) {
 			return this.file.json() as Promise<T>;
 		}
@@ -192,6 +192,11 @@ export class SAF {
 		});
 	}
 
+	public async edit(callback: (content: string) => string | Promise<string>) {
+		const content = await this.file.text();
+		await this.write(await callback(content));
+		return this;
+	}
 
 	/**
 	 * Generates a safe filename by appending a number if the file already exists
