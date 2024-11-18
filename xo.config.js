@@ -8,6 +8,7 @@ export default {
 		'unicorn/switch-case-braces': 0,
 		'n/file-extension-in-import': 0,
 		'unicorn/prevent-abbreviations': 0,
+		'@typescript-eslint/no-unnecessary-boolean-literal-compare': 0,
 		// Avoid converting backtick strings if they're used for escaping single or double quotes.
 		'quotes': [
 			'error',
