@@ -13,7 +13,7 @@ declare global {
 	const ansis: typeof globals.ansis;
 	const path: typeof globals.path;
 	const argv: typeof globals.argv;
-	const args: typeof globals.args; // eslint-disable-line unicorn/prevent-abbreviations
+	const args: typeof globals.args;
 	const flags: typeof globals.flags;
 	const select: typeof globals.select;
 	const autoselect: typeof globals.autoselect;
@@ -34,6 +34,7 @@ declare global {
 	const resolveTilde: typeof globals.resolveTilde;
 	const cwd: typeof globals.cwd;
 	const SAF: typeof globals.SAF;
+	const die: typeof globals.die;
 }
 
 // export type ExtendedGlobal = typeof globalThis;

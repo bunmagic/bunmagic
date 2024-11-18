@@ -73,5 +73,9 @@ export class Exit extends Error {
 	}
 }
 
+export function die(output: unknown) {
+	throw new Exit(output);
+}
+
 
 export const sleep = async (ms: number) => Bun.sleep(ms);
