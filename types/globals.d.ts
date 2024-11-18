@@ -25,4 +25,6 @@ declare global {
     const slugify: typeof globals.slugify;
     const resolveTilde: typeof globals.resolveTilde;
     const cwd: typeof globals.cwd;
+    const SAF: typeof globals.SAF;
+    const die: typeof globals.die;
 }

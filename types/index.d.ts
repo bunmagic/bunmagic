@@ -11,8 +11,9 @@ export { $spinner } from './globals/spinner';
 export { openEditor, slugify } from './lib/utils';
 export { notMinimist };
 export * from './globals/utils';
-export { select, autoselect, getPassword, ask } from './globals/selection';
+export * from './globals/selection';
 export * from './globals/fs';
+export { SAF } from './extras/saf';
 declare const args: string[], flags: Record<string, string | number | boolean>;
 declare const argv: {
     _: string[];

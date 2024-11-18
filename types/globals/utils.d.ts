@@ -9,4 +9,5 @@ export declare class Exit extends Error {
     private indent;
     private exit;
 }
+export declare function die(output: unknown): void;
 export declare const sleep: (ms: number) => Promise<void>;
