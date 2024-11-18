@@ -21,7 +21,7 @@
     "fix": "xo --fix src",
     "lint": "xo src",
     "test": "xo src",
-    "build": "tsc src/globals.ts --declaration --emitDeclarationOnly --outdir types --skipLibCheck --downlevelIteration"
+    "build": "tsc src/globals.ts --declaration --emitDeclarationOnly --outdir types --skipLibCheck --downlevelIteration --target ES2020 --moduleResolution bundler"
   },
   "types": "types/index.d.ts",
   "module": "src/index.ts",
