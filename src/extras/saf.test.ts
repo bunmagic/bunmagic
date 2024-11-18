@@ -193,6 +193,35 @@ describe('SAF', () => {
 		expect(saf.path).toBe(path.join(TEST_DIR, 'subdir', 'new_name.md'));
 	});
 
+	test('generates safe paths and unique filenames', async () => {
+		const duplicateBase = 'safe_path_test';
+
+		const getUpdatedFilename = async () => {
+			const file = getTestFile('test.txt');
+			file.base = duplicateBase;
+			await file.update();
+			return file;
+		};
+
+		const file1 = await getUpdatedFilename();
+		await file1.write('test');
+		expect(file1.base).toBe(duplicateBase);
+		expect(file1.path).toBe(path.join(TEST_DIR, `${duplicateBase}.txt`));
+
+		// Test creating the same file again
+		const file2 = await getUpdatedFilename();
+		await file2.write('test2');
+
+		expect(file2.path).not.toBe(file1.path);
+		expect(file2.base).toBe(`${duplicateBase}_1`);
+
+		// Test creating the same file again
+		const file3 = await getUpdatedFilename();
+		await file3.write('test3');
+		expect(file3.base).toBe(`${duplicateBase}_2`);
+		expect(file3.path).toBe(path.join(TEST_DIR, `${duplicateBase}_2.txt`));
+	});
+
 
 	test('throws error after too many duplicate attempts', async () => {
 		// Create many numbered files to force the error
