@@ -11,9 +11,11 @@ export { openEditor, slugify } from './lib/utils';
 export { notMinimist };
 
 export * from './globals/utils';
-export { select, autoselect, getPassword, ask } from './globals/selection';
+export {
+	select, autoselect, getPassword, ask,
+} from './globals/selection';
 export * from './globals/fs';
-
+export { SAF } from './extras/saf';
 
 const { args, flags } = notMinimist(Bun.argv.slice(2) || []);
 const argv = { _: args, ...flags };
