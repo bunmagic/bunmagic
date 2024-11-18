@@ -1,5 +1,7 @@
-import path from 'node:path';
-import { mkdir, rm, writeFile } from 'node:fs/promises';
+/* eslint-disable import/no-unassigned-import */
+import { mkdir, rm } from 'node:fs/promises';
+import os from 'node:os';
+import 'bunmagic/globals';
 import {
 	expect,
 	test,
@@ -9,64 +11,200 @@ import {
 } from 'bun:test';
 import { SAF } from './saf';
 
-describe('SAF', () => {
-	const testDirectory = path.join(process.cwd(), 'test-tmp');
+const TEST_DIR = '/tmp/bunmagic-saf-test';
 
+function getTestFile(file: string) {
+	return SAF.from(TEST_DIR, file);
+}
+
+describe('SAF', () => {
 	beforeEach(async () => {
-		await mkdir(testDirectory, { recursive: true });
+		await mkdir(TEST_DIR, { recursive: true });
+		cd(TEST_DIR);
 	});
 
 	afterEach(async () => {
-		await rm(testDirectory, { recursive: true, force: true });
+		cd('~');
+		await rm(TEST_DIR, { recursive: true, force: true });
 	});
 
-	test('constructor handles tilde paths', () => {
-		const saf = new SAF('~/test.txt');
-		expect(saf.path).toContain('/test.txt');
-		expect(saf.path).not.toContain('~');
+	test('can create a SAF instance from directory and target', () => {
+		const saf = getTestFile('test.txt');
+		expect(saf.path).toBe(path.resolve(TEST_DIR, 'test.txt'));
 	});
 
-	test('getSafePath returns original path if no file exists', async () => {
-		const testPath = path.join(testDirectory, 'test.txt');
-		const saf = new SAF(testPath);
-		const safePath = await saf.getSafePath(testPath);
-		expect(safePath).toBe(testPath);
+	test('can create a SAF instance from target only', () => {
+		const saf = getTestFile('test2.txt');
+		expect(saf.path).toBe(path.resolve(TEST_DIR, 'test2.txt'));
 	});
 
-	test('getSafePath appends number for existing files', async () => {
-		const testPath = path.join(testDirectory, 'test.txt');
-		await writeFile(testPath, 'original');
-
-		const saf = new SAF(testPath);
-		const safePath = await saf.getSafePath(testPath);
-		expect(safePath).toBe(path.join(testDirectory, 'test_1.txt'));
+	test('handles tilde expansion in target', () => {
+		const saf = SAF.from('~/test3.txt');
+		expect(saf.path).toBe(`${os.homedir()}/test3.txt`);
 	});
 
-	test('rename renames file to new path', async () => {
-		const originalPath = path.join(testDirectory, 'original.txt');
-		const newPath = path.join(testDirectory, 'new.txt');
-		await writeFile(originalPath, 'test content');
+	test('write and read content', async () => {
+		const saf = getTestFile('write_test.txt');
+		const content = 'Hello, SAF!';
+		await saf.write(content);
+		const readContent = await saf.file.text();
+		expect(readContent).toBe(content);
+	});
 
-		const saf = new SAF(originalPath);
-		const resultPath = await saf.rename(newPath);
+	test('json method without data should read existing JSON', async () => {
+		const saf = getTestFile('data.json');
+		const data = { key: 'value' };
+		await saf.write(JSON.stringify(data, null, 2));
 
-		expect(resultPath).toBe(newPath);
-		const exists = await Bun.file(newPath).exists();
+		const readData = await saf.json();
+		expect(readData).toEqual(data);
+	});
+
+	test('json method with data should write JSON', async () => {
+		const saf = getTestFile('write_json.json');
+		const data = { foo: 'bar' };
+		const returnedData = await saf.json(data);
+		expect(returnedData).toEqual(data);
+
+		const fileContent = await saf.file.text();
+		expect(JSON.parse(fileContent)).toEqual(data);
+	});
+
+	test('update method changes the handle when safeMode is enabled', async () => {
+		const saf = getTestFile('update_test.txt');
+		await saf.write('Initial Content');
+
+		saf.safeMode = true;
+		await saf.update();
+
+		expect(saf.path).toBe(path.resolve(TEST_DIR, 'update_test.txt'));
+	});
+
+	test('update method handles deleted files', async () => {
+		const saf = SAF.from('deleted_file.txt');
+		await saf.delete();
+		const result = await saf.update();
+		expect(result).toBe(saf);
+	});
+
+	test('delete method removes the file and clears handle', async () => {
+		const saf = getTestFile('delete_test.txt');
+		await saf.write('To be deleted');
+		await saf.delete('clear_handle');
+
+		const exists = await saf.exists();
+		expect(exists).toBe(false);
+		expect(saf.path).toBe('');
+	});
+
+	test('saf.name returns the file slug name', () => {
+		const saf = getTestFile('test.txt');
+		expect(saf.base).toBe('test');
+	});
+
+	test('delete method keeps the handle when specified', async () => {
+		const saf = getTestFile('delete_keep_handle.txt');
+		await saf.write('To be deleted but handle kept');
+		expect(saf.name).toBe('delete_keep_handle.txt');
+		await saf.delete('keep_handle');
+		expect(saf.name).toBe('delete_keep_handle.txt');
+
+		const exists = await saf.exists();
+		expect(exists).toBe(false);
+	});
+
+	test('isDirectory correctly identifies a directory', async () => {
+		await mkdir(path.resolve(TEST_DIR, 'some_directory'), { recursive: true });
+		const saf = getTestFile('some_directory');
+
+		const isDir = await saf.isDirectory();
+		expect(isDir).toBe(true);
+	});
+
+	test('directory returns an absolute path', () => {
+		const saf = getTestFile('test.txt');
+		expect(saf.directory).toBe(path.resolve(TEST_DIR));
+	});
+
+	test('isDirectory correctly identifies a file', async () => {
+		const saf = getTestFile('some_file.txt');
+		await saf.write('I am a file.');
+
+		const isDir = await saf.isDirectory();
+		expect(isDir).toBe(false);
+	});
+
+	test('File directory is correct', () => {
+		const saf = getTestFile('some_file.txt');
+		expect(saf.directory).toBe(TEST_DIR);
+	});
+
+	test('ensureDirectory creates the directory if it does not exist', async () => {
+		const saf = getTestFile('new_dir/test_dir/test.txt');
+		await saf.ensureDirectory();
+
+		const directory = SAF.from(saf.directory);
+		const exists = await directory.exists();
 		expect(exists).toBe(true);
 	});
 
-	test('rename handles existing target files', async () => {
-		const originalPath = path.join(testDirectory, 'original.txt');
-		const newPath = path.join(testDirectory, 'new.txt');
+	test('edit method modifies the file content', async () => {
+		const saf = getTestFile('edit_test.txt');
+		await saf.write('Original Content');
 
-		await writeFile(originalPath, 'original content');
-		await writeFile(newPath, 'existing content');
+		await saf.edit(content => content.replace('Original', 'Modified'));
+		const modifiedContent = await saf.file.text();
+		expect(modifiedContent).toBe('Modified Content');
+	});
 
-		const saf = new SAF(originalPath);
-		const resultPath = await saf.rename(newPath);
+	test('unsafe method disables safeMode', () => {
+		const saf = getTestFile('unsafe_test.txt');
+		saf.unsafe();
+		expect(saf.safeMode).toBe(false);
+	});
 
-		expect(resultPath).toBe(path.join(testDirectory, 'new_1.txt'));
-		const exists = await Bun.file(resultPath).exists();
-		expect(exists).toBe(true);
+	test('safe method enables safeMode', () => {
+		const saf = getTestFile('safe_test.txt');
+		saf.unsafe();
+		saf.safe();
+		expect(saf.safeMode).toBe(true);
+	});
+
+	test('getters and setters for base, name, extension, path, and directory work correctly', async () => {
+		const saf = getTestFile('base_name.txt');
+		expect(saf.base).toBe('base_name');
+		expect(saf.extension).toBe('.txt');
+		expect(saf.directory).toBe(TEST_DIR);
+
+		saf.base = 'new_base';
+		await saf.update();
+		expect(saf.path).toBe(path.join(TEST_DIR, 'new_base.txt'));
+
+		saf.base = 'new_name';
+		await saf.update();
+		expect(saf.path).toBe(path.join(TEST_DIR, 'new_name.txt'));
+
+		saf.extension = '.md';
+		await saf.update();
+		expect(saf.path).toBe(path.join(TEST_DIR, 'new_name.md'));
+
+		saf.directory = path.join(TEST_DIR, 'subdir');
+		await saf.update();
+		expect(saf.path).toBe(path.join(TEST_DIR, 'subdir', 'new_name.md'));
+	});
+
+
+	test('throws error after too many duplicate attempts', async () => {
+		// Create many numbered files to force the error
+		const baseName = 'error_safe_path_test.txt';
+		const promises = Array.from({ length: 11 }, async (_, i) => {
+			await $`touch ${i === 0 ? baseName : `error_safe_path_test_${i}.txt`}`;
+		});
+		await Promise.all(promises);
+
+		// Attempt to create one more
+		expect(SAF.prepare(path.join(TEST_DIR, baseName)))
+			.rejects
+			.toThrow(`Failed to find a safe path for ${path.join(TEST_DIR, baseName)}`);
 	});
 });

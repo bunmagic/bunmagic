@@ -40,9 +40,8 @@ export function readFirstComment(view: Uint8Array) {
 
 
 async function parseFile(filePath: string): Promise<Properties | undefined> {
-	const file = Bun.file(filePath);
-	const buffer = await file.arrayBuffer();
-	const view = new Uint8Array(buffer);
+	const file = SAF.from(filePath);
+	const view = await file.bytes();
 	const contents = readFirstComment(view);
 	return parseContent(contents);
 }

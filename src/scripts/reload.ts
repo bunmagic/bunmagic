@@ -21,31 +21,30 @@ export async function getBins(): Promise<string[]> {
 
 export async function ensureScriptBin(script: Script) {
 	const exec = 'bunmagic-exec';
-
-	if (flags.force === true && await Bun.file(script.bin).exists()) {
+	const bin = SAF.from(PATHS.bins, script.slug);
+	if (flags.force === true && await bin.file.exists()) {
 		console.log(`Removing ${ansis.bold(script.slug)} script bin file`);
-		await $`rm ${script.bin}`;
+		await bin.delete('keep_handle');
 	}
 
-	if (await Bun.file(script.bin).exists()) {
+	if (await bin.exists()) {
 		return false;
 	}
 
 	// Create script bin
 	await ensureDirectory(PATHS.bins);
-	await Bun.write(script.bin, template(script.slug, script.source, exec));
+	await bin.write(template(script.slug, script.source, exec));
+	await $`chmod +x ${script.bin}`;
+
 	if (script.alias.length > 0) {
 		for (const alias of script.alias) {
-			const aliasBin = path.join(PATHS.bins, alias);
-			await Bun.write(aliasBin, template(script.slug, script.source, exec));
+			const aliasBin = SAF.from(PATHS.bins, alias);
+			await aliasBin.write(template(script.slug, script.source, exec));
 			await $`chmod +x ${aliasBin}`;
-			console.log(`Created new script bin: ${script.slug} -> ${aliasBin}\n`);
+			console.log(`Created new script bin: ${script.slug} -> ${aliasBin.file.name}\n`);
 		}
 	}
 
-	await $`chmod +x ${script.bin}`;
-
-	console.log(`Created new script bin: ${script.slug} -> ${script.bin}\n`);
 	return script.bin;
 }
 

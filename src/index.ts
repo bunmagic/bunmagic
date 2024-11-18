@@ -11,9 +11,7 @@ export { openEditor, slugify } from './lib/utils';
 export { notMinimist };
 
 export * from './globals/utils';
-export {
-	select, autoselect, getPassword, ask,
-} from './globals/selection';
+export * from './globals/selection';
 export * from './globals/fs';
 export { SAF } from './extras/saf';
 

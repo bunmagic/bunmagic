@@ -51,7 +51,7 @@ export const displayScripts = (scripts: Map<string, Script>) => {
 			continue;
 		}
 
-		if (Bun.file(script.source).name?.startsWith('_')) {
+		if (SAF.from(script.source).base?.startsWith('_')) {
 			continue;
 		}
 

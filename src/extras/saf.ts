@@ -1,30 +1,25 @@
 import * as fs from 'node:fs';
 import type { BunFile } from 'bun';
 
-
 /**
  * Swiss Army File manager
  */
 export class SAF {
-	public static from(base: string, handle: string): SAF;
-	public static from(handle: string): SAF;
+	public static from(dir: string, target: string): SAF;
+	public static from(target: string): SAF;
 	public static from(a: string, b?: string): SAF {
 		const dir = b === undefined ? undefined : a;
-		let handle = b === undefined ? a : b;
-		if (handle.startsWith('~')) {
-			handle = resolveTilde(handle);
-		}
-
-		if (handle.includes('..')) {
-			handle = path.resolve(handle);
-		}
-
+		let target = b === undefined ? a : b;
 
 		if (dir) {
-			return new SAF(path.resolve(dir, handle));
+			return new SAF(path.resolve(dir, target));
 		}
 
-		return new SAF(handle);
+		if (target.startsWith('~')) {
+			target = resolveTilde(target);
+		}
+
+		return new SAF(target);
 	}
 
 	public static async prepare(target: string) {
@@ -44,7 +39,7 @@ export class SAF {
 	#handle: string;
 
 	constructor(handle: string) {
-		this.#handle = handle;
+		this.#handle = path.resolve(handle);
 	}
 
 	get base(): string | undefined {
@@ -56,7 +51,7 @@ export class SAF {
 	}
 
 	get name(): string | undefined {
-		return this.file.name;
+		return path.basename(this.#handle);
 	}
 
 	set name(value: string) {
@@ -142,7 +137,11 @@ export class SAF {
 			return false;
 		}
 
-		return this.file.exists();
+		if (await this.file.exists()) {
+			return true;
+		}
+
+		return this.isDirectory();
 	}
 
 	public async write(input: Blob | NodeJS.TypedArray | ArrayBufferLike | string | Bun.BlobPart[] | BunFile) {
@@ -154,13 +153,20 @@ export class SAF {
 		return new Uint8Array(await this.file.arrayBuffer());
 	}
 
-	public async delete() {
+	public async delete(postDelete: 'clear_handle' | 'keep_handle' = 'clear_handle') {
 		if (await this.file.exists()) {
 			fs.unlinkSync(this.#handle);
 		}
 
-		this.#handle = '';
+		if (postDelete === 'clear_handle') {
+			this.#handle = '';
+		}
+
 		return this;
+	}
+
+	public toString(): string {
+		return this.path;
 	}
 
 	public async isDirectory() {
@@ -184,11 +190,14 @@ export class SAF {
 	}
 
 	public async ensureDirectory() {
-		fs.mkdir(this.directory, { recursive: true }, error => {
-			if (error) {
-				console.error(error);
-				throw new Error(`Couldn't create directory: ${this.directory}`);
-			}
+		return new Promise<void>((resolve, reject) => {
+			fs.mkdir(this.directory, { recursive: true }, error => {
+				if (error) {
+					reject(new Error(`Couldn't create directory: ${this.directory}`));
+				} else {
+					resolve();
+				}
+			});
 		});
 	}
 

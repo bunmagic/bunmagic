@@ -104,11 +104,14 @@ export async function uninstall() {
 	const binaryPath = `${$HOME}/.bunmagic/bin`;
 
 	for (const file of rcFiles) {
-		const content = await Bun.file(file).text();
-		if (content.includes(binaryPath)) {
-			await Bun.write(file, content.replace(`export PATH="${binaryPath}:$PATH"\n`, ''));
-			console.log(`\n- Removed ${binaryPath} from ${file}`);
-		}
+		await SAF.from(file).edit(content => {
+			if (content.includes(binaryPath)) {
+				console.log(`\n- Removed ${binaryPath} from ${file}`);
+				return content.replace(`export PATH="${binaryPath}:$PATH"\n`, '');
+			}
+
+			return content;
+		});
 	}
 
 	cd($HOME);

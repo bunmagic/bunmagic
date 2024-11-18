@@ -8,9 +8,13 @@ type PackageJson = {
 };
 
 export async function getVersion() {
-	const packageFile = path.resolve(import.meta.dir, '../../package.json');
-	const packageJson = await Bun.file(packageFile).json<PackageJson>();
-	return packageJson.version;
+	const packageFile = SAF.from(import.meta.dir, '../../package.json');
+	const json = await packageFile.json<PackageJson>();
+	if ('version' in json !== true) {
+		throw new Exit('package.json is missing the version field');
+	}
+
+	return json.version;
 }
 
 export default async function () {
