@@ -12,7 +12,7 @@ export class SAF {
 		let target = b === undefined ? a : b;
 
 		if (dir) {
-			return new SAF(path.resolve(dir, target));
+			return new SAF(path.resolve(resolveTilde(dir), target));
 		}
 
 		if (target.startsWith('~')) {
