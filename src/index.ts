@@ -14,6 +14,7 @@ export * from './globals/utils';
 export * from './globals/selection';
 export * from './globals/fs';
 export { SAF } from './extras/saf';
+export * from './extras/mac';
 
 const { args, flags } = notMinimist(Bun.argv.slice(2) || []);
 const argv = { _: args, ...flags };
