@@ -87,6 +87,7 @@ export class SAF {
 	}
 
 
+
 	public unsafe() {
 		this.safeMode = false;
 		return this;
@@ -165,10 +166,6 @@ export class SAF {
 		return this;
 	}
 
-	public toString(): string {
-		return this.path;
-	}
-
 	public async isDirectory() {
 		// Bun currently doesn't support checking directories,
 		// This kind of works, but there are too many unknown unknowns:
@@ -206,6 +203,19 @@ export class SAF {
 		await this.write(await callback(content));
 		return this;
 	}
+
+	/**
+	 * Serialization
+	 */
+	public toString(): string {
+		return this.path;
+	}
+
+	// Called when the object is used in a string context
+	public valueOf(): string {
+		return this.path;
+	}
+
 
 	/**
 	 * Generates a safe filename by appending a number if the file already exists
