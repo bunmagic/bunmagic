@@ -1,4 +1,5 @@
 import type { GlobScanOptions } from 'bun';
+import { SAF } from '../extras/saf';
 
 export async function isDirectory(path: string) {
 	const saf = await SAF.prepare(path);
@@ -11,8 +12,12 @@ export async function ensureDirectory(path: string) {
 	return true;
 }
 
-export function cd(path: string) {
-	$.cwd(resolveTilde(path));
+export function cd(path: string | SAF) {
+	if (typeof path === 'string') {
+		$.cwd(resolveTilde(path));
+	} else {
+		$.cwd(path.path);
+	}
 }
 
 export async function cwd() {
