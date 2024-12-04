@@ -86,8 +86,6 @@ export class SAF {
 		this.#dirty = path.join(value, this.base + this.extension);
 	}
 
-
-
 	public unsafe() {
 		this.safeMode = false;
 		return this;
@@ -97,7 +95,6 @@ export class SAF {
 		this.safeMode = true;
 		return this;
 	}
-
 
 	public async json<T = unknown>(data?: T): Promise<T> {
 		if (data === undefined) {

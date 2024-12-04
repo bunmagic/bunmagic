@@ -263,4 +263,44 @@ describe('SAF', () => {
 		const preparedSAF = await SAF.prepare(newFilePath);
 		expect(preparedSAF.path).toBe(newFilePath);
 	});
+
+	describe('isDirectory', () => {
+		test('returns false for non-existent paths', async () => {
+			const saf = getTestFile('non_existent_directory');
+			expect(await saf.isDirectory()).toBe(false);
+		});
+
+		test('returns true only for existing directories', async () => {
+			const dirPath = path.resolve(TEST_DIR, 'test_directory');
+			await mkdir(dirPath, { recursive: true });
+			const saf = getTestFile('test_directory');
+			expect(await saf.isDirectory()).toBe(true);
+		});
+
+		test('returns false for files', async () => {
+			const saf = getTestFile('test_file.txt');
+			await saf.write('content');
+			expect(await saf.isDirectory()).toBe(false);
+		});
+	});
+
+	describe('exists', () => {
+		test('returns false for non-existent paths', async () => {
+			const saf = getTestFile('non_existent');
+			expect(await saf.exists()).toBe(false);
+		});
+
+		test('returns true for files', async () => {
+			const saf = getTestFile('existing_file.txt');
+			await saf.write('content');
+			expect(await saf.exists()).toBe(true);
+		});
+
+		test('returns true for directories', async () => {
+			const dirPath = path.resolve(TEST_DIR, 'existing_directory');
+			await mkdir(dirPath, { recursive: true });
+			const saf = getTestFile('existing_directory');
+			expect(await saf.exists()).toBe(true);
+		});
+	});
 });
