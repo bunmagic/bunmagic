@@ -4,6 +4,7 @@ export default {
 	],
 	bracketSpacing: true,
 	rules: {
+		'@typescript-eslint/member-ordering': 0,
 		'unicorn/prefer-ternary': 0,
 		'unicorn/switch-case-braces': 0,
 		'n/file-extension-in-import': 0,

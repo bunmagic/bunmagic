@@ -5,6 +5,35 @@ import type { BunFile } from 'bun';
  * Swiss Army File manager
  */
 export class SAF {
+	/**
+	 * Safe mode ensures that when the file is moved or renamed,
+	 * it will not overwrite an existing file at the destination.
+	 */
+	public safeMode = true;
+
+	/**
+	 * How to separate the base name from the iteration number
+	 */
+	public safeSeparator = '_';
+
+	/**
+	 * You can change various properties of the file,
+	 * but they won't be be applied until you call `update()`.
+	 */
+	#dirty: string | false = false;
+
+	/**
+	 * The absolute path to the file
+	 */
+	#abspath: string;
+
+	constructor (handle: string) {
+		this.#abspath = path.resolve(handle);
+	}
+
+	/**
+	 * Get a SAF instance from a target path
+	 */
 	public static from(dir: string, target: string): SAF;
 	public static from(target: string): SAF;
 	public static from(a: string, b?: string): SAF {
@@ -22,68 +51,89 @@ export class SAF {
 		return new SAF(target);
 	}
 
+	/**
+	 * Prepare a target path for writing
+	 */
 	public static async prepare(target: string) {
 		const destination = SAF.from(target);
 		if (await destination.file.exists()) {
 			const safeTarget = await destination.getSafePath(target);
-			destination.#handle = safeTarget;
+			destination.#abspath = safeTarget;
 		}
 
 		return destination;
 	}
 
 
-	public safeMode = true;
-	public separator = '_';
-	#dirty: string | false = false;
-	#handle: string;
 
-	constructor(handle: string) {
-		this.#handle = path.resolve(handle);
-	}
 
+	/**
+	 *
+	 * - Utilities
+	 *
+	 */
+
+	/**
+	 * `/path/to/file.txt` -> `file`
+	 */
 	get base(): string | undefined {
-		return path.basename(this.#handle, this.extension);
+		return path.basename(this.#abspath, this.extension);
 	}
 
 	set base(value: string) {
 		this.#dirty = path.join(this.directory, value + this.extension);
 	}
 
+	/**
+	 * `/path/to/file.txt` -> `file.txt`
+	 */
 	get name(): string | undefined {
-		return path.basename(this.#handle);
+		return path.basename(this.#abspath);
 	}
 
 	set name(value: string) {
 		this.#dirty = path.join(this.directory, value + this.extension);
 	}
 
+	/**
+	 * `/path/to/file.txt` -> `/path/to`
+	 */
+	get directory(): string {
+		return path.dirname(this.#abspath);
+	}
+
+	set directory(value: string) {
+		this.#dirty = path.join(value, this.base + this.extension);
+	}
+
+
+	/**
+	 * `/path/to/file.txt` -> `.txt`
+	 */
 	get extension(): string {
-		return path.extname(this.#handle);
+		return path.extname(this.#abspath);
 	}
 
 	set extension(value: string) {
 		this.#dirty = path.join(this.directory, this.base + value);
 	}
 
+	/**
+	 * `/path/to/file.txt`
+	 */
 	get path(): string {
-		return this.#handle;
+		return this.#abspath;
 	}
 
 	set path(value: string) {
 		this.#dirty = value;
 	}
 
+	/**
+	 * Get the Bun file instance
+	 */
 	get file(): BunFile {
-		return Bun.file(this.#handle);
-	}
-
-	get directory(): string {
-		return path.dirname(this.#handle);
-	}
-
-	set directory(value: string) {
-		this.#dirty = path.join(value, this.base + this.extension);
+		return Bun.file(this.#abspath);
 	}
 
 	public unsafe() {
@@ -96,6 +146,10 @@ export class SAF {
 		return this;
 	}
 
+
+	/**
+	 * Quickly read/write JSON
+	 */
 	public async json<T = unknown>(data?: T): Promise<T> {
 		if (data === undefined) {
 			return this.file.json() as Promise<T>;
@@ -106,12 +160,12 @@ export class SAF {
 	}
 
 	public async update() {
-		if (this.#dirty === this.#handle) {
+		if (this.#dirty === this.#abspath) {
 			return this;
 		}
 
 		if (this.#dirty) {
-			if (this.#handle === '') {
+			if (this.#abspath === '') {
 				throw new Error(`Can't update deleted file`);
 			}
 
@@ -123,15 +177,15 @@ export class SAF {
 				await Bun.write(destination.path, this.file);
 			}
 
-			this.#handle = destination.path;
+			this.#abspath = destination.path;
 			this.#dirty = false;
 		}
 
 		return this;
 	}
 
-	public async exists() {
-		if (this.#handle === '') {
+	public async exists(): Promise<boolean> {
+		if (this.#abspath === '') {
 			return false;
 		}
 
@@ -142,28 +196,11 @@ export class SAF {
 		return this.isDirectory();
 	}
 
-	public async write(input: Blob | NodeJS.TypedArray | ArrayBufferLike | string | Bun.BlobPart[] | BunFile) {
-		return Bun.write(this.file, input);
+	public async isFile(): Promise<boolean> {
+		return await this.exists() && await this.isDirectory() === false;
 	}
 
-
-	public async bytes(): Promise<Uint8Array> {
-		return new Uint8Array(await this.file.arrayBuffer());
-	}
-
-	public async delete(postDelete: 'clear_handle' | 'keep_handle' = 'clear_handle') {
-		if (await this.file.exists()) {
-			fs.unlinkSync(this.#handle);
-		}
-
-		if (postDelete === 'clear_handle') {
-			this.#handle = '';
-		}
-
-		return this;
-	}
-
-	public async isDirectory() {
+	public async isDirectory(): Promise<boolean> {
 		// Bun currently doesn't support checking directories,
 		// This kind of works, but there are too many unknown unknowns:
 		// Const file = Bun.file(path);
@@ -182,6 +219,27 @@ export class SAF {
 			});
 		});
 	}
+
+	public async write(input: Blob | NodeJS.TypedArray | ArrayBufferLike | string | Bun.BlobPart[] | BunFile) {
+		return Bun.write(this.file, input);
+	}
+
+	public async bytes(): Promise<Uint8Array> {
+		return new Uint8Array(await this.file.arrayBuffer());
+	}
+
+	public async delete(postDelete: 'clear_handle' | 'keep_handle' = 'clear_handle') {
+		if (await this.file.exists()) {
+			fs.unlinkSync(this.#abspath);
+		}
+
+		if (postDelete === 'clear_handle') {
+			this.#abspath = '';
+		}
+
+		return this;
+	}
+
 
 	public async ensureDirectory() {
 		return new Promise<void>((resolve, reject) => {
@@ -202,7 +260,9 @@ export class SAF {
 	}
 
 	/**
-	 * Serialization
+	 *
+	 * - Serialization
+	 *
 	 */
 	public toString(): string {
 		return this.path;
@@ -238,7 +298,7 @@ export class SAF {
 				throw new Error(`Failed to find a safe path for ${newPath}`);
 			}
 
-			saf.base = `${originalBase}${saf.separator}${iteration}`;
+			saf.base = `${originalBase}${saf.safeSeparator}${iteration}`;
 			destination = saf.#dirty || saf.path;
 		}
 

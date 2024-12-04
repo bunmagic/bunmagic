@@ -70,6 +70,14 @@ describe('SAF', () => {
 		expect(JSON.parse(fileContent)).toEqual(data);
 	});
 
+	test('json method handles invalid JSON gracefully', async () => {
+		const saf = getTestFile('invalid.json');
+		await saf.write('{ invalid: json }');
+
+		const result = await saf.json();
+		expect(result).toBe(null);
+	});
+
 	test('update method changes the handle when safeMode is enabled', async () => {
 		const saf = getTestFile('update_test.txt');
 		await saf.write('Initial Content');
@@ -301,6 +309,26 @@ describe('SAF', () => {
 			await mkdir(dirPath, { recursive: true });
 			const saf = getTestFile('existing_directory');
 			expect(await saf.exists()).toBe(true);
+		});
+	});
+
+	describe('isFile', () => {
+		test('returns false for non-existent paths', async () => {
+			const saf = getTestFile('non_existent_file.txt');
+			expect(await saf.isFile()).toBe(false);
+		});
+
+		test('returns false for directories', async () => {
+			const dirPath = path.resolve(TEST_DIR, 'test_directory');
+			await mkdir(dirPath, { recursive: true });
+			const saf = getTestFile('test_directory');
+			expect(await saf.isFile()).toBe(false);
+		});
+
+		test('returns true only for existing files', async () => {
+			const saf = getTestFile('test_file.txt');
+			await saf.write('content');
+			expect(await saf.isFile()).toBe(true);
 		});
 	});
 });
