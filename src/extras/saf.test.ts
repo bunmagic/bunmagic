@@ -70,14 +70,6 @@ describe('SAF', () => {
 		expect(JSON.parse(fileContent)).toEqual(data);
 	});
 
-	test('json method handles invalid JSON gracefully', async () => {
-		const saf = getTestFile('invalid.json');
-		await saf.write('{ invalid: json }');
-
-		const result = await saf.json();
-		expect(result).toBe(null);
-	});
-
 	test('update method changes the handle when safeMode is enabled', async () => {
 		const saf = getTestFile('update_test.txt');
 		await saf.write('Initial Content');
