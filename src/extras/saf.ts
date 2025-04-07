@@ -174,7 +174,11 @@ export class SAF {
 				: SAF.from(this.#dirty);
 
 			if (await this.exists() !== false) {
-				await Bun.write(destination.path, this.file);
+				const bytes = await this.bytes();
+				const copy = await Bun.write(destination.path, bytes);
+				if (copy === bytes.length) {
+					await this.delete();
+				}
 			}
 
 			this.#abspath = destination.path;
