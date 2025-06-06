@@ -1,4 +1,4 @@
-import { describe, test, expect } from 'bun:test';
+import { describe, expect, test } from 'bun:test';
 import { parseHeader, readFirstComment } from '../parse-file-meta';
 
 const parseContent = parseHeader.fromContent;
@@ -44,9 +44,7 @@ describe('parseContent', () => {
 					{ name: '--option', description: 'Description of the option' },
 					{ name: '[--optional]', description: 'Description of the option' },
 				],
-				subcommand: [
-					{ name: 'sub', description: 'Description of the subcommand' },
-				],
+				subcommand: [{ name: 'sub', description: 'Description of the subcommand' }],
 			},
 			source: 'test.ts',
 			slug: 'test-command',

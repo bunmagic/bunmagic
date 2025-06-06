@@ -11,7 +11,6 @@ export async function $get(...properties: Parameters<typeof $>) {
 	return result.stderr.toString();
 }
 
-
 export function ack(q: string, defaultAnswer: 'y' | 'n' = 'y') {
 	let yesOrNo = '[y/N]';
 	if (defaultAnswer === 'y') {
@@ -26,7 +25,7 @@ export function ack(q: string, defaultAnswer: 'y' | 'n' = 'y') {
 }
 
 export class Exit extends Error {
-	constructor (error?: unknown) {
+	constructor(error?: unknown) {
 		super();
 		if (flags.debug) {
 			console.error(error);
@@ -58,13 +57,19 @@ export class Exit extends Error {
 		}
 
 		const message = error instanceof Error ? error.message : error;
-		console.log(`\n ${ansis.yellow.bold('»')}`, typeof message === 'string' ? ansis.yellow(message) : message);
+		console.log(
+			`\n ${ansis.yellow.bold('»')}`,
+			typeof message === 'string' ? ansis.yellow(message) : message,
+		);
 
 		this.exit(1);
 	}
 
 	private indent(text: string) {
-		return text.split('\n').map(line => `  ${line}`).join('\n');
+		return text
+			.split('\n')
+			.map(line => `  ${line}`)
+			.join('\n');
 	}
 
 	private exit(code: number) {
@@ -76,6 +81,5 @@ export class Exit extends Error {
 export function die(output: unknown) {
 	throw new Exit(output);
 }
-
 
 export const sleep = async (ms: number) => Bun.sleep(ms);

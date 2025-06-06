@@ -9,7 +9,7 @@ export const PATHS: {
 };
 
 export const SUPPORTED_FILES: string[] = ['ts', 'mjs', 'js'] as const;
-export type SupportedFiles = typeof SUPPORTED_FILES[number];
+export type SupportedFiles = (typeof SUPPORTED_FILES)[number];
 
 export type SourcePaths = {
 	namespace?: string;

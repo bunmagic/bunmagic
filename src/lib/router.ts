@@ -1,8 +1,8 @@
 import { Columns } from '@lib/columns';
 import { run } from 'bunmagic/run';
 import { create } from '../scripts/create';
-import type { Script } from './script';
 import { SUPPORTED_FILES } from './config';
+import type { Script } from './script';
 
 export type Route = {
 	/**
@@ -62,32 +62,16 @@ export const displayScripts = (scripts: Map<string, Script>) => {
 
 		const usage = script.usage || { name: '', description: '' };
 		if (usage?.name && usage?.description) {
-			columns.log([
-				ansis.bold(script.slug),
-				'',
-				description,
-			]);
-			columns.log([
-				'',
-				ansis.dim(usage.name),
-				ansis.dim(usage.description),
-			]);
+			columns.log([ansis.bold(script.slug), '', description]);
+			columns.log(['', ansis.dim(usage.name), ansis.dim(usage.description)]);
 		} else {
-			columns.log([
-				ansis.bold(script.slug),
-				ansis.gray(script.usage?.name || ''),
-				description,
-			]);
+			columns.log([ansis.bold(script.slug), ansis.gray(script.usage?.name || ''), description]);
 		}
 
 		if (script.meta) {
 			for (const meta of Object.values(script.meta)) {
 				for (const { name, description } of meta) {
-					columns.log([
-						'',
-						ansis.dim(name),
-						ansis.dim(description),
-					]);
+					columns.log(['', ansis.dim(name), ansis.dim(description)]);
 				}
 			}
 		}
@@ -96,7 +80,11 @@ export const displayScripts = (scripts: Map<string, Script>) => {
 	columns.flushLog();
 };
 
-async function runWithFallback(scripts: Map<string, Script>, key: string, fallback: () => Promise<void>) {
+async function runWithFallback(
+	scripts: Map<string, Script>,
+	key: string,
+	fallback: () => Promise<void>,
+) {
 	if (scripts.has(key)) {
 		const target = scripts.get(key);
 		if (target) {
@@ -114,13 +102,7 @@ async function runWithFallback(scripts: Map<string, Script>, key: string, fallba
 const defaultRouter: Router['callback'] = async ({ namespace, name, exec, command, scripts }) => {
 	const input = `${namespace} ${name}`.trim();
 	// Offer to create utility if it doesn't exist.
-	if (
-		name && (
-			(name !== 'help' && !command)
-			||
-			(name === 'create' && !scripts.has('create'))
-		)
-	) {
+	if (name && ((name !== 'help' && !command) || (name === 'create' && !scripts.has('create')))) {
 		await runWithFallback(scripts, 'create', async () => {
 			try {
 				await create(args[0] ? `${namespace} ${args[0]}` : input);
@@ -140,7 +122,6 @@ const defaultRouter: Router['callback'] = async ({ namespace, name, exec, comman
 			displayScripts(scripts);
 		});
 
-
 		return;
 	}
 
@@ -154,7 +135,6 @@ const defaultRouter: Router['callback'] = async ({ namespace, name, exec, comman
 		console.log('No command found.');
 	}
 };
-
 
 export async function getRouter(sourcePath: string): Promise<Router> {
 	const routerGlob = new Bun.Glob('**router.*');
@@ -170,7 +150,7 @@ export async function getRouter(sourcePath: string): Promise<Router> {
 		}
 
 		try {
-			const source = await import(file) as Record<string, unknown>;
+			const source = (await import(file)) as Record<string, unknown>;
 			if (source.router) {
 				return {
 					file,

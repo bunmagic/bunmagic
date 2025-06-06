@@ -1,9 +1,6 @@
-
-import {
-	getPathScripts,
-} from '@lib/scripts';
-import { update, get, type SourcePaths } from '@lib/config';
+import { type SourcePaths, get, update } from '@lib/config';
 import type { Script } from '@lib/script';
+import { getPathScripts } from '@lib/scripts';
 import { parseInput } from './parse-input';
 
 export type Source = SourcePaths & {
@@ -16,17 +13,19 @@ async function getValidSources(): Promise<Array<SourcePaths>> {
 		throw new Error('No sources defined.');
 	}
 
-	const validSources = await Promise.all(sourceConfig.map(async source => {
-		if (source.dir && !await isDirectory(source.dir)) {
-			console.warn(`Path ${source.dir} does not exist`);
-			if (ack(`Remove ${source.dir} from sources?`)) {
-				console.log(`Removing ${source.dir} from sources`);
-				return null;
+	const validSources = await Promise.all(
+		sourceConfig.map(async source => {
+			if (source.dir && !(await isDirectory(source.dir))) {
+				console.warn(`Path ${source.dir} does not exist`);
+				if (ack(`Remove ${source.dir} from sources?`)) {
+					console.log(`Removing ${source.dir} from sources`);
+					return null;
+				}
 			}
-		}
 
-		return source;
-	}));
+			return source;
+		}),
+	);
 
 	const filteredSources = validSources.filter((source): source is SourcePaths => source !== null);
 
@@ -43,14 +42,16 @@ async function getValidSources(): Promise<Array<SourcePaths>> {
 
 export async function getSources(): Promise<Array<Source>> {
 	const validatedSources = await getValidSources();
-	const sources = Promise.all(validatedSources.map(async source => {
-		const scripts = await getPathScripts(source.dir, source.namespace);
-		return {
-			dir: source.dir,
-			namespace: source.namespace,
-			scripts: Array.from(scripts.values()),
-		};
-	}));
+	const sources = Promise.all(
+		validatedSources.map(async source => {
+			const scripts = await getPathScripts(source.dir, source.namespace);
+			return {
+				dir: source.dir,
+				namespace: source.namespace,
+				scripts: Array.from(scripts.values()),
+			};
+		}),
+	);
 
 	return sources;
 }
@@ -105,4 +106,3 @@ export async function findAny<T extends string>(query: T): Promise<Script | Sour
 		return namespace;
 	}
 }
-

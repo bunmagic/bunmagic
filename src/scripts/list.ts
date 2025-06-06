@@ -5,9 +5,9 @@
  * @flag [[--info|-i]] Display more information about each script.
  */
 import path from 'node:path';
-import { getSources, type Source } from '@lib/sources';
-import ansis from 'ansis';
 import { displayScriptInfo, setupScriptColumns } from '@lib/display-utils';
+import { type Source, getSources } from '@lib/sources';
+import ansis from 'ansis';
 import fuzzysort from 'fuzzysort';
 
 async function getSourcesToDisplay(query: string[]): Promise<Source[]> {
@@ -81,10 +81,7 @@ export default async function listScripts() {
 					dir: source.dir,
 				});
 			} else {
-				columns.log([
-					ansis.bold(formattedSlug),
-					script.desc || '',
-				]);
+				columns.log([ansis.bold(formattedSlug), script.desc || '']);
 			}
 
 			if (!hasBinaryFile) {

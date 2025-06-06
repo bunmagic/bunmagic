@@ -1,4 +1,3 @@
-
 export async function isMacOS() {
 	return process.platform === 'darwin';
 }

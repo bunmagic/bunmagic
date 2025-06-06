@@ -1,4 +1,4 @@
-import { it, describe, expect } from 'bun:test';
+import { describe, expect, it } from 'bun:test';
 import { notMinimist } from './not-minimist';
 
 describe('notMinimist', () => {
@@ -33,16 +33,15 @@ describe('notMinimist', () => {
 	});
 
 	it('should parse various types of boolean flags', () => {
-		const result = notMinimist(
-			[
-				'--true1',
-				'--true2=true',
-				'--true3',
-				'true',
-				'--false1=false',
-				'--false2',
-				'false',
-			]);
+		const result = notMinimist([
+			'--true1',
+			'--true2=true',
+			'--true3',
+			'true',
+			'--false1=false',
+			'--false2',
+			'false',
+		]);
 		expect(result.flags.true1).toBe(true);
 		expect(result.flags.true2).toBe(true);
 		expect(result.flags.true3).toBe(true);

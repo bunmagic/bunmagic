@@ -1,8 +1,8 @@
 /**
-* Display the current version of bunmagic
-* @usage [[version | -v]]
-* @alias -v
-*/
+ * Display the current version of bunmagic
+ * @usage [[version | -v]]
+ * @alias -v
+ */
 type PackageJson = {
 	version: string;
 };

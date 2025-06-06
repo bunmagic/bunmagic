@@ -8,25 +8,16 @@ export function displayScriptInfo(columns: Columns, script: Script) {
 		description += ' ' + ansis.dim(`(alias: ${script.alias.join(', ')})`);
 	}
 
-	columns.log([
-		ansis.bold(script.slug),
-		description,
-	]);
+	columns.log([ansis.bold(script.slug), description]);
 
 	if (script.usage?.name) {
-		columns.log([
-			'  ' + ansis.dim(script.usage.name),
-			script.usage.description || '',
-		]);
+		columns.log(['  ' + ansis.dim(script.usage.name), script.usage.description || '']);
 	}
 
 	if (script.meta) {
 		for (const meta of Object.values(script.meta)) {
 			for (const { name, description } of meta) {
-				columns.log([
-					'  ' + ansis.dim(name),
-					ansis.dim(description),
-				]);
+				columns.log(['  ' + ansis.dim(name), ansis.dim(description)]);
 			}
 		}
 	}

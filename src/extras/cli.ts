@@ -69,7 +69,7 @@ async function clearFrame(frame: string, wipe = false) {
 	}
 }
 
-async function * chunkStreamer5000(signal: AbortController['signal']) {
+async function* chunkStreamer5000(signal: AbortController['signal']) {
 	process.stdin.setRawMode(true);
 	const reader = Bun.stdin.stream().getReader() as ReadableStreamDefaultReader<Uint8Array>;
 	try {

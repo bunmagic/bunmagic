@@ -6,10 +6,10 @@
     "fuzzysort": "^3.0.2"
   },
   "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
     "@types/bun": "^1.1.0",
     "@types/fs-extra": "^11.0.4",
-    "@types/minimist": "^1.2.5",
-    "xo": "latest"
+    "@types/minimist": "^1.2.5"
   },
   "bin": {
     "bunmagic": "src/bin/bunmagic.ts",
@@ -17,9 +17,11 @@
     "bunmagic-exec-namespace": "src/bin/bunmagic-exec-namespace.ts"
   },
   "scripts": {
-    "fix": "xo --fix src",
-    "lint": "xo src",
-    "test": "xo src",
+    "fix": "biome check --write src",
+    "lint": "biome lint src",
+    "format": "biome format --write src",
+    "check": "biome check src",
+    "test": "biome check src",
     "build": "tsc src/globals.ts --declaration --emitDeclarationOnly --outdir types --skipLibCheck --downlevelIteration --target ES2020 --moduleResolution bundler"
   },
   "types": "types/index.d.ts",

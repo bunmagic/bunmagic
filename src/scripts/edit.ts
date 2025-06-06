@@ -1,13 +1,10 @@
+import { PATHS } from '@lib/config';
 /**
  * Edit scripts. If no script name is specified, will open all scripts and the ~/.bunmagic directory
  * @usage [[script-name]]
  */
-import {
-	findNamespace,
-	findScript,
-} from '@lib/sources';
+import { findNamespace, findScript } from '@lib/sources';
 import { openEditor } from '@lib/utils';
-import { PATHS } from '@lib/config';
 import { create } from './create';
 
 export default async function () {

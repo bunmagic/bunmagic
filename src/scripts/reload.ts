@@ -8,7 +8,6 @@ import { PATHS } from '@lib/config';
 import type { Script } from '@lib/script';
 import { getSources } from '@lib/sources';
 
-
 function template(name: string, scriptPath: string, exec: string): string {
 	let output = '#!/bin/bash\n';
 	output += `${exec} ${scriptPath} ${name} $@`;
@@ -22,7 +21,7 @@ export async function getBins(): Promise<string[]> {
 export async function ensureScriptBin(script: Script) {
 	const exec = 'bunmagic-exec';
 	const bin = SAF.from(PATHS.bins, script.slug);
-	if (flags.force === true && await bin.file.exists()) {
+	if (flags.force === true && (await bin.file.exists())) {
 		console.log(`Removing ${ansis.bold(script.slug)} script bin file`);
 		await bin.delete('keep_handle');
 	}
@@ -52,7 +51,7 @@ export async function ensureNamespaceBin(binaryName: string, targetPath: string)
 	const exec = 'bunmagic-exec-namespace';
 	const binaryPath = path.join(PATHS.bins, binaryName);
 
-	if (flags.force === true && await Bun.file(binaryPath).exists()) {
+	if (flags.force === true && (await Bun.file(binaryPath).exists())) {
 		console.log(`Removing ${ansis.bold(binaryName)} namespace bin file`);
 		await $`rm ${binaryPath}`;
 	}

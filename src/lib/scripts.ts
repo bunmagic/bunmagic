@@ -1,5 +1,5 @@
-import { parseHeader } from '@lib/parse-file-meta';
 import { SUPPORTED_FILES } from '@lib/config';
+import { parseHeader } from '@lib/parse-file-meta';
 import { Script } from '@lib/script';
 
 async function describeScript(source: string, namespace?: string): Promise<Script | false> {
@@ -14,7 +14,10 @@ async function describeScript(source: string, namespace?: string): Promise<Scrip
 	});
 }
 
-export async function getPathScripts(target: string, namespace?: string): Promise<Map<string, Script >> {
+export async function getPathScripts(
+	target: string,
+	namespace?: string,
+): Promise<Map<string, Script>> {
 	const glob = new Bun.Glob(`*.{${SUPPORTED_FILES.join(',')}}`);
 	const scripts = new Map<string, Script>();
 	const descriptions: Promise<Script | false>[] = [];
@@ -43,14 +46,14 @@ export async function getPathScripts(target: string, namespace?: string): Promis
 
 		for (const alias of script.alias) {
 			if (scripts.has(alias)) {
-				console.warn(`Warning: Alias '${alias}' conflicts with an existing command or alias. Skipping.`);
+				console.warn(
+					`Warning: Alias '${alias}' conflicts with an existing command or alias. Skipping.`,
+				);
 			} else {
 				scripts.set(alias, script);
 			}
 		}
 	}
-
-
 
 	return scripts;
 }

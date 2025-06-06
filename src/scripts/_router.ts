@@ -1,7 +1,7 @@
-import { slugify } from '@lib/utils';
 import type { Router } from '@lib/router';
-import help from './help';
+import { slugify } from '@lib/utils';
 import { create } from './create';
+import help from './help';
 import version from './version';
 
 export const router: Router['callback'] = async ({ name, exec, command, scripts }) => {

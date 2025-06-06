@@ -2,8 +2,8 @@
  * Remove a directory from the script source list.
  */
 import * as config from '@lib/config';
-import { getSources } from '@lib/sources';
 import { PATHS } from '@lib/config';
+import { getSources } from '@lib/sources';
 import { reloadBins } from './reload';
 
 export async function removeSourceDirectory(target?: string): Promise<void> {
@@ -35,7 +35,16 @@ export async function removeSourceDirectory(target?: string): Promise<void> {
 
 async function cleanBins() {
 	const sources = await getSources();
-	const allBins = new Set(sources.flatMap(source => source.scripts ? source.scripts.flatMap(script => [script.bin, ...script.alias ? script.alias.map(alias => `${PATHS.bins}/${alias}`) : []]) : []));
+	const allBins = new Set(
+		sources.flatMap(source =>
+			source.scripts
+				? source.scripts.flatMap(script => [
+						script.bin,
+						...(script.alias ? script.alias.map(alias => `${PATHS.bins}/${alias}`) : []),
+					])
+				: [],
+		),
+	);
 	allBins.add(`${PATHS.bins}/bm`);
 	const binFiles = new Bun.Glob('*');
 	for await (const binName of binFiles.scan(PATHS.bins)) {
@@ -47,13 +56,13 @@ async function cleanBins() {
 	}
 }
 
-
 export default async function () {
 	const directory = args[0];
 	const cwd = process.cwd();
 
 	const sources = await getSources();
-	const sourceExists = (targetDirectory: string): boolean => sources.some(source => source.dir === targetDirectory);
+	const sourceExists = (targetDirectory: string): boolean =>
+		sources.some(source => source.dir === targetDirectory);
 
 	try {
 		if (directory && !sourceExists(directory)) {
@@ -64,12 +73,18 @@ export default async function () {
 
 		if (!directory && !sourceExists(cwd)) {
 			// 2 - Directory not provided, Using CWD, but doesn't exist
-			console.log(`The current working directory "${cwd}" does not exist in the source list. Selecting from available sources.`);
+			console.log(
+				`The current working directory "${cwd}" does not exist in the source list. Selecting from available sources.`,
+			);
 			await removeSourceDirectory();
 		} else if (directory && sourceExists(directory)) {
 			// 3 - Directory provided, exists
 			await removeSourceDirectory(directory);
-		} else if (!directory && sourceExists(cwd) && ack(`Do you want to delete the current working directory ${cwd}?`)) {
+		} else if (
+			!directory &&
+			sourceExists(cwd) &&
+			ack(`Do you want to delete the current working directory ${cwd}?`)
+		) {
 			// 4 - Directory not provided, Using CWD, exists
 			await removeSourceDirectory(cwd);
 		}

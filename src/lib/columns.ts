@@ -160,7 +160,7 @@ export class Columns<T extends number = number, Row extends string | string[] = 
 	private fitWidths(widths: number[]): number[] {
 		const adjustedWidths = [...widths];
 		const maxCols = (process.stdout.columns || 80) - this.indent;
-		const availableWidth = maxCols - (this.gap * (this.columnCount - 1));
+		const availableWidth = maxCols - this.gap * (this.columnCount - 1);
 
 		// Calculate the total width of fixed and percentage columns
 		let fixedWidth = 0;
@@ -180,7 +180,9 @@ export class Columns<T extends number = number, Row extends string | string[] = 
 
 		// Distribute the remaining width among 'auto' columns based on their content width
 		const remainingWidth = availableWidth - fixedWidth - percentageWidth;
-		const autoColumnIndices = this.config.map((config, index) => (config === 'auto' || config === '') ? index : -1).filter(index => index !== -1);
+		const autoColumnIndices = this.config
+			.map((config, index) => (config === 'auto' || config === '' ? index : -1))
+			.filter(index => index !== -1);
 		let distributedWidth = 0;
 		for (const columnIndex of autoColumnIndices) {
 			const contentWidth = widths[columnIndex];
@@ -227,7 +229,9 @@ export class Columns<T extends number = number, Row extends string | string[] = 
 				// Attempt to preserve color codes for fully colored entries
 				if (rawContent !== content && rawContentPos > 0) {
 					const colorCode = content.slice(0, rawContentPos);
-					const resetCode = content.slice(content.lastIndexOf(rawContent) + rawContent.length + colorCode.length);
+					const resetCode = content.slice(
+						content.lastIndexOf(rawContent) + rawContent.length + colorCode.length,
+					);
 					const wrapAt = this.nearestWrap(rawContent, widthLimit, 1);
 					const visibleContent = rawContent.slice(0, wrapAt);
 					const remainingContent = rawContent.replace(visibleContent, '');
@@ -277,4 +281,3 @@ export class Columns<T extends number = number, Row extends string | string[] = 
 		return widths;
 	}
 }
-

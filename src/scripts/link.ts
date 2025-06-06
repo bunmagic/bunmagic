@@ -27,9 +27,21 @@ export async function addSourceDirectory(target?: string) {
 		return;
 	}
 
-	console.log(ansis.dim('If you namespace this source, all your scripts within that dir will be prefixed with the namespace.'));
-	console.log(ansis.dim('For example, if you add a source with the namespace "foo", a script called "bar" will be available as "foo bar".'));
-	console.log(ansis.dim('If you don\'t want to namespace, just press enter and your scripts will be available globally.'));
+	console.log(
+		ansis.dim(
+			'If you namespace this source, all your scripts within that dir will be prefixed with the namespace.',
+		),
+	);
+	console.log(
+		ansis.dim(
+			'For example, if you add a source with the namespace "foo", a script called "bar" will be available as "foo bar".',
+		),
+	);
+	console.log(
+		ansis.dim(
+			"If you don't want to namespace, just press enter and your scripts will be available globally.",
+		),
+	);
 	const namespace = prompt('Namespace (optional):') || undefined;
 
 	target = path.resolve(target);
@@ -43,12 +55,10 @@ export async function addSourceDirectory(target?: string) {
 
 export default async function () {
 	const directory = args[0];
-	if (directory && !await Bun.file(directory).exists() && !await isDirectory(directory)) {
-		console.log(
-			'The path you provided doesn\'t exist. Are you sure it\'s correct?',
-		);
+	if (directory && !(await Bun.file(directory).exists()) && !(await isDirectory(directory))) {
+		console.log("The path you provided doesn't exist. Are you sure it's correct?");
 		console.log(path.resolve(directory));
-		if (!(ack('\nContinue?'))) {
+		if (!ack('\nContinue?')) {
 			return;
 		}
 	}

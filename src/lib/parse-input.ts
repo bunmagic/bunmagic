@@ -8,7 +8,10 @@ export type InputMeta = {
 };
 
 function parseSlug(input: string): [string, string | undefined] {
-	const parts = input.split('.').map(part => slugify(part)).filter(Boolean);
+	const parts = input
+		.split('.')
+		.map(part => slugify(part))
+		.filter(Boolean);
 
 	if (parts.length === 0) {
 		throw new Error(`Invalid input: ${input}`);
@@ -28,13 +31,7 @@ function parseSlug(input: string): [string, string | undefined] {
 }
 
 export function parseInput(input: string): InputMeta {
-	const array = input
-		.trim()
-		.split(' ')
-		.filter(Boolean)
-		.join('/')
-		.split('/')
-		.filter(Boolean);
+	const array = input.trim().split(' ').filter(Boolean).join('/').split('/').filter(Boolean);
 	if (array.length === 1) {
 		const [slug, extension] = parseSlug(array[0]);
 		return { slug, extension, command: slug };
@@ -52,4 +49,3 @@ export function parseInput(input: string): InputMeta {
 
 	throw new Error('A command should consist of 1 or 2 words.');
 }
-

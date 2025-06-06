@@ -1,5 +1,5 @@
-import { $ } from 'bun';
 import ansis from 'ansis';
+import { $ } from 'bun';
 import { CLI } from '../extras';
 
 class Spinner {
@@ -29,11 +29,15 @@ class Spinner {
 	private static disableConsole() {
 		// eslint-disable-next-line @typescript-eslint/no-empty-function
 		const noop = () => {};
-		Reflect.set(globalThis, 'console', new Proxy(console, {
-			get() {
-				return noop;
-			},
-		}));
+		Reflect.set(
+			globalThis,
+			'console',
+			new Proxy(console, {
+				get() {
+					return noop;
+				},
+			}),
+		);
 	}
 
 	private static enableConsole() {
@@ -72,9 +76,10 @@ class Spinner {
 	private status: 'inactive' | 'running' | 'success' | 'error' = 'inactive';
 	private animationIndex = 0;
 	private label: string | undefined;
-	private readonly animation = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'].map(s => ansis.dim(s));
+	private readonly animation = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'].map(s =>
+		ansis.dim(s),
+	);
 	private error: Error | undefined;
-
 
 	public setLabel = (text: string) => {
 		this.label = text;
@@ -113,7 +118,10 @@ class Spinner {
 			if (flags.debug && this.error.stack) {
 				const padSize = this.label?.length ? this.label.length + 3 : 0;
 				const padding = ' '.repeat(padSize);
-				const paddedStack = this.error.stack.split('\n').map(line => `${padding}${line.trim()}`).join('\n');
+				const paddedStack = this.error.stack
+					.split('\n')
+					.map(line => `${padding}${line.trim()}`)
+					.join('\n');
 				output += ansis.dim(`\n${paddedStack}`);
 			}
 		}
@@ -156,11 +164,11 @@ class Spinner {
 
 // eslint-disable-next-line @typescript-eslint/promise-function-async
 const $quiet = (...properties: Parameters<typeof $>) => {
-	if( flags.debug ) {
+	if (flags.debug) {
 		return $(...properties);
 	}
 	return $(...properties).quiet();
-}
+};
 
 type Callback<T> = ($: typeof $quiet, setLabel: Spinner['setLabel']) => Promise<T>;
 

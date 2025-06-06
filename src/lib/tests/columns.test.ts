@@ -1,6 +1,6 @@
 import { expect, test } from 'bun:test';
-import { Columns } from '../columns';
 import ansis from 'ansis';
+import { Columns } from '../columns';
 // Utility function to generate a string with sequential characters and spaces every few characters
 function generateString(length: number, spaceEvery = 0): string {
 	const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -33,7 +33,7 @@ function pad(...data: string[] | Array<PaddedString>) {
 	if (typeof data === 'string') {
 		input = data[0];
 	} else {
-		input = data.map(d => typeof d === 'string' ? d : d.get()).join('');
+		input = data.map(d => (typeof d === 'string' ? d : d.get())).join('');
 	}
 
 	return {
@@ -48,11 +48,9 @@ function row(...columns: PaddedString[]): string[] {
 	return columns.map(column => column.get());
 }
 
-
 function whitespace(length: number) {
 	return ' '.repeat(length);
 }
-
 
 test('generateString - length and space frequency', () => {
 	const length = 20;
@@ -70,8 +68,12 @@ test('generateRow - column count, length, and space frequency', () => {
 	const generated = generateRow(columns, length, spaceEvery);
 
 	expect(generated.length).toBe(columns);
-	expect(generated.every(column => column.length === length + Math.floor((length - 1) / spaceEvery))).toBe(true);
-	expect(generated.every(column => column.split(' ').every(part => part.length <= spaceEvery))).toBe(true);
+	expect(
+		generated.every(column => column.length === length + Math.floor((length - 1) / spaceEvery)),
+	).toBe(true);
+	expect(
+		generated.every(column => column.split(' ').every(part => part.length <= spaceEvery)),
+	).toBe(true);
 });
 
 test('Two Columns', () => {
@@ -80,9 +82,7 @@ test('Two Columns', () => {
 	const col2 = pad('Column 2');
 	columns.log(row(col1, col2));
 	const result = columns.flush();
-	expect(result).toBe(
-		whitespace(2) + col1.get(20) + whitespace(2) + col2.get(20),
-	);
+	expect(result).toBe(whitespace(2) + col1.get(20) + whitespace(2) + col2.get(20));
 });
 
 test('Three Columns', () => {
@@ -93,11 +93,7 @@ test('Three Columns', () => {
 	columns.log(row(col1, col2, col3));
 	const result = columns.flush();
 	expect(result).toBe(
-		whitespace(2) + col1.get(20)
-		+
-		whitespace(2) + col2.get(20)
-		+
-		whitespace(2) + col3.get(20),
+		whitespace(2) + col1.get(20) + whitespace(2) + col2.get(20) + whitespace(2) + col3.get(20),
 	);
 });
 
@@ -109,11 +105,17 @@ test('Two Columns with a manual line break', () => {
 	columns.log([col1.get(), col2.get() + '\n' + line2.get()]);
 	const result = columns.flush();
 	expect(result).toBe(
-		whitespace(2) + col1.get(20) + whitespace(2) + col2.get(20)
-		+ '\n' + whitespace(2) + whitespace(20) + whitespace(2) + line2.get(20),
+		whitespace(2) +
+			col1.get(20) +
+			whitespace(2) +
+			col2.get(20) +
+			'\n' +
+			whitespace(2) +
+			whitespace(20) +
+			whitespace(2) +
+			line2.get(20),
 	);
 });
-
 
 test('Two Columns with a line wrap', () => {
 	const columns = new Columns(2, [10, 10]).buffer();
@@ -124,11 +126,15 @@ test('Two Columns with a line wrap', () => {
 	const result = columns.flush();
 
 	expect(result).toBe(
-		whitespace(2) + col1.get() + whitespace(2) + col2l1.get()
-		+ '\n' + whitespace(2 + 10 + 2) + col2l2.get(10),
+		whitespace(2) +
+			col1.get() +
+			whitespace(2) +
+			col2l1.get() +
+			'\n' +
+			whitespace(2 + 10 + 2) +
+			col2l2.get(10),
 	);
 });
-
 
 test('2 columns, 2 rows', () => {
 	const columns = new Columns(2, [10, 20]).buffer();
@@ -141,10 +147,16 @@ test('2 columns, 2 rows', () => {
 	const result = columns.flush();
 
 	expect(result).toBe(
-		whitespace(2) + 'x'.repeat(10)
-		+ whitespace(2) + 'o'.repeat(20)
-		+ '\n' + whitespace(2) + 'x'.repeat(10)
-		+ whitespace(2) + 'o'.repeat(10) + whitespace(10),
+		whitespace(2) +
+			'x'.repeat(10) +
+			whitespace(2) +
+			'o'.repeat(20) +
+			'\n' +
+			whitespace(2) +
+			'x'.repeat(10) +
+			whitespace(2) +
+			'o'.repeat(10) +
+			whitespace(10),
 	);
 });
 
@@ -157,7 +169,7 @@ test('give up on columns if the terminal is too narrow and content too wide', ()
 	const col2 = pad(thirty);
 	columns.log(row(col1, col2));
 	const result = columns.flush();
-	expect(ansis.strip(result)).toBe(`x`.repeat(10) + '\n' + 'o'.repeat(30) + `\n${'┈'.repeat(process.stdout.columns)}\n`);
+	expect(ansis.strip(result)).toBe(
+		'x'.repeat(10) + '\n' + 'o'.repeat(30) + `\n${'┈'.repeat(process.stdout.columns)}\n`,
+	);
 });
-
-

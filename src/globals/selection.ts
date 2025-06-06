@@ -11,11 +11,7 @@ type Option<T extends string> = {
 function fuzzyMatch(text: string, query: string): number[] {
 	let queryIndex = 0; // Current index in the query string
 	const matchIndexes: number[] = []; // Stores indexes where matches occur
-	for (
-		let index = 0;
-		index < text.length && queryIndex < query.length;
-		index++
-	) {
+	for (let index = 0; index < text.length && queryIndex < query.length; index++) {
 		if (text[index] === query[queryIndex]) {
 			matchIndexes.push(index); // Store the index of the match
 			queryIndex++; // Move to the next character in the query
@@ -47,9 +43,7 @@ const utfKeyMap: Record<string, string> = {
 	' ': ' ',
 };
 
-function interpretKey(
-	utfSequence: Uint8Array,
-): string | number | false | { key: string } {
+function interpretKey(utfSequence: Uint8Array): string | number | false | { key: string } {
 	const sequence = String.fromCodePoint(...utfSequence);
 	if (sequence in utfKeyMap) {
 		return { key: utfKeyMap[sequence] };
@@ -69,11 +63,7 @@ function interpretKey(
 	return false;
 }
 
-function renderFrame(
-	selectionQuestion: string,
-	options: Option<string>[],
-	query: string,
-) {
+function renderFrame(selectionQuestion: string, options: Option<string>[], query: string) {
 	const totalOptionsCount = options.length;
 	const output: string[] = [`> ${ansis.bold(selectionQuestion)}`];
 
@@ -114,10 +104,7 @@ function renderFrame(
 	return output.join('\n');
 }
 
-async function searchOptions<T extends string>(
-	query: string,
-	options: Array<Option<T>>,
-) {
+async function searchOptions<T extends string>(query: string, options: Array<Option<T>>) {
 	const matches = options.map(option =>
 		fuzzyMatch(option.label.toLowerCase(), query.toLowerCase()),
 	);
@@ -181,18 +168,14 @@ export async function select<T extends string>(
 			}
 
 			if (input.key === 'up') {
-				const previousSelected = _options.findIndex(
-					option => option.selected,
-				);
+				const previousSelected = _options.findIndex(option => option.selected);
 				const selected = previousSelected - 1 < 0 ? _options.length - 1 : previousSelected - 1;
 				_options[previousSelected].selected = false;
 				_options[selected].selected = true;
 			}
 
 			if (input.key === 'down') {
-				const previousSelected = _options.findIndex(
-					option => option.selected,
-				);
+				const previousSelected = _options.findIndex(option => option.selected);
 				const selected = (previousSelected + 1) % _options.length;
 				_options[previousSelected].selected = false;
 				_options[selected].selected = true;
@@ -202,11 +185,7 @@ export async function select<T extends string>(
 				query = query.slice(0, -1);
 				await searchOptions(query, _options);
 			}
-		} else if (
-			typeof input === 'number' &&
-			input > 0 &&
-			input <= _options.length
-		) {
+		} else if (typeof input === 'number' && input > 0 && input <= _options.length) {
 			const index = input - 1;
 			if (_options[index]) {
 				for (const option of _options) {
@@ -275,10 +254,7 @@ export async function getPassword(message: string): Promise<string> {
 				throw new Error('User interrupted');
 			}
 
-			if (
-				(input.key === 'backspace' || input.key === 'delete') &&
-				password.length > 0
-			) {
+			if ((input.key === 'backspace' || input.key === 'delete') && password.length > 0) {
 				await CLI.stdout('\b \b');
 				password = password.slice(0, -1);
 			}
@@ -295,15 +271,21 @@ export async function getPassword(message: string): Promise<string> {
 	return password;
 }
 
-
 function cliMarkdown(input: string) {
 	input = input.replaceAll(/\*\*(.*?)\*\*/g, (_, match: string) => ansis.bold(match));
 	input = input.replaceAll(/__(.*?)__/g, (_, match: string) => ansis.dim(match));
 	return input;
 }
 
-type HandleAskResponse = 'required' | 'use_default' | ((answer: string | undefined) => Promise<string>);
-export async function ask(q: string, defaultAnswer = '', handle: HandleAskResponse = 'use_default'): Promise<string> {
+type HandleAskResponse =
+	| 'required'
+	| 'use_default'
+	| ((answer: string | undefined) => Promise<string>);
+export async function ask(
+	q: string,
+	defaultAnswer = '',
+	handle: HandleAskResponse = 'use_default',
+): Promise<string> {
 	if (handle === 'required') {
 		handle = async answer => {
 			if (!answer?.trim()) {
@@ -319,7 +301,7 @@ export async function ask(q: string, defaultAnswer = '', handle: HandleAskRespon
 	}
 
 	q = cliMarkdown(q);
-	const display = (text: string) => text || '\'\'';
+	const display = (text: string) => text || "''";
 	const columns = process.stdout.columns;
 
 	const stream = CLI.stream();
@@ -334,7 +316,6 @@ export async function ask(q: string, defaultAnswer = '', handle: HandleAskRespon
 	await CLI.stdout(inputPrompt);
 	await CLI.hideCursor();
 
-
 	for await (const chunk of stream.start()) {
 		const input = interpretKey(chunk);
 		if (!input) {
@@ -345,13 +326,17 @@ export async function ask(q: string, defaultAnswer = '', handle: HandleAskRespon
 			if (input.key === 'return') {
 				try {
 					const result = await handle(answer);
-					const displayAnswer = result ? ansis.green(result) : ansis.dim.greenBright('\'\'');
+					const displayAnswer = result ? ansis.green(result) : ansis.dim.greenBright("''");
 					// On success: clear current line in case the next print is shorter than the current one
 					await CLI.clearLine();
 
 					// Also clear & replace line above
 					await CLI.moveUp(1);
-					await CLI.replaceLine(ansis.green('✔︎'), ansis.dim(q + ':'), ansis.dim('"') + displayAnswer + ansis.dim('"'));
+					await CLI.replaceLine(
+						ansis.green('✔︎'),
+						ansis.dim(q + ':'),
+						ansis.dim('"') + displayAnswer + ansis.dim('"'),
+					);
 
 					await CLI.showCursor();
 					break;
@@ -379,10 +364,7 @@ export async function ask(q: string, defaultAnswer = '', handle: HandleAskRespon
 				throw new Exit(0);
 			}
 
-			if (
-				(input.key === 'backspace' || input.key === 'delete') &&
-				answer.length > 0
-			) {
+			if ((input.key === 'backspace' || input.key === 'delete') && answer.length > 0) {
 				await CLI.showCursor();
 				await CLI.stdout('\b \b');
 				answer = answer.slice(0, -1);

@@ -27,7 +27,7 @@ export class SAF {
 	 */
 	#abspath: string;
 
-	constructor (handle: string) {
+	constructor(handle: string) {
 		this.#abspath = path.resolve(handle);
 	}
 
@@ -63,9 +63,6 @@ export class SAF {
 
 		return destination;
 	}
-
-
-
 
 	/**
 	 *
@@ -106,7 +103,6 @@ export class SAF {
 		this.#dirty = path.join(value, this.base + this.extension);
 	}
 
-
 	/**
 	 * `/path/to/file.txt` -> `.txt`
 	 */
@@ -146,7 +142,6 @@ export class SAF {
 		return this;
 	}
 
-
 	/**
 	 * Quickly read/write JSON
 	 */
@@ -169,11 +164,9 @@ export class SAF {
 				throw new Error(`Can't update deleted file`);
 			}
 
-			const destination = this.safeMode ?
-				await SAF.prepare(this.#dirty)
-				: SAF.from(this.#dirty);
+			const destination = this.safeMode ? await SAF.prepare(this.#dirty) : SAF.from(this.#dirty);
 
-			if (await this.exists() !== false) {
+			if ((await this.exists()) !== false) {
 				const bytes = await this.bytes();
 				const copy = await Bun.write(destination.path, bytes);
 				if (copy === bytes.length) {
@@ -201,7 +194,7 @@ export class SAF {
 	}
 
 	public async isFile(): Promise<boolean> {
-		return await this.exists() && await this.isDirectory() === false;
+		return (await this.exists()) && (await this.isDirectory()) === false;
 	}
 
 	public async isDirectory(): Promise<boolean> {
@@ -224,7 +217,9 @@ export class SAF {
 		});
 	}
 
-	public async write(input: Blob | NodeJS.TypedArray | ArrayBufferLike | string | Bun.BlobPart[] | BunFile) {
+	public async write(
+		input: Blob | NodeJS.TypedArray | ArrayBufferLike | string | Bun.BlobPart[] | BunFile,
+	) {
 		return Bun.write(this.file, input);
 	}
 
@@ -243,7 +238,6 @@ export class SAF {
 
 		return this;
 	}
-
 
 	public async ensureDirectory() {
 		return new Promise<void>((resolve, reject) => {
@@ -277,7 +271,6 @@ export class SAF {
 		return this.path;
 	}
 
-
 	/**
 	 * Generates a safe filename by appending a number if the file already exists
 	 * @param newPath The desired new path
@@ -289,14 +282,14 @@ export class SAF {
 			throw new Error(`Couldn't get base name for ${newPath}`);
 		}
 
-		if (await saf.exists() === false) {
+		if ((await saf.exists()) === false) {
 			return saf.path;
 		}
 
 		let iteration = 0;
 		const originalBase = saf.base;
 		let destination = saf.path;
-		while (destination && await Bun.file(destination).exists()) {
+		while (destination && (await Bun.file(destination).exists())) {
 			iteration++;
 			if (iteration > 10) {
 				throw new Error(`Failed to find a safe path for ${newPath}`);

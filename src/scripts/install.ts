@@ -29,7 +29,12 @@ async function filterAsync<T>(array: T[], callback: (item: T) => Promise<boolean
 }
 
 async function availableRcFiles() {
-	const rcFiles = [`${$HOME}/.zshrc`, `${$HOME}/.bashrc`, `${$HOME}/.profile`, `${$HOME}/.bash_profile`];
+	const rcFiles = [
+		`${$HOME}/.zshrc`,
+		`${$HOME}/.bashrc`,
+		`${$HOME}/.profile`,
+		`${$HOME}/.bash_profile`,
+	];
 	return filterAsync(rcFiles, async file => Bun.file(file).exists());
 }
 
@@ -41,12 +46,12 @@ async function setupBinaryPath(binaryPath: string) {
 
 	if (rcFile === 'Custom') {
 		const customFile = await require(async () => {
-			const file = prompt('Enter the path to the file you\'d like to add bunmagic to:');
+			const file = prompt("Enter the path to the file you'd like to add bunmagic to:");
 			if (!file) {
 				throw new Exit('No file path provided');
 			}
 
-			if (!await Bun.file(file).exists()) {
+			if (!(await Bun.file(file).exists())) {
 				throw new Exit(`File not found: ${file}`);
 			}
 
@@ -87,7 +92,10 @@ async function setupConfig(bmPath: string) {
 		return;
 	}
 
-	const defaultExtension = await select<config.SupportedFiles>('What file extension would you like to use for your scripts?', config.SUPPORTED_FILES);
+	const defaultExtension = await select<config.SupportedFiles>(
+		'What file extension would you like to use for your scripts?',
+		config.SUPPORTED_FILES,
+	);
 	const defaults: config.Config = {
 		extension: defaultExtension,
 	};
@@ -127,7 +135,7 @@ export default async function setup() {
 
 	console.log(`\nInstalling ${ansis.bold('bunmagic')}...\n`);
 	if (!Bun.env.PATH) {
-		throw new Exit('Can\'t find $PATH variable. Exiting.');
+		throw new Exit("Can't find $PATH variable. Exiting.");
 	}
 
 	const existingMagic = await $`which bunmagic`.quiet().text();
@@ -150,7 +158,7 @@ export default async function setup() {
 	await setupConfig(bmPath);
 
 	console.log('\n- Setting up the script source directory.');
-	if (await config.get('sources') === undefined) {
+	if ((await config.get('sources')) === undefined) {
 		await addSourceDirectory();
 	}
 
@@ -159,5 +167,7 @@ export default async function setup() {
 	// Welcome!
 	await displayWelcomeMessage();
 
-	console.log(`\n- Open a new terminal to reload your ${ansis.bold('$PATH')} variable to apply the changes.`);
+	console.log(
+		`\n- Open a new terminal to reload your ${ansis.bold('$PATH')} variable to apply the changes.`,
+	);
 }

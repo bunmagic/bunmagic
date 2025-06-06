@@ -1,17 +1,13 @@
+import { SUPPORTED_FILES, get } from '@lib/config';
+import { parseInput } from '@lib/parse-input';
+import { Script } from '@lib/script';
 /**
  * Create a new script
  * @usage <script-name>
  * @alias new
  */
-import {
-	getSources,
-	findAny,
-	findNamespace,
-} from '@lib/sources';
-import { SUPPORTED_FILES, get } from '@lib/config';
+import { findAny, findNamespace, getSources } from '@lib/sources';
 import { openEditor, slugify } from '@lib/utils';
-import { Script } from '@lib/script';
-import { parseInput } from '@lib/parse-input';
 import { ensureNamespaceBin, ensureScriptBin } from './reload';
 
 export default async function () {
@@ -46,7 +42,6 @@ export async function getExtension(extension?: string): Promise<string> {
 
 	return extension;
 }
-
 
 async function scriptPath(slug: string): Promise<PartialScriptPath> {
 	const commandExists = await $`which ${slug}`.nothrow().quiet();
@@ -86,7 +81,7 @@ export async function create(input: string, content = '') {
 	if (existing) {
 		const target = 'source' in existing ? existing.source : existing.dir;
 		const messageExists = `"${ansis.bold(command)}" already exists:`;
-		const messageEdit = `Open in editor?`;
+		const messageEdit = 'Open in editor?';
 		if (ack(`${messageExists}\n${messageEdit}`, 'y')) {
 			return openEditor(target);
 		}
@@ -112,12 +107,9 @@ export async function create(input: string, content = '') {
 		namespace,
 		slug,
 	});
-	const binaryFile
-		= await (
-			namespace
-				? ensureNamespaceBin(binaryName, targetPath)
-				: ensureScriptBin(script)
-		);
+	const binaryFile = await (namespace
+		? ensureNamespaceBin(binaryName, targetPath)
+		: ensureScriptBin(script));
 
 	if (binaryFile) {
 		await $`chmod +x ${binaryFile}`;

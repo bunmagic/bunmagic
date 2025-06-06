@@ -26,7 +26,7 @@ async function linkGlobalsRefFile(ref: InstanceType<typeof SAF>) {
 
 export default async function importBunmagicTypes() {
 	const globalReference = SAF.from('~/.bunmagic/global-reference.ts');
-	if (await globalReference.exists() === false) {
+	if ((await globalReference.exists()) === false) {
 		await createGlobalsReference(globalReference);
 	}
 
@@ -35,12 +35,14 @@ export default async function importBunmagicTypes() {
 
 	if (ack('Add bunmagic.d.ts to .gitignore?')) {
 		const gitignore = SAF.from('.gitignore');
-		if (await gitignore.exists() === false) {
+		if ((await gitignore.exists()) === false) {
 			await Bun.write(gitignore.path, 'bunmagic.d.ts');
 		} else {
 			const content = await Bun.file(gitignore.path).text();
 			if (!content.includes('bunmagic.d.ts')) {
-				const newContent = content.endsWith('\n') ? `${content}bunmagic.d.ts\n` : `${content}\nbunmagic.d.ts\n`;
+				const newContent = content.endsWith('\n')
+					? `${content}bunmagic.d.ts\n`
+					: `${content}\nbunmagic.d.ts\n`;
 				await Bun.write(gitignore.path, newContent);
 			}
 		}

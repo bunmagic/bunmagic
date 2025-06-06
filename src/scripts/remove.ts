@@ -1,13 +1,11 @@
-/**
-* Remove and unlink a script
-* @usage <script-name>
-* @alias rm
-*/
-import { Script } from '@lib/script';
 import { update } from '@lib/config';
-import {
-	getSources, findNamespace, type Source, findAny,
-} from '@lib/sources';
+/**
+ * Remove and unlink a script
+ * @usage <script-name>
+ * @alias rm
+ */
+import { Script } from '@lib/script';
+import { type Source, findAny, findNamespace, getSources } from '@lib/sources';
 
 async function removeNamespace(query: string) {
 	const source = await findNamespace(query);
@@ -51,9 +49,7 @@ async function removeScript(script: Script) {
 
 export default async function () {
 	if (args.length === 0) {
-		throw new Error(
-			`You must specify which script to remove.`,
-		);
+		throw new Error('You must specify which script to remove.');
 	}
 
 	const input = args.join(' ');
@@ -73,4 +69,3 @@ export default async function () {
 
 	throw new Exit('Unknown script type');
 }
-

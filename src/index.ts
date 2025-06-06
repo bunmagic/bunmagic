@@ -19,13 +19,4 @@ export * from './extras/mac';
 const { args, flags } = notMinimist(Bun.argv.slice(2) || []);
 const argv = { _: args, ...flags };
 export const $HOME = os.homedir();
-export {
-	$,
-	path,
-	ansis,
-	ansis as chalk,
-	os,
-	args,
-	argv,
-	flags,
-};
+export { $, path, ansis, ansis as chalk, os, args, argv, flags };

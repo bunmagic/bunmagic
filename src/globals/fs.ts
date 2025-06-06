@@ -25,7 +25,6 @@ export async function cwd() {
 	return (await $`pwd`.text()).trim();
 }
 
-
 export function resolveTilde(input: string) {
 	if (input.startsWith('~')) {
 		return `${$HOME}${input.slice(1)}`;
@@ -43,7 +42,6 @@ export async function glob(pattern = '*', options: GlobScanOptions = {}) {
 	if (!options.cwd) {
 		defaultGlobOptions.cwd = await cwd();
 	}
-
 
 	const glob = new Bun.Glob(pattern);
 	const files: string[] = [];

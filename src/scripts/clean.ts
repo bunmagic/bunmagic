@@ -10,13 +10,17 @@ export default async function () {
 	const realBins = await getBins();
 	const sources = await getSources();
 
-	const expectedBins = new Set(await Promise.all(sources.flatMap(async source => {
-		if (source.namespace) {
-			return source.namespace;
-		}
+	const expectedBins = new Set(
+		await Promise.all(
+			sources.flatMap(async source => {
+				if (source.namespace) {
+					return source.namespace;
+				}
 
-		return source.scripts.map(script => script.slug);
-	})));
+				return source.scripts.map(script => script.slug);
+			}),
+		),
+	);
 
 	for (const binary of realBins) {
 		const name = path.basename(binary);

@@ -1,4 +1,3 @@
-
 import { parse } from 'comment-parser';
 
 const decoder = new TextDecoder();
@@ -36,8 +35,6 @@ export function readFirstComment(view: Uint8Array) {
 
 	return '';
 }
-
-
 
 async function parseFile(filePath: string): Promise<Properties | undefined> {
 	const file = SAF.from(filePath);
@@ -115,7 +112,6 @@ async function parseContent(contents: string) {
 
 	return properties;
 }
-
 
 export const parseHeader = {
 	fromFile: parseFile,

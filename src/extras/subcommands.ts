@@ -1,4 +1,6 @@
-type Subcommand<Arguments = unknown[], ReturnValue = void> = (...parameters: Arguments[]) => Promise<ReturnValue>;
+type Subcommand<Arguments = unknown[], ReturnValue = void> = (
+	...parameters: Arguments[]
+) => Promise<ReturnValue>;
 
 class Subcommands<
 	Callback,
@@ -6,7 +8,7 @@ class Subcommands<
 	Name extends keyof Config = keyof Config,
 > {
 	private readonly _commands: Config;
-	constructor (commands: Config) {
+	constructor(commands: Config) {
 		this._commands = commands;
 	}
 
@@ -15,7 +17,9 @@ class Subcommands<
 			return commandName as Name;
 		}
 
-		throw new Error(`Invalid command. Valid commands are: ${Object.keys(this._commands).join(', ')}`);
+		throw new Error(
+			`Invalid command. Valid commands are: ${Object.keys(this._commands).join(', ')}`,
+		);
 	}
 
 	public get<N extends Name>(commandName?: N): Config[N];
@@ -29,7 +33,9 @@ class Subcommands<
 			return this._commands[fallback];
 		}
 
-		throw new Error(`Invalid command. Valid commands are: ${Object.keys(this._commands).join(', ')}`);
+		throw new Error(
+			`Invalid command. Valid commands are: ${Object.keys(this._commands).join(', ')}`,
+		);
 	}
 
 	public get commands(): Name[] {
@@ -54,14 +60,8 @@ class Subcommands<
  * TypeScript doesn't support partial type inference,
  * So we need to use a factory function to create the subcommands.
  */
-export function subcommandFactory<
-	Arguments = unknown[],
-	ReturnValue = void,
->() {
-	return <
-		Name extends string,
-		Config extends Record<Name, Subcommand<Arguments, ReturnValue>>,
-	>(
+export function subcommandFactory<Arguments = unknown[], ReturnValue = void>() {
+	return <Name extends string, Config extends Record<Name, Subcommand<Arguments, ReturnValue>>>(
 		commands: Config,
 	) => new Subcommands(commands);
 }

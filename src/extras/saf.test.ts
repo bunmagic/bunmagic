@@ -2,13 +2,7 @@
 import { mkdir, rm } from 'node:fs/promises';
 import os from 'node:os';
 import 'bunmagic/globals';
-import {
-	expect,
-	test,
-	describe,
-	beforeEach,
-	afterEach,
-} from 'bun:test';
+import { afterEach, beforeEach, describe, expect, test } from 'bun:test';
 import { SAF } from './saf';
 
 const TEST_DIR = '/tmp/bunmagic-saf-test';
@@ -222,7 +216,6 @@ describe('SAF', () => {
 		expect(file3.path).toBe(path.join(TEST_DIR, `${duplicateBase}_2.txt`));
 	});
 
-
 	test('throws error after too many duplicate attempts', async () => {
 		// Create many numbered files to force the error
 		const baseName = 'error_safe_path_test.txt';
@@ -232,14 +225,14 @@ describe('SAF', () => {
 		await Promise.all(promises);
 
 		// Attempt to create one more
-		expect(SAF.prepare(path.join(TEST_DIR, baseName)))
-			.rejects
-			.toThrow(`Failed to find a safe path for ${path.join(TEST_DIR, baseName)}`);
+		expect(SAF.prepare(path.join(TEST_DIR, baseName))).rejects.toThrow(
+			`Failed to find a safe path for ${path.join(TEST_DIR, baseName)}`,
+		);
 	});
 
 	test('bytes method returns correct binary content', async () => {
 		const saf = getTestFile('binary_file.bin');
-		const buffer = new Uint8Array([0x00, 0xFF, 0x7E, 0x80]);
+		const buffer = new Uint8Array([0x00, 0xff, 0x7e, 0x80]);
 		await saf.write(buffer);
 		const bytes = await saf.bytes();
 		expect(bytes).toEqual(buffer);

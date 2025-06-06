@@ -30,7 +30,7 @@ async function linkSource(source: string, target: string) {
 	}
 
 	// Skip already existing files
-	if (targetIsFile && await Bun.file(targetPath).exists()) {
+	if (targetIsFile && (await Bun.file(targetPath).exists())) {
 		console.log(ansis.yellow.dim(` Skipping File: ${ansis.reset(targetPath)}`));
 		return;
 	}
@@ -41,7 +41,9 @@ async function linkSource(source: string, target: string) {
 		return;
 	}
 
-	console.log(ansis.green.dim(` Linking: ${ansis.reset(source)}\n To:      ${ansis.reset(target)}\n`));
+	console.log(
+		ansis.green.dim(` Linking: ${ansis.reset(source)}\n To:      ${ansis.reset(target)}\n`),
+	);
 	await $`ln -s ${source} ${target}`;
 }
 
@@ -56,14 +58,18 @@ async function symlinkBunmagic(target: string) {
 
 	await linkSource(bunmagicDirectory, target);
 	await linkSource(`${bunmagicDirectory}/types`, target);
-	await linkSource(`${bunmagicDirectory}/tsconfig.sources.json`, path.join(target, 'tsconfig.json'));
+	await linkSource(
+		`${bunmagicDirectory}/tsconfig.sources.json`,
+		path.join(target, 'tsconfig.json'),
+	);
 	await linkSource(`${bunmagicDirectory}/node_modules`, path.join(target, 'types/node_modules'));
 }
 
 export default async function symlinkSources() {
-	const target = flags.target && typeof flags.target === 'string'
-		? resolveTilde(flags.target)
-		: `${$HOME}/.bunmagic/`;
+	const target =
+		flags.target && typeof flags.target === 'string'
+			? resolveTilde(flags.target)
+			: `${$HOME}/.bunmagic/`;
 
 	const sources = await getSources();
 	const directories = sources.map(source => source.dir);
@@ -77,4 +83,3 @@ export default async function symlinkSources() {
 
 	await symlinkBunmagic(target);
 }
-
