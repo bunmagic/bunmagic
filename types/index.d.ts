@@ -14,9 +14,10 @@ export * from './globals/utils';
 export * from './globals/selection';
 export * from './globals/fs';
 export { SAF } from './extras/saf';
+export * from './extras/mac';
 declare const args: string[], flags: Record<string, string | number | boolean>;
 declare const argv: {
     _: string[];
 };
 export declare const $HOME: string;
-export { $, path, ansis, ansis as chalk, os, args, argv, flags, };
+export { $, path, ansis, ansis as chalk, os, args, argv, flags };
