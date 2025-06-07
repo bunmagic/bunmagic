@@ -37,14 +37,14 @@ for (const [key, value] of Object.entries(globals)) {
 }
 
 // Assign each global individually to preserve property descriptors
-for (const [key, value] of Object.entries(deprecatedGlobals)) {
-	if (Object.prototype.hasOwnProperty.call(deprecatedGlobals, key)) {
-		const descriptor = Object.getOwnPropertyDescriptor(deprecatedGlobals, key);
-		if (descriptor) {
-			Object.defineProperty(globalThis, key, descriptor);
-		} else {
-			(globalThis as any)[key] = value;
-		}
+// Use Object.keys to avoid triggering getters during iteration
+for (const key of Object.keys(deprecatedGlobals)) {
+	const descriptor = Object.getOwnPropertyDescriptor(deprecatedGlobals, key);
+	if (descriptor) {
+		Object.defineProperty(globalThis, key, descriptor);
+	} else {
+		// This shouldn't happen since we create all properties with descriptors
+		(globalThis as any)[key] = deprecatedGlobals[key];
 	}
 }
 
@@ -82,7 +82,7 @@ declare global {
 }
 
 // export type ExtendedGlobal = typeof globalThis;
-const customGlobalsFile = `${$HOME}/.bunmagic/custom-globals.ts`;
+const customGlobalsFile = `${globals.$HOME}/.bunmagic/custom-globals.ts`;
 // @ts-ignore
 if (await Bun.file(customGlobalsFile).exists()) {
 	// @ts-ignore

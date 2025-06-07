@@ -1,3 +1,5 @@
+import { $HOME } from 'bunmagic';
+
 export const PATHS: {
 	bunmagic: string;
 	bins: string;

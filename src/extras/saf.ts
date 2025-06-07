@@ -1,5 +1,6 @@
 import * as fs from 'node:fs';
 import type { BunFile } from 'bun';
+import { path } from 'bunmagic';
 
 /**
  * Swiss Army File manager

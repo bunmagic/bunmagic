@@ -1,4 +1,5 @@
 import { Columns } from '@lib/columns';
+import { path } from 'bunmagic';
 import { run } from 'bunmagic/run';
 import { create } from '../scripts/create';
 import { SUPPORTED_FILES } from './config';
