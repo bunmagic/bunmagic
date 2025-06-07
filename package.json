@@ -21,7 +21,6 @@
     "lint": "biome lint src",
     "format": "biome format --write src",
     "check": "biome check src",
-    "test": "biome check src",
     "build": "tsc src/globals.ts --declaration --emitDeclarationOnly --outdir types --skipLibCheck --downlevelIteration --target ES2020 --module ESNext --moduleResolution bundler"
   },
   "types": "types/index.d.ts",

@@ -334,7 +334,7 @@ export async function ask(
 					await CLI.moveUp(1);
 					await CLI.replaceLine(
 						ansis.green('✔︎'),
-						ansis.dim(q + ':'),
+						ansis.dim(`${q}:`),
 						ansis.dim('"') + displayAnswer + ansis.dim('"'),
 					);
 

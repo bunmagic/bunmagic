@@ -12,25 +12,7 @@
     "rules": {
       "recommended": true,
       "style": {
-        "useConst": "error",
-        "noImplicitBoolean": "off",
-        "useTemplate": "off",
-        "useCollapsedElseIf": "off"
-      },
-      "suspicious": {
-        "noExplicitAny": "off",
-        "noImplicitAnyLet": "off",
-        "noControlCharactersInRegex": "off"
-      },
-      "complexity": {
-        "noMultipleSpacesInRegularExpressionLiterals": "off"
-      },
-      "correctness": {
-        "noUnusedVariables": "error",
-        "useExhaustiveDependencies": "off"
-      },
-      "nursery": {
-        "noCommonJs": "off"
+        "useConst": "error"
       }
     }
   },

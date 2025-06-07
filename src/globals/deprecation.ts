@@ -45,6 +45,11 @@ function shouldShowWarning(): boolean {
 		return false;
 	}
 
+	// Check if globals were explicitly imported (via environment variable)
+	if (process.env.BUNMAGIC_EXPLICIT_GLOBALS === 'true') {
+		return false;
+	}
+
 	// Check if warnings are disabled via environment variable
 	if (process.env.BUNMAGIC_DISABLE_DEPRECATION_WARNINGS === 'true') {
 		return false;

@@ -1,4 +1,5 @@
 #!/usr/bin/env bun
+import { Exit, args } from 'bunmagic';
 import { runNamespace } from 'bunmagic/run';
 
 const sourcePath = args.shift();

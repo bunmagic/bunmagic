@@ -55,7 +55,7 @@ export default async function listScripts() {
 		columns.log('');
 		columns.log(ansis.gray.dim('–').repeat(process.stdout.columns * 0.8));
 		columns.log('');
-		columns.log(`${ansis.yellow.bold('◈ ' + name)}: ${ansis.dim.yellow(source.dir)}`);
+		columns.log(`${ansis.yellow.bold(`◈ ${name}`)}: ${ansis.dim.yellow(source.dir)}`);
 
 		for (const script of source.scripts) {
 			if (script.slug.startsWith('_')) {

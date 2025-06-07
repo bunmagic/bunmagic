@@ -1,6 +1,4 @@
-// eslint-disable-next-line import/no-unassigned-import
-import 'bunmagic/globals';
-import { args, flags } from 'bunmagic';
+import { ansis, args, flags } from 'bunmagic';
 
 /**
  * This is run by `./bin/bunmagic-exec.ts` to execute a script.

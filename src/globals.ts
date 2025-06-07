@@ -6,6 +6,8 @@ import * as globals from './index';
 // This will be set to true when imported via "bunmagic/globals"
 export function markAsExplicitlyImported() {
 	setExplicitImport(true);
+	// Also set an environment variable so child processes know
+	process.env.BUNMAGIC_EXPLICIT_GLOBALS = 'true';
 }
 
 // For backwards compatibility, check if we should show warnings
@@ -39,6 +41,11 @@ for (const [key, value] of Object.entries(globals)) {
 // Assign each global individually to preserve property descriptors
 // Use Object.keys to avoid triggering getters during iteration
 for (const key of Object.keys(deprecatedGlobals)) {
+	// Skip if property already exists on globalThis
+	if (Object.prototype.hasOwnProperty.call(globalThis, key)) {
+		continue;
+	}
+
 	const descriptor = Object.getOwnPropertyDescriptor(deprecatedGlobals, key);
 	if (descriptor) {
 		Object.defineProperty(globalThis, key, descriptor);
@@ -49,7 +56,9 @@ for (const key of Object.keys(deprecatedGlobals)) {
 }
 
 // Add bunmagic namespace without deprecation
-(globalThis as any).bunmagic = globals;
+if (!Object.prototype.hasOwnProperty.call(globalThis, 'bunmagic')) {
+	(globalThis as any).bunmagic = globals;
+}
 
 declare global {
 	const $: typeof globals.$;
@@ -83,10 +92,7 @@ declare global {
 
 // export type ExtendedGlobal = typeof globalThis;
 const customGlobalsFile = `${globals.$HOME}/.bunmagic/custom-globals.ts`;
-// @ts-ignore
 if (await Bun.file(customGlobalsFile).exists()) {
-	// @ts-ignore
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 	const customGlobals = await import(customGlobalsFile);
 	Object.assign(globalThis, customGlobals);
 }

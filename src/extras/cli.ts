@@ -26,7 +26,7 @@ async function clearLines(count = 1) {
 
 async function replaceLine(...messages: string[]) {
 	await clearLine();
-	await stdout(messages.join(' ') + '\n');
+	await stdout(`${messages.join(' ')}\n`);
 }
 
 async function clearLine() {
@@ -62,7 +62,7 @@ async function clearFrame(frame: string, wipe = false) {
 	const lineCount = lines.length - 1;
 	if (wipe) {
 		await moveUp(lineCount);
-		await stdout(lines.map(line => '\r' + ' '.repeat(line.length)).join('\n'));
+		await stdout(lines.map(line => `\r${' '.repeat(line.length)}`).join('\n'));
 		await clearLines(lineCount);
 	} else {
 		await clearLines(lineCount);

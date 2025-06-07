@@ -58,7 +58,7 @@ export const displayScripts = (scripts: Map<string, Script>) => {
 
 		let description = script.desc || '';
 		if (script.alias.length > 0) {
-			description += ' ' + ansis.dim(`(alias: ${script.alias.join(', ')})`);
+			description += ` ${ansis.dim(`(alias: ${script.alias.join(', ')})`)}`;
 		}
 
 		const usage = script.usage || { name: '', description: '' };
