@@ -3,6 +3,20 @@
  */
 import * as config from '@lib/config';
 import { setupAlias } from '@lib/setup';
+import {
+	path,
+	$,
+	$HOME,
+	Exit,
+	SAF,
+	ack,
+	ansis,
+	args,
+	cd,
+	ensureDirectory,
+	flags,
+	select,
+} from 'bunmagic';
 import { addSourceDirectory } from './link';
 
 async function require<T>(callback: () => Promise<T>, attempts = 3): Promise<T> {

@@ -3,6 +3,7 @@ import { setupAlias } from '@lib/setup';
  * Check if bunmagic is set up correctly
  */
 import { getSources } from '@lib/sources';
+import { $, $HOME, Exit, ansis } from 'bunmagic';
 import { addSourceDirectory } from './link';
 import { reloadBins } from './reload';
 

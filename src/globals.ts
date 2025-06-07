@@ -1,7 +1,7 @@
+import { createDeprecatedProxy, deprecatedGetter, setExplicitImport } from './globals/deprecation';
 /* eslint-disable @typescript-eslint/prefer-ts-expect-error */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import * as globals from './index';
-import { createDeprecatedProxy, deprecatedGetter, setExplicitImport } from './globals/deprecation';
 
 // This will be set to true when imported via "bunmagic/globals"
 export function markAsExplicitlyImported() {
@@ -11,8 +11,8 @@ export function markAsExplicitlyImported() {
 // For backwards compatibility, check if we should show warnings
 // Check the import URL to determine how this module was loaded
 const importPath = import.meta.url;
-const isPackageImport = importPath.endsWith('/bunmagic/globals') || importPath.includes('bunmagic/globals');
-
+const isPackageImport =
+	importPath.endsWith('/bunmagic/globals') || importPath.includes('bunmagic/globals');
 
 if (isPackageImport) {
 	// This is the "import 'bunmagic/globals'" path - no warnings

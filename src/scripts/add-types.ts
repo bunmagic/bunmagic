@@ -1,6 +1,7 @@
 /**
  * Import Bunmagic global types in the current directory.
  */
+import { $, SAF, ack, ansis } from 'bunmagic';
 
 const bunmagicPath = SAF.from('~/.bunmagic/bunmagic');
 

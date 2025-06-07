@@ -7,6 +7,7 @@
 import { PATHS } from '@lib/config';
 import type { Script } from '@lib/script';
 import { getSources } from '@lib/sources';
+import { path, $, SAF, ansis, ensureDirectory, flags, glob } from 'bunmagic';
 
 function template(name: string, scriptPath: string, exec: string): string {
 	let output = '#!/bin/bash\n';

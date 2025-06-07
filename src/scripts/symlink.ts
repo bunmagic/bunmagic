@@ -4,6 +4,7 @@
  * @flag [--remove] Remove the symlinks.
  */
 import { getSources } from '@lib/sources';
+import { path, $, $HOME, ansis, ensureDirectory, flags, isDirectory, resolveTilde } from 'bunmagic';
 
 async function linkSource(source: string, target: string) {
 	let targetPath = target;

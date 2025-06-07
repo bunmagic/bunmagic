@@ -1,4 +1,5 @@
-const DEPRECATION_MESSAGE = 'bunmagic: Implicit globals are deprecated. Please use explicit imports instead.\n  For quick scripts, add: import "bunmagic/globals";\n  For production code, import only what you need.';
+const DEPRECATION_MESSAGE =
+	'bunmagic: Implicit globals are deprecated. Please use explicit imports instead.\n  For quick scripts, add: import "bunmagic/globals";\n  For production code, import only what you need.';
 const SHOWN_WARNINGS = new Set<string>();
 let EXPLICIT_IMPORT = false;
 
@@ -43,17 +44,17 @@ function shouldShowWarning(): boolean {
 	if (EXPLICIT_IMPORT) {
 		return false;
 	}
-	
+
 	// Check if warnings are disabled via environment variable
 	if (process.env.BUNMAGIC_DISABLE_DEPRECATION_WARNINGS === 'true') {
 		return false;
 	}
-	
+
 	// Check if we're in a test environment
 	if (process.env.NODE_ENV === 'test' || process.env.BUNMAGIC_TEST === 'true') {
 		return false;
 	}
-	
+
 	return true;
 }
 
@@ -61,17 +62,15 @@ function showDeprecationWarning(globalName: string): void {
 	if (!shouldShowWarning()) {
 		return;
 	}
-	
+
 	// Only show each warning once per global
 	if (SHOWN_WARNINGS.has(globalName)) return;
-	
+
 	SHOWN_WARNINGS.add(globalName);
-	
+
 	const suggestion = IMPORT_SUGGESTIONS[globalName as keyof typeof IMPORT_SUGGESTIONS];
-	const message = suggestion 
-		? `${DEPRECATION_MESSAGE}\n  Use: ${suggestion}`
-		: DEPRECATION_MESSAGE;
-	
+	const message = suggestion ? `${DEPRECATION_MESSAGE}\n  Use: ${suggestion}` : DEPRECATION_MESSAGE;
+
 	// Use process.stderr.write for immediate output
 	process.stderr.write(`\x1b[33m${message}\x1b[0m\n`);
 }
@@ -82,7 +81,7 @@ export function createDeprecatedProxy<T>(target: T, globalName: string): T {
 		// Show warning on first access (we'll handle this differently in globals.ts)
 		return target;
 	}
-	
+
 	// For functions, we need special handling
 	if (typeof target === 'function') {
 		const handler = {
@@ -101,7 +100,7 @@ export function createDeprecatedProxy<T>(target: T, globalName: string): T {
 		};
 		return new Proxy(target, handler) as T;
 	}
-	
+
 	// For objects, track property access
 	const handler = {
 		get(targetObj: any, prop: string | symbol): any {
@@ -113,7 +112,7 @@ export function createDeprecatedProxy<T>(target: T, globalName: string): T {
 			return Reflect.set(targetObj, prop, value);
 		},
 	};
-	
+
 	return new Proxy(target, handler) as T;
 }
 
