@@ -22,7 +22,7 @@ if (isPackageImport) {
 }
 
 // Create proxied versions of globals that show deprecation warnings
-const deprecatedGlobals: Record<string, any> = {};
+const deprecatedGlobals: Record<string, unknown> = {};
 
 // Handle each global with appropriate deprecation wrapper
 for (const [key, value] of Object.entries(globals)) {
@@ -51,13 +51,13 @@ for (const key of Object.keys(deprecatedGlobals)) {
 		Object.defineProperty(globalThis, key, descriptor);
 	} else {
 		// This shouldn't happen since we create all properties with descriptors
-		(globalThis as any)[key] = deprecatedGlobals[key];
+		(globalThis as Record<string, unknown>)[key] = deprecatedGlobals[key];
 	}
 }
 
 // Add bunmagic namespace without deprecation
 if (!Object.prototype.hasOwnProperty.call(globalThis, 'bunmagic')) {
-	(globalThis as any).bunmagic = globals;
+	(globalThis as Record<string, unknown>).bunmagic = globals;
 }
 
 declare global {

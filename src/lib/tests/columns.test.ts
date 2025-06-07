@@ -104,8 +104,8 @@ test('Two Columns with a manual line break', () => {
 	const line2 = pad('Line 2');
 	columns.log([col1.get(), `${col2.get()}\n${line2.get()}`]);
 	const result = columns.flush();
-	// biome-ignore lint/style/useTemplate: Multi-line string concatenation is more readable here
 	expect(result).toBe(
+		// biome-ignore lint/style/useTemplate: Multi-line string concatenation is more readable here
 		whitespace(2) +
 			col1.get(20) +
 			whitespace(2) +
@@ -126,8 +126,8 @@ test('Two Columns with a line wrap', () => {
 	columns.log(row(col1, pad(col2l1, col2l2)));
 	const result = columns.flush();
 
-	// biome-ignore lint/style/useTemplate: Multi-line string concatenation is more readable here
 	expect(result).toBe(
+		// biome-ignore lint/style/useTemplate: Multi-line string concatenation is more readable here
 		whitespace(2) +
 			col1.get() +
 			whitespace(2) +
@@ -148,8 +148,8 @@ test('2 columns, 2 rows', () => {
 	columns.log(row(col1, col2));
 	const result = columns.flush();
 
-	// biome-ignore lint/style/useTemplate: Multi-line string concatenation is more readable here
 	expect(result).toBe(
+		// biome-ignore lint/style/useTemplate: Multi-line string concatenation is more readable here
 		whitespace(2) +
 			'x'.repeat(10) +
 			whitespace(2) +
@@ -172,8 +172,8 @@ test('give up on columns if the terminal is too narrow and content too wide', ()
 	const col2 = pad(thirty);
 	columns.log(row(col1, col2));
 	const result = columns.flush();
-	// biome-ignore lint/style/useTemplate: String concatenation is more readable here
 	expect(ansis.strip(result)).toBe(
+		// biome-ignore lint/style/useTemplate: String concatenation is more readable here
 		'x'.repeat(10) + '\n' + 'o'.repeat(30) + `\n${'┈'.repeat(process.stdout.columns)}\n`,
 	);
 });

@@ -32,7 +32,7 @@ export class Columns<T extends number = number, Row extends string | string[] = 
 					if (index > 0) {
 						// Preserve control characters (ansi colors, etc.), but remove leading tabs.
 						// Still allow for leading spaces to allow intentional custom indentation.
-						// eslint-disable-next-line no-control-regex
+						// biome-ignore lint/suspicious/noControlCharactersInRegex: ANSI escape sequences are expected here
 						content = content.replaceAll(/^(\u001B\[[\d;]*m)*\t+/g, '$1');
 					}
 

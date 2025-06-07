@@ -13,7 +13,7 @@ export async function openEditor(path: string) {
 	const edit = Bun.env.EDITOR || 'code';
 
 	// If using VSCode, open in a new window
-	let result;
+	let result: Awaited<ReturnType<typeof $>>;
 	if (edit === 'code' || edit === 'cursor') {
 		result = await $`code -n ${path}`.quiet();
 	} else {

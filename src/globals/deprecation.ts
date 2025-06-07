@@ -98,11 +98,11 @@ export function createDeprecatedProxy<T>(target: T, globalName: string): T {
 	// For functions, we need special handling
 	if (typeof target === 'function') {
 		const handler = {
-			apply(targetFn: any, thisArg: any, argList: any[]): any {
+			apply(targetFn: (...args: unknown[]) => unknown, thisArg: unknown, argList: unknown[]): unknown {
 				showDeprecationWarning(globalName);
 				return Reflect.apply(targetFn, thisArg, argList);
 			},
-			get(targetObj: any, prop: string | symbol): any {
+			get(targetObj: (...args: unknown[]) => unknown, prop: string | symbol): unknown {
 				// Handle function properties (like $.cwd)
 				if (prop in targetObj) {
 					showDeprecationWarning(globalName);
@@ -116,11 +116,11 @@ export function createDeprecatedProxy<T>(target: T, globalName: string): T {
 
 	// For objects, track property access
 	const handler = {
-		get(targetObj: any, prop: string | symbol): any {
+		get(targetObj: Record<string | symbol, unknown>, prop: string | symbol): unknown {
 			showDeprecationWarning(globalName);
 			return Reflect.get(targetObj, prop);
 		},
-		set(targetObj: any, prop: string | symbol, value: any): boolean {
+		set(targetObj: Record<string | symbol, unknown>, prop: string | symbol, value: unknown): boolean {
 			showDeprecationWarning(globalName);
 			return Reflect.set(targetObj, prop, value);
 		},
