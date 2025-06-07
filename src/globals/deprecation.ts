@@ -71,8 +71,16 @@ function showDeprecationWarning(globalName: string): void {
 	const suggestion = IMPORT_SUGGESTIONS[globalName as keyof typeof IMPORT_SUGGESTIONS];
 	const message = suggestion ? `${DEPRECATION_MESSAGE}\n  Use: ${suggestion}` : DEPRECATION_MESSAGE;
 
-	// Use process.stderr.write for immediate output
-	process.stderr.write(`\x1b[33m${message}\x1b[0m\n`);
+	// Check if --trace flag is passed
+	const hasTraceFlag = process.argv.includes('--trace') || process.argv.includes('-trace');
+
+	if (hasTraceFlag) {
+		// Use console.trace to show the call stack
+		console.trace(`\x1b[33m${message}\x1b[0m`);
+	} else {
+		// Use process.stderr.write for immediate output
+		process.stderr.write(`\x1b[33m${message}\x1b[0m\n`);
+	}
 }
 
 export function createDeprecatedProxy<T>(target: T, globalName: string): T {
