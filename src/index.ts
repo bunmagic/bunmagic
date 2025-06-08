@@ -1,5 +1,3 @@
-/* eslint-disable unicorn/prefer-export-from */
-// Importing each module
 import * as os from 'node:os';
 import * as path from 'node:path';
 import ansis from 'ansis';
