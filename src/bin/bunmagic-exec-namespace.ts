@@ -1,4 +1,4 @@
-#!/usr/bin/env bun
+#!/usr/bin/env bun --install=fallback
 import { Exit, args } from 'bunmagic';
 import { runNamespace } from 'bunmagic/run';
 
