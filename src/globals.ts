@@ -1,6 +1,4 @@
 import { createDeprecatedProxy, deprecatedGetter, setExplicitImport } from './globals/deprecation';
-/* eslint-disable @typescript-eslint/prefer-ts-expect-error */
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 import * as globals from './index';
 
 // This will be set to true when imported via "bunmagic/globals"
