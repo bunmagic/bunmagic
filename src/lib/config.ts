@@ -1,4 +1,4 @@
-import { $HOME } from 'bunmagic';
+import { $HOME, SAF } from 'bunmagic';
 
 export const PATHS: {
 	bunmagic: string;

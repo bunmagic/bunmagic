@@ -1,3 +1,5 @@
+import { $, chalk } from 'bunmagic';
+
 export function slugify(text: string) {
 	return text
 		.toLowerCase()
@@ -26,10 +28,10 @@ export async function openEditor(path: string) {
 
 	console.log(result);
 	console.log('');
-	console.log(ansis.bold('Editor missing!'));
-	console.log(`I tried to use "${ansis.bold(edit)}" to open ${path}`);
+	console.log(chalk.bold('Editor missing!'));
+	console.log(`I tried to use "${chalk.bold(edit)}" to open ${path}`);
 	console.log(
-		`\n 🔗 ${ansis.bold('Read more here: ')}\nhttps://github.com/bunmagic/bunmagic/tree/main#code-editor\n`,
+		`\n 🔗 ${chalk.bold('Read more here: ')}\nhttps://github.com/bunmagic/bunmagic/tree/main#code-editor\n`,
 	);
 	throw new Error(result.stdout.toString() || result.stderr.toString());
 }

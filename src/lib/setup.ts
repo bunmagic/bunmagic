@@ -1,3 +1,6 @@
+import ansis from 'ansis';
+import { $, ack } from 'bunmagic';
+
 export async function setupAlias(binaryPath: string) {
 	const bmAliasBinary = `${binaryPath}/bm`;
 	const bmAliasQuestion = `\n- Do you want to setup ${ansis.bold('bm')} as a shortcut for ${ansis.bold('bunmagic')}?`;

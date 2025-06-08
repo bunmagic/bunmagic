@@ -1,3 +1,5 @@
+import { ansis, $, flags } from 'bunmagic';
+
 /**
  * Run a shell command and return the result as text,
  * even if it's an error.

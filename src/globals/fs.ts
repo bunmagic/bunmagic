@@ -1,5 +1,5 @@
+import { $HOME, $, SAF } from 'bunmagic';
 import type { GlobScanOptions } from 'bun';
-import { SAF } from '../extras/saf';
 
 export async function isDirectory(path: string) {
 	const saf = await SAF.prepare(path);
