@@ -1,6 +1,5 @@
 /// <reference types="node" />
 import * as globals from './index';
-export declare function markAsExplicitlyImported(): void;
 declare global {
     const $: typeof globals.$;
     const ansis: typeof globals.ansis;
@@ -29,4 +28,5 @@ declare global {
     const SAF: typeof globals.SAF;
     const die: typeof globals.die;
     const copyToClipboard: typeof globals.copyToClipboard;
+    const CLI: typeof globals.CLI;
 }

@@ -14,6 +14,7 @@ export * from './globals/utils';
 export * from './globals/selection';
 export * from './globals/fs';
 export { SAF } from './extras/saf';
+export { CLI } from './extras/cli';
 export * from './extras/mac';
 declare const args: string[], flags: Record<string, string | number | boolean>;
 declare const argv: {

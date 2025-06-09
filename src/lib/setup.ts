@@ -1,5 +1,4 @@
 import ansis from 'ansis';
-import { $, ack } from 'bunmagic';
 
 export async function setupAlias(binaryPath: string) {
 	const bmAliasBinary = `${binaryPath}/bm`;

@@ -2,7 +2,6 @@
  * Add an additional directory to use as script source.
  */
 import * as config from '@lib/config';
-import { path, ack, ansis, args, ensureDirectory, isDirectory } from 'bunmagic';
 import { reloadBins } from './reload';
 
 export async function addSourceDirectory(target?: string) {

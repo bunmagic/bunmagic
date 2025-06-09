@@ -1,5 +1,3 @@
-import { ansis, args, flags } from 'bunmagic';
-
 /**
  * This is run by `./bin/bunmagic-exec.ts` to execute a script.
  * It runs the script directly without loading any other dependencies.

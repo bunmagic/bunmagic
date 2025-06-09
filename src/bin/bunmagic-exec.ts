@@ -1,5 +1,5 @@
 #!/usr/bin/env bun --install=fallback
-import { Exit, args } from 'bunmagic';
+import 'bunmagic/globals';
 import { run } from 'bunmagic/run';
 
 const scriptFile = args.shift();

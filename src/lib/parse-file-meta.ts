@@ -1,4 +1,3 @@
-import { SAF } from 'bunmagic';
 import { parse } from 'comment-parser';
 
 const decoder = new TextDecoder();

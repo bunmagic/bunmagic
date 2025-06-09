@@ -1,4 +1,4 @@
-import { $, chalk } from 'bunmagic';
+declare const chalk: typeof import('ansis').default;
 
 export function slugify(text: string) {
 	return text

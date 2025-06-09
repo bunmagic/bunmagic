@@ -1,5 +1,5 @@
 #!/usr/bin/env bun --install=fallback
-import { Exit, args } from 'bunmagic';
+import 'bunmagic/globals';
 import { runNamespace } from 'bunmagic/run';
 
 const sourcePath = args.shift();

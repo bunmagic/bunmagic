@@ -3,7 +3,6 @@
  * @usage [[version | -v]]
  * @alias -v
  */
-import { Exit, SAF } from 'bunmagic';
 
 type PackageJson = {
 	version: string;

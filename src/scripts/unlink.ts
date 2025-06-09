@@ -4,7 +4,6 @@
 import * as config from '@lib/config';
 import { PATHS } from '@lib/config';
 import { getSources } from '@lib/sources';
-import { path, $, ack, ansis, args, select } from 'bunmagic';
 import { reloadBins } from './reload';
 
 export async function removeSourceDirectory(target?: string): Promise<void> {

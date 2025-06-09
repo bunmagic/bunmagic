@@ -1,6 +1,5 @@
 import { PATHS } from '@lib/config';
 import { slugify } from '@lib/utils';
-import { path } from 'bunmagic';
 
 export class Script {
 	public readonly type = 'script' as const;

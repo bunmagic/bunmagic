@@ -8,7 +8,6 @@ import { Script } from '@lib/script';
  */
 import { findAny, findNamespace, getSources } from '@lib/sources';
 import { openEditor, slugify } from '@lib/utils';
-import { path, $, Exit, ack, ansis, args, select } from 'bunmagic';
 import { ensureNamespaceBin, ensureScriptBin } from './reload';
 
 export default async function () {

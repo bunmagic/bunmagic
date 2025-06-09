@@ -2,8 +2,6 @@ import { type SourcePaths, get, update } from '@lib/config';
 import type { Script } from '@lib/script';
 import { getPathScripts } from '@lib/scripts';
 import { parseInput } from './parse-input';
-import { isDirectory } from 'bunmagic';
-import { ack } from 'bunmagic';
 
 export type Source = SourcePaths & {
 	scripts: Script[];

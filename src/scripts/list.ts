@@ -8,7 +8,6 @@ import path from 'node:path';
 import { displayScriptInfo, setupScriptColumns } from '@lib/display-utils';
 import { type Source, getSources } from '@lib/sources';
 import ansis from 'ansis';
-import { args, flags } from 'bunmagic';
 import fuzzysort from 'fuzzysort';
 
 async function getSourcesToDisplay(query: string[]): Promise<Source[]> {

@@ -1,6 +1,5 @@
 import type { Router } from '@lib/router';
 import { slugify } from '@lib/utils';
-import { Exit, args, flags } from 'bunmagic';
 import { create } from './create';
 import help from './help';
 import version from './version';

@@ -2,7 +2,6 @@
  * Remove bin files from the bin directory that don't have a matching script.
  */
 import { getSources } from '@lib/sources';
-import { path, $, ack } from 'bunmagic';
 import { getBins } from './reload';
 
 export default async function () {

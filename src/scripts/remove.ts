@@ -6,7 +6,6 @@ import { update } from '@lib/config';
  */
 import { Script } from '@lib/script';
 import { type Source, findAny, findNamespace, getSources } from '@lib/sources';
-import { $, Exit, ack, ansis, args } from 'bunmagic';
 
 async function removeNamespace(query: string) {
 	const source = await findNamespace(query);

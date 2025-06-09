@@ -1,62 +1,10 @@
-import { createDeprecatedProxy, deprecatedGetter, setExplicitImport } from './globals/deprecation';
 import * as globals from './index';
 
-// This will be set to true when imported via "bunmagic/globals"
-export function markAsExplicitlyImported() {
-	setExplicitImport(true);
-	// Also set an environment variable so child processes know
-	process.env.BUNMAGIC_EXPLICIT_GLOBALS = 'true';
-}
-
-// For backwards compatibility, check if we should show warnings
-// Check the import URL to determine how this module was loaded
-const importPath = import.meta.url;
-const isPackageImport =
-	importPath.endsWith('/bunmagic/globals') || importPath.includes('bunmagic/globals');
-
-if (isPackageImport) {
-	// This is the "import 'bunmagic/globals'" path - no warnings
-	markAsExplicitlyImported();
-}
-
-// Create proxied versions of globals that show deprecation warnings
-const deprecatedGlobals: Record<string, unknown> = {};
-
-// Handle each global with appropriate deprecation wrapper
-for (const [key, value] of Object.entries(globals)) {
-	if (typeof value === 'function' || (typeof value === 'object' && value !== null)) {
-		deprecatedGlobals[key] = createDeprecatedProxy(value, key);
-	} else {
-		// For primitive values, we'll use getter functions
-		Object.defineProperty(deprecatedGlobals, key, {
-			get: deprecatedGetter(key, value),
-			enumerable: true,
-			configurable: true,
-		});
-	}
-}
-
-// Assign each global individually to preserve property descriptors
-// Use Object.keys to avoid triggering getters during iteration
-for (const key of Object.keys(deprecatedGlobals)) {
-	// Skip if property already exists on globalThis
-	if (Object.prototype.hasOwnProperty.call(globalThis, key)) {
-		continue;
-	}
-
-	const descriptor = Object.getOwnPropertyDescriptor(deprecatedGlobals, key);
-	if (descriptor) {
-		Object.defineProperty(globalThis, key, descriptor);
-	} else {
-		// This shouldn't happen since we create all properties with descriptors
-		(globalThis as Record<string, unknown>)[key] = deprecatedGlobals[key];
-	}
-}
-
-// Add bunmagic namespace without deprecation
-if (!Object.prototype.hasOwnProperty.call(globalThis, 'bunmagic')) {
-	(globalThis as Record<string, unknown>).bunmagic = globals;
-}
+Object.assign(globalThis, {
+	...globals,
+	// Allow explicit globals reference via `bunmagic` prefix.
+	bunmagic: globals,
+});
 
 declare global {
 	const $: typeof globals.$;

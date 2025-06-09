@@ -1,7 +1,6 @@
 import { SUPPORTED_FILES } from '@lib/config';
 import { parseHeader } from '@lib/parse-file-meta';
 import { Script } from '@lib/script';
-import { path, flags } from 'bunmagic';
 
 async function describeScript(source: string, namespace?: string): Promise<Script | false> {
 	const meta = await parseHeader.fromFile(source);
