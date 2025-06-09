@@ -86,6 +86,7 @@ declare global {
 	const SAF: typeof globals.SAF;
 	const die: typeof globals.die;
 	const copyToClipboard: typeof globals.copyToClipboard;
+	const CLI: typeof globals.CLI;
 }
 
 // export type ExtendedGlobal = typeof globalThis;
