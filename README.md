@@ -14,7 +14,8 @@ This is how you create a `demo` command and import `cowsay` from npm, and delive
 * **Create** new scripts with `bunmagic create <script-name>`.
 * **List** all known scripts with `bunmagic list`
 * **Edit** scripts with `bunmagic <script-name>`
-* Use the **built-in utilities** for common CLI tasks (e.g., `cd`, `ack`, `select`, `isDirectory`, `ensureDirectory`, `glob`).
+* **No imports needed!** All Bunmagic utilities are available as globals (e.g., `$`, `cd`, `ack`, `select`, `isDirectory`, `glob`, and more).
+* Use the **built-in utilities** for common CLI tasks without any import statements.
 * Leverage **Bun** to quickly build powerful scripts using all the features that bun provides - run shell commands, import npm packages, and more.
 
 ## 🚀 Install
@@ -48,6 +49,7 @@ This will create a `lse.ts` file in bunmagic source directory and link it up as 
 Now add in a bit script:
 
 ```js
+// No imports needed! All bunmagic utilities are available globally
 const ext = args[0];
 const ls = await glob(`*.${ext}`);
 console.log(ls.join("\n"));
@@ -79,19 +81,29 @@ Bunmagic is going to handle creating a binary and making sure it's executable fo
 
 ## 📦 API
 
-Bun supports dynamic [package imports](https://bun.sh/docs/runtime/modules#importing-packages) out of the box. So you can use any npm package in your scripts:
+### 🌍 Everything is Global!
+
+**This is a key feature of Bunmagic:** All utilities and helpers are available as global variables in your scripts. You don't need to import anything to use `$`, `args`, `flags`, `cd`, `ack`, `select`, `glob`, and all other Bunmagic utilities. They're just there, ready to use!
+
+```ts
+// No imports needed for Bunmagic utilities!
+await $`echo "Shell commands with $"`;
+const files = await glob("*.json");
+const choice = await select("Pick one:", files);
+cd("~/projects");
+```
+
+Bun also supports dynamic [package imports](https://bun.sh/docs/runtime/modules#importing-packages) out of the box. So you can use any npm package in your scripts:
 
 ```ts
 import cowsay from 'cowsay';
 console.log(cowsay.say({ text: 'Hello, Bunmagic!' }));
 ```
 
-However, there are a few global variables that are useful for writing CLI scripts that come bundled with Bun Magic.
-
 
 ### `$` Bun Shell
 
-Bun [Shell](https://bun.sh/docs/runtime/shell) is already imported as `$` globally. Use this to run all your shell commands as you would in Bun.
+Bun [Shell](https://bun.sh/docs/runtime/shell) is available as `$` globally. Use this to run all your shell commands as you would in Bun.
 
 ### Arguments
 
@@ -141,6 +153,8 @@ console.log(Bun.argv);
 
 ### 🧰 Built-in Utilities
 
+All the utilities below are available as global variables in your scripts - no imports needed!
+
 #### Ansis (an alternative to Chalk)
 
 [ansis](https://www.npmjs.com/package/ansis) - is a small library for styling the terminal output. The interface is almost exactly the same as the one in [chalk](https://www.npmjs.com/package/chalk), but it's much smaller and faster:
@@ -152,13 +166,11 @@ ansis.bold.red.bgGreen("This is bold red text on a green background");
 
 #### $HOME
 
-Variable: `$HOME`
-
 The `$HOME` global variable is a shortcut for `os.homedir()`. It holds the absolute path to the current user's home directory. 
 
 #### resolveTilde
 
-Interface: `resolveTilde(path: string): string`
+`resolveTilde(path: string): string`
 
 If you need to quickly resolve a path that starts with a tilde ( `~` ), you can use the `resolveTilde` function. It replaces the tilde with the absolute path to the current user's home directory.
 
@@ -171,7 +183,7 @@ console.log(resolvedPath);
 
 #### cd
 
-Interface: `cd(path: string): void`
+`cd(path: string): void`
 
 `cd` is a wrapper around `$.cwd`, but it also resolves the tilde ( `~` ) to the home directory.
 
@@ -208,13 +220,15 @@ const selected = await select("Select an option:", options);
 
 ### 🗄️ Filesystem Utilities
 
+All filesystem utilities are available as global functions - no imports needed!
+
 If you need to interact with the filesystem a lot, `fs-extra` is great, but I've only found that often I need only a few key functions.
 
 That's why I've included only a handful of functions that I've found to be the most useful.
 
 #### isDirectory
 
-Interface: `isDirectory(path: string): Promise<boolean>`
+`isDirectory(path: string): Promise<boolean>`
 
 Due to Bun's ( v1.0.26 ) current limitations in directly checking if a path is a directory, this function utilizes Node.js's `fs.stat` method to perform the check. If an error occurs during this process (e.g., if the path does not exist), the promise will resolve to `false`. Otherwise, it resolves based on whether the path points to a directory.
 
@@ -229,7 +243,7 @@ This function is particularly useful when you need to make sure a directory is p
 
 #### glob
 
-Interface: `glob(pattern: string = '*', options: GlobScanOptions = {}): Promise<string[]>` ( [`GlobScanOptions`](https://github.com/oven-sh/bun/blob/49ccad9367b0a30158dbb03ff00bc9a523d43c14/packages/bun-types/bun.d.ts#L4669-L4709) )
+`glob(pattern: string = '*', options: GlobScanOptions = {}): Promise<string[]>` ( [`GlobScanOptions`](https://github.com/oven-sh/bun/blob/49ccad9367b0a30158dbb03ff00bc9a523d43c14/packages/bun-types/bun.d.ts#L4669-L4709) )
 
 This is a shortcut for [`new Bun.Glob()`](https://bun.sh/docs/api/glob) that allows you to quickly scan a directory and get a list of files that match a pattern. 
 
