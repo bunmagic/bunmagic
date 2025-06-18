@@ -1,11 +1,7 @@
-export const PATHS: {
-	bunmagic: string;
-	bins: string;
-	config: string;
-} = {
-	bunmagic: `${$HOME}/.bunmagic`,
-	bins: `${$HOME}/.bunmagic/bin`,
-	config: `${$HOME}/.bunmagic/config.json`,
+export const PATHS = {
+	get bunmagic() { return `${$HOME}/.bunmagic`; },
+	get bins() { return `${$HOME}/.bunmagic/bin`; },
+	get config() { return `${$HOME}/.bunmagic/config.json`; },
 };
 
 export const SUPPORTED_FILES: string[] = ['ts', 'mjs', 'js'] as const;

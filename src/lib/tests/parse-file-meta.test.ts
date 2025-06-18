@@ -49,6 +49,7 @@ describe('parseContent', () => {
 			source: 'test.ts',
 			slug: 'test-command',
 			alias: ['t', 'other'],
+			autohelp: false,
 		});
 	});
 
@@ -68,6 +69,28 @@ describe('parseContent', () => {
 			source: '',
 			slug: '',
 			alias: [],
+			autohelp: false,
+		});
+	});
+
+	test('should parse @autohelp tag correctly', async () => {
+		const content = `
+      /**
+	   * This is a test command with autohelp
+       * @autohelp
+       * @usage test-cmd <input>
+       */
+    `;
+		const properties = await parseContent(content);
+		expect(properties).toEqual({
+			name: '',
+			description: 'This is a test command with autohelp',
+			usage: { name: 'test-cmd', description: '<input>' },
+			meta: {},
+			source: '',
+			slug: '',
+			alias: [],
+			autohelp: true,
 		});
 	});
 });

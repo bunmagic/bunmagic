@@ -11,6 +11,7 @@ async function describeScript(source: string, namespace?: string): Promise<Scrip
 		alias: meta?.alias,
 		desc: meta?.description,
 		meta: meta?.meta,
+		autohelp: meta?.autohelp,
 	});
 }
 

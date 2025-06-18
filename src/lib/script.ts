@@ -14,11 +14,6 @@ export class Script {
 	 */
 	command: string;
 	/**
-	 * The full path to the bin file, for example
-	 * `~/.bunmagic/bins/my-command`
-	 */
-	bin: string;
-	/**
 	 * The full source path, for example:
 	 * `/path/to/dir/my-command.js`
 	 */
@@ -46,6 +41,11 @@ export class Script {
 
 	meta?: Record<string, Array<{ name: string; description: string }>>;
 
+	/**
+	 * Whether the script should automatically show help when --help is passed.
+	 */
+	autohelp: boolean;
+
 	constructor({
 		source,
 		namespace,
@@ -54,6 +54,7 @@ export class Script {
 		usage,
 		alias,
 		meta,
+		autohelp = false,
 	}: {
 		source: string;
 		namespace?: string;
@@ -62,16 +63,25 @@ export class Script {
 		usage?: { name: string; description: string };
 		alias?: string[];
 		meta?: Record<string, Array<{ name: string; description: string }>>;
+		autohelp?: boolean;
 	}) {
 		this.source = source;
 		this.slug = slugify(slug ?? path.parse(source).name);
 		this.command = namespace ? `${namespace} ${this.slug}` : this.slug;
-		this.bin = `${PATHS.bins}/${this.slug}`;
 		this.desc = desc;
 		this.usage = usage;
 		this.alias = alias ?? [];
 		this.namespace = namespace;
 		this.meta = meta;
+		this.autohelp = autohelp;
+	}
+
+	/**
+	 * The full path to the bin file, for example
+	 * `~/.bunmagic/bins/my-command`
+	 */
+	get bin() {
+		return `${PATHS.bins}/${this.slug}`;
 	}
 
 	/**

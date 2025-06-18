@@ -52,6 +52,7 @@ type Properties = {
 	source: string;
 	slug: string;
 	alias: string[];
+	autohelp: boolean;
 };
 async function parseContent(contents: string) {
 	if (contents.length === 0) {
@@ -75,6 +76,7 @@ async function parseContent(contents: string) {
 		slug: '',
 		alias: [],
 		meta: {},
+		autohelp: false,
 	};
 
 	if (result.description) {
@@ -99,6 +101,11 @@ async function parseContent(contents: string) {
 
 		if (tag === 'alias') {
 			properties.alias.push(spec.name);
+			continue;
+		}
+
+		if (tag === 'autohelp') {
+			properties.autohelp = true;
 			continue;
 		}
 

@@ -10,6 +10,7 @@ import { notMinimist } from './globals/not-minimist';
 export { $spinner } from './globals/spinner';
 export { openEditor, slugify } from './lib/utils';
 export { notMinimist };
+export { showHelp } from './globals/help';
 export * from './globals/utils';
 export * from './globals/selection';
 export * from './globals/fs';

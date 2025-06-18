@@ -35,6 +35,7 @@ declare global {
 	const die: typeof globals.die;
 	const copyToClipboard: typeof globals.copyToClipboard;
 	const CLI: typeof globals.CLI;
+	const showHelp: typeof globals.showHelp;
 }
 
 // export type ExtendedGlobal = typeof globalThis;
