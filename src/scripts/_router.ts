@@ -4,7 +4,7 @@ import { create } from './create';
 import help from './help';
 import version from './version';
 
-export const router: Router['callback'] = async ({ name, exec, command, scripts }) => {
+export const router: Router['callback'] = async ({ namespace, name, exec, command, scripts }) => {
 	const input = [name, ...args].map(t => slugify(t)).join(' ');
 
 	// Don't take over flags too eagerly:
@@ -18,7 +18,7 @@ export const router: Router['callback'] = async ({ name, exec, command, scripts 
 	// Check for autohelp before general help
 	if (command?.autohelp && flags.help) {
 		const { displayScriptHelp } = await import('@lib/help-display');
-		displayScriptHelp(command);
+		displayScriptHelp(command, namespace);
 		return;
 	}
 

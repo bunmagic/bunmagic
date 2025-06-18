@@ -34,7 +34,7 @@ export type Router = {
 	callback: (route: Route) => Promise<void>;
 };
 
-export const displayScripts = (scripts: Map<string, Script>) => {
+export const displayScripts = (scripts: Map<string, Script>, namespace?: string) => {
 	const columns = new Columns(3, ['auto', 'auto', 'auto']);
 	columns.gap = 5;
 	columns.buffer();
@@ -62,15 +62,51 @@ export const displayScripts = (scripts: Map<string, Script>) => {
 		const usage = script.usage || { name: '', description: '' };
 		if (usage?.name && usage?.description) {
 			columns.log([ansis.bold(script.slug), '', description]);
-			columns.log(['', ansis.dim(usage.name), ansis.dim(usage.description)]);
+			// Skip showing namespace in usage if it's redundant
+			if (namespace && usage.name === namespace) {
+				columns.log(['', '', ansis.dim(usage.description)]);
+			} else {
+				let usageName = usage.name;
+				// Strip namespace prefix if present
+				if (namespace?.trim() && usageName.startsWith(`${namespace} `)) {
+					usageName = usageName.slice(namespace.length + 1);
+				}
+				columns.log(['', ansis.dim(usageName), ansis.dim(usage.description)]);
+			}
 		} else {
-			columns.log([ansis.bold(script.slug), ansis.gray(script.usage?.name || ''), description]);
+			let usageName = script.usage?.name || '';
+			if (namespace?.trim() && usageName.startsWith(`${namespace} `)) {
+				usageName = usageName.slice(namespace.length + 1);
+			}
+			columns.log([ansis.bold(script.slug), ansis.gray(usageName), description]);
 		}
 
 		if (script.meta) {
-			for (const meta of Object.values(script.meta)) {
-				for (const { name, description } of meta) {
-					columns.log(['', ansis.dim(name), ansis.dim(description)]);
+			for (const [metaType, metaItems] of Object.entries(script.meta)) {
+				for (const { name, description } of metaItems) {
+					let displayName = name;
+
+					// For examples and similar metadata, check if it starts with the namespace
+					// and remove it to avoid redundancy
+					if (namespace?.trim()) {
+						// Check if it's just the namespace alone
+						if (displayName === namespace) {
+							// Show only description in third column
+							columns.log(['', '', ansis.dim(description)]);
+							continue;
+						}
+						// Check if it starts with namespace followed by space
+						if (displayName.startsWith(`${namespace} `)) {
+							displayName = displayName.slice(namespace.length + 1);
+						}
+					}
+
+					// For certain metadata types like examples, show in third column if no description
+					if (metaType === 'example' && !description) {
+						columns.log(['', '', ansis.dim(displayName)]);
+					} else {
+						columns.log(['', ansis.dim(displayName), ansis.dim(description)]);
+					}
 				}
 			}
 		}
@@ -118,7 +154,7 @@ const defaultRouter: Router['callback'] = async ({ namespace, name, exec, comman
 				console.log(ansis.yellow(`> Command not found: ${ansis.bold(input)}\n`));
 			}
 
-			displayScripts(scripts);
+			displayScripts(scripts, namespace);
 		});
 
 		return;

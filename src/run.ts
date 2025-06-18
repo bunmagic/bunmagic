@@ -8,7 +8,7 @@ export async function run(scriptFile: string, skipAutoHelp = false) {
 		const { parseHeader } = await import('@lib/parse-file-meta');
 		const { Script } = await import('@lib/script');
 		const { displayScriptHelp } = await import('@lib/help-display');
-		
+
 		const meta = await parseHeader.fromFile(scriptFile);
 		if (meta?.autohelp) {
 			const scriptObj = new Script({
@@ -19,7 +19,9 @@ export async function run(scriptFile: string, skipAutoHelp = false) {
 				meta: meta.meta,
 				autohelp: meta.autohelp,
 			});
-			displayScriptHelp(scriptObj);
+			// Get namespace from environment if available
+			const namespace = process.env.BUNMAGIC_NAMESPACE;
+			displayScriptHelp(scriptObj, namespace);
 			throw new Exit(0);
 		}
 	}
@@ -56,6 +58,8 @@ export async function runNamespace(namespace: string, sourcePath: string) {
 		const command = scripts.get(name);
 
 		if (!command) {
+			// Set namespace in environment for consistency
+			process.env.BUNMAGIC_NAMESPACE = namespace;
 			await router.callback({
 				namespace,
 				name,
@@ -74,7 +78,11 @@ export async function runNamespace(namespace: string, sourcePath: string) {
 			name,
 			command,
 			scripts,
-			exec: async () => run(command.source),
+			exec: async () => {
+				// Set namespace in environment for child processes
+				process.env.BUNMAGIC_NAMESPACE = namespace;
+				return run(command.source);
+			},
 		});
 	} catch (error) {
 		console.log(ansis.bold.red('Fatal Error: '), error);

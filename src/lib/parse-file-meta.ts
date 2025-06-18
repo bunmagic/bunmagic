@@ -43,7 +43,7 @@ async function parseFile(filePath: string): Promise<Properties | undefined> {
 	return parseContent(contents);
 }
 
-type Meta = { name: string; description: string };
+type Meta = { name: string; description: string; group?: string };
 type Properties = {
 	name: string;
 	description: string;
@@ -87,8 +87,17 @@ async function parseContent(contents: string) {
 		return properties;
 	}
 
+	let currentGroup: string | undefined;
+
 	for (const spec of result.tags) {
 		let tag = spec.tag;
+
+		// Handle @group tag
+		if (tag === 'group') {
+			currentGroup = `${spec.name} ${spec.description}`.trim();
+			continue;
+		}
+
 		if (tag === 'name' || tag === 'source' || tag === 'slug') {
 			properties[tag] = `${spec.name} ${spec.description}`.trim();
 			continue;
@@ -114,7 +123,14 @@ async function parseContent(contents: string) {
 		}
 
 		properties.meta[tag] ||= [];
-		properties.meta[tag].push({ name: spec.name, description: spec.description });
+		const meta: Meta = { name: spec.name, description: spec.description };
+
+		// Add group to flags if we're in a group
+		if (tag === 'flags' && currentGroup) {
+			meta.group = currentGroup;
+		}
+
+		properties.meta[tag].push(meta);
 	}
 
 	return properties;

@@ -93,6 +93,30 @@ export class Columns<T extends number = number, Row extends string | string[] = 
 		return rows.join('\n');
 	}
 
+	private wrapText(text: string, maxWidth: number): string[] {
+		const lines: string[] = [];
+		const words = text.split(' ');
+		let currentLine = '';
+
+		for (const word of words) {
+			const testLine = currentLine ? `${currentLine} ${word}` : word;
+			if (ansis.strip(testLine).length <= maxWidth) {
+				currentLine = testLine;
+			} else {
+				if (currentLine) {
+					lines.push(currentLine);
+				}
+				currentLine = word;
+			}
+		}
+
+		if (currentLine) {
+			lines.push(currentLine);
+		}
+
+		return lines;
+	}
+
 	private nearestWrap(content: string, before: number, maxRangeWords = 2): number {
 		const sentenceEnds = new Set(['.', '!', '?']);
 		let lastFoundIndex = -1;
@@ -210,11 +234,37 @@ export class Columns<T extends number = number, Row extends string | string[] = 
 		let row = '';
 		const leftovers = Array.from({ length: columns.length }, () => '');
 
-		// If the terminal isn't wide enough - give up on column
+		// If the terminal isn't wide enough - use a vertical layout
 		const widthSum = widths.reduce((sum, width) => sum + width, 0);
 		const columnSum = this.calculateColumnWidths().reduce((sum, width) => sum + width, 0);
 		if (widths.some(value => value <= 0) || widthSum / columnSum <= 0.48) {
-			return `${columns.join('\n')}\n${ansis.dim('┈'.repeat(process.stdout.columns || 80))}\n`;
+			// Create a vertical layout with better formatting
+			let result = '';
+			const termWidth = process.stdout.columns || 80;
+
+			// For scripts/commands, show them in a structured format
+			if (columns.length >= 2) {
+				const [command, args, description] = columns;
+				result += `${' '.repeat(this.indent)}${command}\n`;
+
+				if (args?.trim()) {
+					result += `${' '.repeat(this.indent + 2)}${ansis.dim(args)}\n`;
+				}
+
+				if (description?.trim()) {
+					// Wrap long descriptions
+					const descWidth = termWidth - this.indent - 4;
+					const wrapped = this.wrapText(description, descWidth);
+					for (const line of wrapped) {
+						result += `${' '.repeat(this.indent + 2)}${line}\n`;
+					}
+				}
+			} else {
+				// Fallback for single column or other layouts
+				result = `${columns.map(col => `${' '.repeat(this.indent)}${col}`).join('\n')}\n`;
+			}
+
+			return result;
 		}
 
 		for (const [column, content] of columns.entries()) {
