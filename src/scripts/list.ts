@@ -17,6 +17,18 @@ async function getSourcesToDisplay(query: string[]): Promise<Source[]> {
 		return sources;
 	}
 
+	const queryString = query.join(' ');
+
+	// Check for exact namespace match first
+	const exactNamespaceMatch = sources.find(source => 
+		source.namespace && source.namespace.toLowerCase() === queryString.toLowerCase()
+	);
+
+	if (exactNamespaceMatch) {
+		return [exactNamespaceMatch];
+	}
+
+	// If no exact namespace match, do fuzzy search
 	const searchableData = sources.flatMap(r =>
 		r.scripts.map(script => ({
 			script,
@@ -25,7 +37,7 @@ async function getSourcesToDisplay(query: string[]): Promise<Source[]> {
 		})),
 	);
 
-	const results = fuzzysort.go(query.join(' '), searchableData, {
+	const results = fuzzysort.go(queryString, searchableData, {
 		keys: ['searchString'],
 	});
 	const groupedResults: Record<string, Source> = {};
