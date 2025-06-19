@@ -20,7 +20,8 @@ async function getSourcesToDisplay(query: string[]): Promise<Source[]> {
 	const searchableData = sources.flatMap(r =>
 		r.scripts.map(script => ({
 			script,
-			searchString: [script.slug, script.desc].filter(Boolean).join(' '),
+			namespace: r.namespace,
+			searchString: [script.slug, r.namespace, script.desc].filter(Boolean).join(' '),
 		})),
 	);
 
@@ -29,8 +30,7 @@ async function getSourcesToDisplay(query: string[]): Promise<Source[]> {
 	});
 	const groupedResults: Record<string, Source> = {};
 	for (const result of results) {
-		const { script } = result.obj;
-		const namespace = script.namespace;
+		const { script, namespace } = result.obj;
 		const key = namespace || 'global';
 		groupedResults[key] ||= {
 			namespace: namespace || undefined,
