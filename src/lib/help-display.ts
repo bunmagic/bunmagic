@@ -60,7 +60,9 @@ export function displayScriptHelp(script: Script, namespace?: string): void {
 			ansis.dim(ansis.yellow(`[${param}]`)),
 		);
 		// Don't double-append description if it's already in usageLine
-		const hasDescription = namespace?.trim() && usageLine.includes(script.usage.description || '');
+		// Strip ANSI codes from usageLine before checking if description is included
+		const hasDescription =
+			script.usage.description && ansis.strip(usageLine).includes(script.usage.description);
 		console.log(
 			`    ${usageLine}${!hasDescription && script.usage.description ? ` ${script.usage.description}` : ''}`,
 		);
