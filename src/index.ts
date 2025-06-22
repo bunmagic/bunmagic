@@ -8,6 +8,7 @@ export { $spinner } from './globals/spinner';
 export { openEditor, slugify } from './lib/utils';
 export { notMinimist };
 export { showHelp } from './globals/help';
+export { $stdin } from './globals/stdin';
 
 export * from './globals/utils';
 export * from './globals/selection';
