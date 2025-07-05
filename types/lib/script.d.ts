@@ -37,6 +37,7 @@ export declare class Script {
     meta?: Record<string, Array<{
         name: string;
         description: string;
+        group?: string;
     }>>;
     /**
      * Whether the script should automatically show help when --help is passed.
@@ -55,6 +56,7 @@ export declare class Script {
         meta?: Record<string, Array<{
             name: string;
             description: string;
+            group?: string;
         }>>;
         autohelp?: boolean;
     });

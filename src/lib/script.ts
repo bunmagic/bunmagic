@@ -1,5 +1,5 @@
-import { PATHS } from '@lib/config';
-import { slugify } from '@lib/utils';
+import { PATHS } from './config';
+import { slugify } from './utils';
 
 export class Script {
 	public readonly type = 'script' as const;
@@ -39,7 +39,7 @@ export class Script {
 
 	namespace: string | undefined;
 
-	meta?: Record<string, Array<{ name: string; description: string }>>;
+	meta?: Record<string, Array<{ name: string; description: string; group?: string }>>;
 
 	/**
 	 * Whether the script should automatically show help when --help is passed.
@@ -62,7 +62,7 @@ export class Script {
 		desc?: string;
 		usage?: { name: string; description: string };
 		alias?: string[];
-		meta?: Record<string, Array<{ name: string; description: string }>>;
+		meta?: Record<string, Array<{ name: string; description: string; group?: string }>>;
 		autohelp?: boolean;
 	}) {
 		this.source = source;
