@@ -19,9 +19,5 @@
  * ```
  */
 export async function $stdin(): Promise<string> {
-	let stdin = '';
-	for await (const chunk of Bun.stdin.stream()) {
-		stdin += Buffer.from(chunk).toString();
-	}
-	return stdin;
+	return await Bun.stdin.text();
 }
