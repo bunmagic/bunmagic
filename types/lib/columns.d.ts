@@ -12,6 +12,7 @@ export declare class Columns<T extends number = number, Row extends string | str
     flush(): string;
     flushLog(): void;
     render(): string;
+    private wrapText;
     private nearestWrap;
     private calculateColumnWidths;
     private fitWidths;

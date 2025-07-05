@@ -3,6 +3,7 @@ declare function parseFile(filePath: string): Promise<Properties | undefined>;
 type Meta = {
     name: string;
     description: string;
+    group?: string;
 };
 type Properties = {
     name: string;
