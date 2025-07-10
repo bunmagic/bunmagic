@@ -1,7 +1,3 @@
-/// <reference types="node" />
-/// <reference types="node" />
-/// <reference types="bun-types" />
-/// <reference types="bun-types" />
 import * as os from 'node:os';
 import * as path from 'node:path';
 import ansis from 'ansis';

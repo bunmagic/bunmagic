@@ -1,5 +1,4 @@
-/// <reference types="bun-types" />
-/// <reference types="bun-types" />
+import { $ } from 'bun';
 declare class Spinner {
     private static spinners;
     private static linesRendered;
@@ -22,7 +21,7 @@ declare class Spinner {
     setError(error: unknown): void;
     setStatus(status: 'success' | 'error'): void;
 }
-declare const $quiet: (strings: TemplateStringsArray, ...expressions: import("bun").ShellExpression[]) => import("bun").ShellPromise;
+declare const $quiet: (...properties: Parameters<typeof $>) => $.ShellPromise;
 type Callback<T> = ($: typeof $quiet, setLabel: Spinner['setLabel']) => Promise<T>;
 export declare function $spinner<T>(label: string, callback: Callback<T>): Promise<T>;
 export declare function $spinner<T>(callback: Callback<T>): Promise<T>;

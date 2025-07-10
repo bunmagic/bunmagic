@@ -12,7 +12,7 @@ declare function showCursor(): Promise<void>;
 declare function raw(on: boolean): Promise<void>;
 declare function clearFrame(frame: string, wipe?: boolean): Promise<void>;
 declare function stream(): {
-    start: () => AsyncGenerator<Uint8Array, void, unknown>;
+    start: () => AsyncGenerator<Uint8Array<ArrayBufferLike>, void, unknown>;
     stop: () => void;
 };
 export declare const CLI: {

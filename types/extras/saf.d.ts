@@ -1,7 +1,3 @@
-/// <reference types="bun-types" />
-/// <reference types="node" />
-/// <reference types="bun-types" />
-/// <reference types="bun-types" />
 import type { BunFile } from 'bun';
 /**
  * Swiss Army File manager

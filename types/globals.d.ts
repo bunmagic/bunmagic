@@ -1,4 +1,3 @@
-/// <reference types="node" />
 import * as globals from './index';
 declare global {
     const $: typeof globals.$;

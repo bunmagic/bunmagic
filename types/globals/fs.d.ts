@@ -1,5 +1,3 @@
-/// <reference types="bun-types" />
-/// <reference types="bun-types" />
 import type { GlobScanOptions } from 'bun';
 import type { SAF as SAFType } from '../extras/saf';
 export declare function isDirectory(path: string): Promise<boolean>;
