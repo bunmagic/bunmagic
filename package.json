@@ -1,13 +1,13 @@
 {
   "name": "bunmagic",
   "dependencies": {
-    "ansis": "^3.1.1",
+    "ansis": "^3.17.0",
     "comment-parser": "^1.4.1",
-    "fuzzysort": "^3.0.2"
+    "fuzzysort": "^3.1.0"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
-    "@types/bun": "^1.1.0",
+    "@types/bun": "^1.2.18",
     "@types/fs-extra": "^11.0.4",
     "@types/minimist": "^1.2.5"
   },
@@ -39,6 +39,6 @@
     "./lib": "./src/lib.ts"
   },
   "peerDependencies": {
-    "typescript": "^5.0.0"
+    "typescript": "^5.3.3"
   }
 }
