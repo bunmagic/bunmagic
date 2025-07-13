@@ -273,6 +273,22 @@ For example, to make `fs-extra` available in all your scripts by default, add th
 export * as fs from 'fs-extra';
 ```
 
+### Environment Variables
+
+#### `BUNMAGIC_STRICT`
+
+By default, when you run a command that doesn't exist, bunmagic will offer to create it for you. Set `BUNMAGIC_STRICT=1` to disable this behavior and exit with an error instead.
+
+```sh
+# Exit with error for invalid commands instead of prompting to create
+BUNMAGIC_STRICT=1 my-command
+
+# Or export it for the entire session
+export BUNMAGIC_STRICT=1
+```
+
+This is particularly useful in CI/CD environments or production scripts where you want commands to fail fast if they don't exist.
+
 ### Code Editor
 
 `bunmagic` is going to try to use your `EDITOR` environment variable and fall back to `code` as the editor when opening script files.

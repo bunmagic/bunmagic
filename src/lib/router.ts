@@ -138,6 +138,11 @@ const defaultRouter: Router['callback'] = async ({ namespace, name, exec, comman
 	const input = `${namespace} ${name}`.trim();
 	// Offer to create utility if it doesn't exist.
 	if (name && ((name !== 'help' && !command) || (name === 'create' && !scripts.has('create')))) {
+		// Check if strict mode is enabled via environment variable
+		if (process.env.BUNMAGIC_STRICT === '1') {
+			throw new Exit(`Command not found: ${ansis.bold(input)}`);
+		}
+		
 		await runWithFallback(scripts, 'create', async () => {
 			try {
 				await create(args[0] ? `${namespace} ${args[0]}` : input);
