@@ -7,15 +7,14 @@ import { notMinimist } from './globals/not-minimist';
 export { $spinner } from './globals/spinner';
 export { openEditor, slugify } from './lib/utils';
 export { notMinimist };
-export { showHelp } from './globals/help';
-export { $stdin } from './globals/stdin';
-
-export * from './globals/utils';
-export * from './globals/selection';
-export * from './globals/fs';
-export { SAF } from './extras/saf';
 export { CLI } from './extras/cli';
 export * from './extras/mac';
+export { SAF } from './extras/saf';
+export * from './globals/fs';
+export { showHelp } from './globals/help';
+export * from './globals/selection';
+export { $stdin } from './globals/stdin';
+export * from './globals/utils';
 
 const { args, flags } = notMinimist(Bun.argv.slice(2) || []);
 const argv = { _: args, ...flags };

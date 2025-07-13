@@ -1,6 +1,7 @@
 import { expect, test } from 'bun:test';
 import ansis from 'ansis';
 import { Columns } from '../columns';
+
 // Utility function to generate a string with sequential characters and spaces every few characters
 function generateString(length: number, spaceEvery = 0): string {
 	const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';

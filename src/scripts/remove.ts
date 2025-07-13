@@ -5,7 +5,7 @@ import { update } from '@lib/config';
  * @alias rm
  */
 import { Script } from '@lib/script';
-import { type Source, findAny, findNamespace, getSources } from '@lib/sources';
+import { findAny, findNamespace, getSources, type Source } from '@lib/sources';
 
 async function removeNamespace(query: string) {
 	const source = await findNamespace(query);

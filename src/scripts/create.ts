@@ -1,4 +1,4 @@
-import { SUPPORTED_FILES, get } from '@lib/config';
+import { get, SUPPORTED_FILES } from '@lib/config';
 import { parseInput } from '@lib/parse-input';
 import { Script } from '@lib/script';
 /**

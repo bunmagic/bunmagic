@@ -6,7 +6,7 @@
  */
 import path from 'node:path';
 import { displayScriptInfo, setupScriptColumns } from '@lib/display-utils';
-import { type Source, getSources } from '@lib/sources';
+import { getSources, type Source } from '@lib/sources';
 import ansis from 'ansis';
 import fuzzysort from 'fuzzysort';
 
@@ -20,8 +20,8 @@ async function getSourcesToDisplay(query: string[]): Promise<Source[]> {
 	const queryString = query.join(' ');
 
 	// Check for exact namespace match first
-	const exactNamespaceMatch = sources.find(source => 
-		source.namespace && source.namespace.toLowerCase() === queryString.toLowerCase()
+	const exactNamespaceMatch = sources.find(
+		source => source.namespace && source.namespace.toLowerCase() === queryString.toLowerCase(),
 	);
 
 	if (exactNamespaceMatch) {

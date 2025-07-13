@@ -1,4 +1,4 @@
-import { type SourcePaths, get, update } from '@lib/config';
+import { get, type SourcePaths, update } from '@lib/config';
 import type { Script } from '@lib/script';
 import { getPathScripts } from '@lib/scripts';
 import { parseInput } from './parse-input';

@@ -38,8 +38,15 @@ describe('notMinimist', () => {
 		expect(result.flags.key2).toBe('value2 with spaces');
 	});
 
-	it("should support args and multiple flag values with spaces", () => {
-		const result = notMinimist(['arg1', 'arg2', '--key1=value1', 'with', 'spaces', '--key2=value2 with spaces']);
+	it('should support args and multiple flag values with spaces', () => {
+		const result = notMinimist([
+			'arg1',
+			'arg2',
+			'--key1=value1',
+			'with',
+			'spaces',
+			'--key2=value2 with spaces',
+		]);
 		expect(result.flags.key1).toBe('value1 with spaces');
 		expect(result.flags.key2).toBe('value2 with spaces');
 		expect(result.args).toEqual(['arg1', 'arg2']);
