@@ -27,6 +27,10 @@ const utfKeyMap: Record<string, string> = {
 	'\u001B[A': 'up',
 	// "Down Arrow" (ESC [ B)
 	'\u001B[B': 'down',
+	// "Right Arrow" (ESC [ C)
+	'\u001B[C': 'right',
+	// "Left Arrow" (ESC [ D)
+	'\u001B[D': 'left',
 	// "Ctrl+C" (ETX)
 	'\u0003': 'interrupt',
 	// "Enter" (LF)
@@ -39,6 +43,28 @@ const utfKeyMap: Record<string, string> = {
 	'\u007F': 'backspace',
 	// Delete
 	'\u001B[3~': 'delete',
+	// Home (ESC [ H or ESC [ 1 ~)
+	'\u001B[H': 'home',
+	'\u001B[1~': 'home',
+	// End (ESC [ F or ESC [ 4 ~)
+	'\u001B[F': 'end',
+	'\u001B[4~': 'end',
+	// Ctrl+A (Start of line)
+	'\u0001': 'home',
+	// Ctrl+E (End of line)
+	'\u0005': 'end',
+	// Ctrl+W (Delete word backwards)
+	'\u0017': 'delete-word-backward',
+	// Alt+Left (ESC b - word backward)
+	'\u001Bb': 'word-backward',
+	// Alt+Right (ESC f - word forward)
+	'\u001Bf': 'word-forward',
+	// Alt+Backspace (ESC DEL)
+	'\u001B\u007F': 'delete-word-backward',
+	// Alt+Delete (ESC [ 3 ~)
+	'\u001B\u001B[3~': 'delete-word-forward',
+	// Alt+d (delete word forward)
+	'\u001Bd': 'delete-word-forward',
 	// Space
 	' ': ' ',
 };
@@ -146,7 +172,7 @@ export async function select<T extends string>(
 	const stream = CLI.stream();
 	for await (const chunk of stream.start()) {
 		const input = interpretKey(chunk);
-		if (!input) {
+		if (input === false) {
 			continue;
 		}
 
@@ -240,7 +266,7 @@ export async function getPassword(message: string): Promise<string> {
 	await CLI.stdout(`${message}`);
 	for await (const chunk of stream.start()) {
 		const input = interpretKey(chunk);
-		if (!input) {
+		if (input === false) {
 			continue;
 		}
 
@@ -277,6 +303,26 @@ function cliMarkdown(input: string) {
 	return input;
 }
 
+function findWordBoundary(text: string, pos: number, direction: 'left' | 'right'): number {
+	if (direction === 'left') {
+		if (pos === 0) return 0;
+		let newPos = pos - 1;
+		// Skip spaces
+		while (newPos > 0 && text[newPos] === ' ') newPos--;
+		// Skip non-spaces
+		while (newPos > 0 && text[newPos - 1] !== ' ') newPos--;
+		return newPos;
+	} else {
+		if (pos === text.length) return text.length;
+		let newPos = pos;
+		// Skip non-spaces
+		while (newPos < text.length && text[newPos] !== ' ') newPos++;
+		// Skip spaces
+		while (newPos < text.length && text[newPos] === ' ') newPos++;
+		return newPos;
+	}
+}
+
 type HandleAskResponse =
 	| 'required'
 	| 'use_default'
@@ -306,6 +352,7 @@ export async function ask(
 
 	const stream = CLI.stream();
 	let answer = '';
+	let cursorPosition = 0;
 	stream.start();
 	console.log(ansis.yellow('»') + ansis.reset(` ${q}: `));
 
@@ -316,9 +363,24 @@ export async function ask(
 	await CLI.stdout(inputPrompt);
 	await CLI.hideCursor();
 
+	// Helper to render the current input state
+	const renderInput = async () => {
+		await CLI.clearLine();
+		const displayText = display(answer);
+		await CLI.stdout(`${inputFlag} ${displayText}`);
+		// Move cursor to correct position
+		if (cursorPosition < answer.length) {
+			const moveBack = ansis.strip(displayText).length - cursorPosition;
+			if (moveBack > 0) {
+				await CLI.moveLeft(moveBack);
+			}
+		}
+		await CLI.showCursor();
+	};
+
 	for await (const chunk of stream.start()) {
 		const input = interpretKey(chunk);
-		if (!input) {
+		if (input === false) {
 			continue;
 		}
 
@@ -354,6 +416,7 @@ export async function ask(
 					await CLI.hideCursor();
 					await CLI.moveLeft(answer.length);
 					answer = '';
+					cursorPosition = 0;
 				}
 			}
 
@@ -364,28 +427,102 @@ export async function ask(
 				throw new Exit(0);
 			}
 
-			if ((input.key === 'backspace' || input.key === 'delete') && answer.length > 0) {
-				await CLI.showCursor();
-				await CLI.stdout('\b \b');
-				answer = answer.slice(0, -1);
+			// Cursor navigation
+			if (input.key === 'left' && cursorPosition > 0) {
+				cursorPosition--;
+				await CLI.moveLeft(1);
+				continue;
+			}
+
+			if (input.key === 'right' && cursorPosition < answer.length) {
+				cursorPosition++;
+				await CLI.moveRight(1);
+				continue;
+			}
+
+			if (input.key === 'home') {
+				if (cursorPosition > 0) {
+					await CLI.moveLeft(cursorPosition);
+					cursorPosition = 0;
+				}
+				continue;
+			}
+
+			if (input.key === 'end') {
+				if (cursorPosition < answer.length) {
+					await CLI.moveRight(answer.length - cursorPosition);
+					cursorPosition = answer.length;
+				}
+				continue;
+			}
+
+			// Word navigation
+			if (input.key === 'word-backward') {
+				const newPos = findWordBoundary(answer, cursorPosition, 'left');
+				if (newPos < cursorPosition) {
+					await CLI.moveLeft(cursorPosition - newPos);
+					cursorPosition = newPos;
+				}
+				continue;
+			}
+
+			if (input.key === 'word-forward') {
+				const newPos = findWordBoundary(answer, cursorPosition, 'right');
+				if (newPos > cursorPosition) {
+					await CLI.moveRight(newPos - cursorPosition);
+					cursorPosition = newPos;
+				}
+				continue;
+			}
+
+			// Deletion operations
+			if (input.key === 'delete-word-backward' && cursorPosition > 0) {
+				const newPos = findWordBoundary(answer, cursorPosition, 'left');
+				answer = answer.slice(0, newPos) + answer.slice(cursorPosition);
+				cursorPosition = newPos;
+				await renderInput();
+				continue;
+			}
+
+			if (input.key === 'delete-word-forward' && cursorPosition < answer.length) {
+				const newPos = findWordBoundary(answer, cursorPosition, 'right');
+				answer = answer.slice(0, cursorPosition) + answer.slice(newPos);
+				await renderInput();
+				continue;
+			}
+
+			if (input.key === 'backspace' && cursorPosition > 0) {
+				answer = answer.slice(0, cursorPosition - 1) + answer.slice(cursorPosition);
+				cursorPosition--;
 				if (answer === '') {
 					await CLI.clearLine();
 					await CLI.hideCursor();
 					await CLI.stdout(inputPrompt);
+				} else {
+					await renderInput();
 				}
+				continue;
 			}
 
+			if (input.key === 'delete' && cursorPosition < answer.length) {
+				answer = answer.slice(0, cursorPosition) + answer.slice(cursorPosition + 1);
+				await renderInput();
+				continue;
+			}
+
+			// Space handling
 			if (input.key === ' ') {
-				answer += ' ';
-				await CLI.showCursor();
-				await CLI.clearLine();
-				await CLI.stdout(`${ansis.yellowBright('…')} ${display(answer.slice(-columns + 2))}`);
+				answer = answer.slice(0, cursorPosition) + ' ' + answer.slice(cursorPosition);
+				cursorPosition++;
+				await renderInput();
+				continue;
 			}
 		} else if (typeof input === 'number' || typeof input === 'string') {
-			answer += `${input}`;
-			await CLI.showCursor();
-			await CLI.clearLine();
-			await CLI.stdout(`${ansis.yellowBright('…')} ${display(answer.slice(-columns + 2))}`);
+			// Insert character at cursor position
+			const inputStr = `${input}`;
+			answer = answer.slice(0, cursorPosition) + inputStr + answer.slice(cursorPosition);
+			cursorPosition += inputStr.length;
+			await renderInput();
 		}
 	}
 
