@@ -1,8 +1,9 @@
 /**
  * List all known scripts.
+ * @autohelp
  * @usage [[filter]]  Optional that fuzzy matches sources paths.
  * @alias ls
- * @flag [[--info|-i]] Display more information about each script.
+ * @flag --info, -i Display more information about each script.
  */
 import path from 'node:path';
 import { displayScriptInfo, setupScriptColumns } from '@lib/display-utils';

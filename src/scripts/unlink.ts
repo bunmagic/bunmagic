@@ -1,5 +1,7 @@
 /**
  * Remove a directory from the script source list.
+ * @autohelp
+ * @usage [[directory]]
  */
 import * as config from '@lib/config';
 import { PATHS } from '@lib/config';

@@ -7,66 +7,46 @@ export function displayScriptHelp(script: Script, namespace?: string): void {
 	// Display script name and description
 	console.log(`\n  ${ansis.bold(script.command)}`);
 	if (script.desc) {
-		console.log(`  ${script.desc}`);
+		for (const line of script.desc.trim().split('\n')) {
+			if (line.trim().length === 0) {
+				console.log('');
+				continue;
+			}
+			console.log(`  ${line.trimEnd()}`);
+		}
 	}
 
 	// Display usage
-	if (script.usage?.name) {
-		console.log(`\n  ${ansis.bold('Usage:')}`);
-		// Format usage with proper parameter highlighting
-		let usageLine = script.usage.name;
+	console.log(`\n  ${ansis.bold('Usage:')}`);
+	const fullCommand =
+		namespace?.trim() && !script.command.startsWith(`${namespace} `)
+			? `${namespace} ${script.command}`
+			: script.command;
+	const rawUsage =
+		script.usage && (script.usage.name || script.usage.description)
+			? namespace?.trim() && script.usage.name === namespace
+				? (script.usage.description ?? '').trim()
+				: [script.usage.name, script.usage.description].filter(Boolean).join(' ').trim()
+			: '';
 
-		// Handle namespace prefixing for usage line
-		if (namespace?.trim() && script.usage?.description) {
-			// If usage.name is just the namespace, and description has the actual usage
-			if (usageLine === namespace) {
-				// Check if description already starts with the command name
-				if (
-					script.usage.description.startsWith(`${script.command} `) ||
-					script.usage.description === script.command
-				) {
-					// Description already has command, just prepend namespace
-					usageLine = `${namespace} ${script.usage.description}`;
-				} else {
-					// Description doesn't have command, add both namespace and command
-					usageLine = `${namespace} ${script.command} ${script.usage.description}`;
-				}
-			}
-			// If usage already has the full "namespace command", leave it as is
-			else if (usageLine.startsWith(`${namespace} ${script.command}`)) {
-				// Already correct format
-			}
-			// If usage starts with just the command name, prepend only namespace
-			else if (usageLine === script.command || usageLine.startsWith(`${script.command} `)) {
-				usageLine = `${namespace} ${usageLine}`;
-			}
-			// For any other pattern that doesn't start with namespace
-			else if (!usageLine.startsWith(namespace)) {
-				usageLine = `${namespace} ${script.command} ${usageLine}`;
-			}
-		} else if (namespace?.trim()) {
-			// No description, handle normally
-			if (usageLine === namespace) {
-				usageLine = `${namespace} ${script.command}`;
-			} else if (!usageLine.startsWith(namespace)) {
-				usageLine = `${namespace} ${script.command}`;
-			}
+	let usageLine = fullCommand;
+	if (rawUsage) {
+		if (rawUsage === script.slug || rawUsage.startsWith(`${script.slug} `)) {
+			usageLine = `${fullCommand}${rawUsage.slice(script.slug.length)}`;
+		} else if (rawUsage.startsWith(`${fullCommand} `) || rawUsage === fullCommand) {
+			usageLine = rawUsage;
+		} else {
+			usageLine = `${fullCommand} ${rawUsage}`;
 		}
-
-		// Highlight required parameters in yellow
-		usageLine = usageLine.replace(/<([^>]+)>/g, (match, param) => ansis.yellow(`<${param}>`));
-		// Highlight optional parameters in dim yellow
-		usageLine = usageLine.replace(/\[([^\]]+)\]/g, (match, param) =>
-			ansis.dim(ansis.yellow(`[${param}]`)),
-		);
-		// Don't double-append description if it's already in usageLine
-		// Strip ANSI codes from usageLine before checking if description is included
-		const hasDescription =
-			script.usage.description && ansis.strip(usageLine).includes(script.usage.description);
-		console.log(
-			`    ${usageLine}${!hasDescription && script.usage.description ? ` ${script.usage.description}` : ''}`,
-		);
 	}
+
+	// Highlight required parameters in yellow
+	usageLine = usageLine.replace(/<([^>]+)>/g, (_match, param) => ansis.yellow(`<${param}>`));
+	// Highlight optional parameters in dim yellow
+	usageLine = usageLine.replace(/\[([^\]]+)\]/g, (_match, param) =>
+		ansis.dim(ansis.yellow(`[${param}]`)),
+	);
+	console.log(`    ${usageLine}`);
 
 	// Display flags
 	if (script.meta?.flags && script.meta.flags.length > 0) {

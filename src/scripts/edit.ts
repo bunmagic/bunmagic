@@ -1,8 +1,9 @@
-import { PATHS } from '@lib/config';
 /**
  * Edit scripts. If no script name is specified, will open all scripts and the ~/.bunmagic directory
+ * @autohelp
  * @usage [[script-name]]
  */
+import { PATHS } from '@lib/config';
 import { findNamespace, findScript } from '@lib/sources';
 import { openEditor } from '@lib/utils';
 import { create } from './create';

@@ -1,9 +1,10 @@
-import { update } from '@lib/config';
 /**
  * Remove and unlink a script
+ * @autohelp
  * @usage <script-name>
  * @alias rm
  */
+import { update } from '@lib/config';
 import { Script } from '@lib/script';
 import { findAny, findNamespace, getSources, type Source } from '@lib/sources';
 

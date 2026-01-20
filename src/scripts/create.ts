@@ -1,11 +1,12 @@
-import { get, SUPPORTED_FILES } from '@lib/config';
-import { parseInput } from '@lib/parse-input';
-import { Script } from '@lib/script';
 /**
  * Create a new script
+ * @autohelp
  * @usage <script-name>
  * @alias new
  */
+import { get, SUPPORTED_FILES } from '@lib/config';
+import { parseInput } from '@lib/parse-input';
+import { Script } from '@lib/script';
 import { findAny, findNamespace, getSources } from '@lib/sources';
 import { openEditor, slugify } from '@lib/utils';
 import { ensureNamespaceBin, ensureScriptBin } from './reload';

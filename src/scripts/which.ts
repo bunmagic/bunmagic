@@ -1,6 +1,9 @@
 /**
  * Show the source location for a script or namespace.
+ * @autohelp
  * @usage <script-name>
+ * @example which my-script
+ * @example which my-namespace
  */
 import { Script } from '@lib/script';
 import { findAny } from '@lib/sources';

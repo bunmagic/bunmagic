@@ -83,6 +83,9 @@ export const displayScripts = (scripts: Map<string, Script>, namespace?: string)
 
 		if (script.meta) {
 			for (const [metaType, metaItems] of Object.entries(script.meta)) {
+				if (metaType === 'example') {
+					continue;
+				}
 				for (const { name, description } of metaItems) {
 					let displayName = name;
 

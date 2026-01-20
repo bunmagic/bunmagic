@@ -9,16 +9,27 @@ export const router: Router['callback'] = async ({ namespace, name, exec, comman
 
 	// Don't take over flags too eagerly:
 	const noArguments = (check?: string | number | boolean) => args.length === 0 && check;
+	const wantsHelp = Boolean(flags.h || flags.help);
+
+	// Help should always win, even when other flags are passed.
+	if (wantsHelp && command?.autohelp) {
+		const { displayScriptHelp } = await import('@lib/help-display');
+		displayScriptHelp(command, namespace);
+		return;
+	}
+
+	if (wantsHelp) {
+		await help(scripts);
+		return;
+	}
 
 	if (input === 'version' || noArguments(flags.v || flags.version)) {
 		await version();
 		return;
 	}
 
-	// Check for autohelp before general help
-	if (command?.autohelp && flags.help) {
-		const { displayScriptHelp } = await import('@lib/help-display');
-		displayScriptHelp(command, namespace);
+	if (name === 'help') {
+		await help(scripts, args[0]);
 		return;
 	}
 

@@ -1,5 +1,7 @@
 /**
  * Add an additional directory to use as script source.
+ * @autohelp
+ * @usage [[directory]]
  */
 import * as config from '@lib/config';
 import { reloadBins } from './reload';

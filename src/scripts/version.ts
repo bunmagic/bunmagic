@@ -1,6 +1,6 @@
 /**
  * Display the current version of bunmagic
- * @usage [[version | -v]]
+ * @autohelp
  * @alias -v
  */
 

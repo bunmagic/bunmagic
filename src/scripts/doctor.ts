@@ -1,7 +1,8 @@
-import { setupAlias } from '@lib/setup';
 /**
  * Check if bunmagic is set up correctly
+ * @autohelp
  */
+import { setupAlias } from '@lib/setup';
 import { getSources } from '@lib/sources';
 import { addSourceDirectory } from './link';
 import { reloadBins } from './reload';

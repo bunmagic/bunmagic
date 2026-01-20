@@ -1,5 +1,6 @@
 /**
  * Install bunmagic and set up your environment
+ * @autohelp
  */
 import * as config from '@lib/config';
 import { setupAlias } from '@lib/setup';

@@ -1,5 +1,6 @@
 /**
  * Copy prebuilt bunmagic.d.ts into the current directory.
+ * @autohelp
  * @alias init
  * @alias add-types
  */

@@ -1,7 +1,8 @@
 /**
  * Symlink all your sources to the bunmagic root directory for easy editing.
- * @flag [--target] The directory to link the sources to. Default: ~/.bunmagic
- * @flag [--remove] Remove the symlinks.
+ * @autohelp
+ * @flag --target <directory> The directory to link the sources to. Default: ~/.bunmagic
+ * @flag --remove Remove the symlinks.
  */
 import { getSources } from '@lib/sources';
 

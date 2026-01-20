@@ -1,5 +1,6 @@
 /**
  * Remove bin files from the bin directory that don't have a matching script.
+ * @autohelp
  */
 import { getSources } from '@lib/sources';
 import { getBins } from './reload';

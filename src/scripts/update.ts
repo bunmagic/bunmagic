@@ -1,5 +1,6 @@
 /**
  * Update bunmagic to the latest version
+ * @autohelp
  */
 import { getVersion } from './version';
 
