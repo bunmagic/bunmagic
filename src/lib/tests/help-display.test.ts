@@ -330,3 +330,73 @@ describe('displayScriptHelp', () => {
 		expect(strippedUsage.trim()).toBe('myapp deploy --prod');
 	});
 });
+
+describe('displayScriptHelp usage edge cases', () => {
+	test('dims optional segment inside required placeholder without breaking required highlight', () => {
+		const script = new Script({
+			source: '/test/optional-inside-required.ts',
+			slug: 'optional-inside-required',
+			desc: 'Optional marker inside required placeholder',
+			usage: {
+				name: 'optional-inside-required',
+				description: '<path[.ext]>',
+			},
+		});
+
+		displayScriptHelp(script);
+
+		const usageLineIndex = consoleOutput.findIndex(line => line.includes('<path'));
+		const usageLine = consoleOutput[usageLineIndex];
+		const strippedUsage = ansis.strip(usageLine);
+
+		expect(strippedUsage).toContain('<path[.ext]>');
+		expect(usageLine).toContain(ansis.yellow('<path'));
+		expect(usageLine).toContain(ansis.dim(ansis.yellow('[.ext]')));
+		expect(usageLine).toContain(ansis.yellow('>'));
+	});
+
+	test('handles nested required markers without corrupting output', () => {
+		const script = new Script({
+			source: '/test/usage.ts',
+			slug: 'usage',
+			desc: 'Usage edge cases',
+			usage: {
+				name: 'usage',
+				description: '@usage <insert your <head>> [args...]',
+			},
+		});
+
+		displayScriptHelp(script);
+
+		const usageLineIndex = consoleOutput.findIndex(line => line.includes('@usage'));
+		const usageLine = consoleOutput[usageLineIndex];
+
+		const strippedUsage = ansis.strip(usageLine);
+		expect(strippedUsage).toContain('@usage <insert your <head>> [args...]');
+		expect(usageLine).not.toMatch(/(^|[^\x1b])\[33m/);
+	});
+
+	test('handles ANSI CSI sequences inside usage text without breaking parsing', () => {
+		const esc = '\x1b[33m';
+		const reset = '\x1b[39m';
+		const script = new Script({
+			source: '/test/ansi.ts',
+			slug: 'ansi',
+			desc: 'ANSI edge cases',
+			usage: {
+				name: 'ansi',
+				description: `@usage <insert ${esc}head${reset}> [args...]`,
+			},
+		});
+
+		displayScriptHelp(script);
+
+		const usageLineIndex = consoleOutput.findIndex(line => line.includes('@usage'));
+		const usageLine = consoleOutput[usageLineIndex];
+
+		const strippedUsage = ansis.strip(usageLine);
+		expect(strippedUsage).toContain('@usage <insert head> [args...]');
+		expect(usageLine).not.toMatch(/(^|[^\x1b])\[33m/);
+	});
+
+});

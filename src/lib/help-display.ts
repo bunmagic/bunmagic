@@ -1,5 +1,124 @@
 import type { Script } from './script';
 
+type UsageStyle = 'plain' | 'required' | 'optional';
+
+function applyUsageStyle(text: string, style: UsageStyle): string {
+	if (style === 'required') {
+		return ansis.yellow(text);
+	}
+	if (style === 'optional') {
+		return ansis.dim(ansis.yellow(text));
+	}
+	return text;
+}
+
+function readAnsiSequence(input: string, start: number): number {
+	if (input[start] !== '\x1b') return 0;
+	const next = input[start + 1];
+	if (next === '[') {
+		for (let i = start + 2; i < input.length; i += 1) {
+			const code = input.charCodeAt(i);
+			if (code >= 0x40 && code <= 0x7e) {
+				return i - start + 1;
+			}
+		}
+		return input.length - start;
+	}
+	if (next === ']') {
+		for (let i = start + 2; i < input.length; i += 1) {
+			const ch = input[i];
+			if (ch === '\x07') {
+				return i - start + 1;
+			}
+			if (ch === '\x1b' && input[i + 1] === '\\') {
+				return i - start + 2;
+			}
+		}
+		return input.length - start;
+	}
+	return start + 1 < input.length ? 2 : 1;
+}
+
+function hasClosing(input: string, start: number, closeChar: string): boolean {
+	for (let i = start; i < input.length; i += 1) {
+		if (input[i] === '\x1b') {
+			const length = readAnsiSequence(input, i);
+			i += Math.max(length - 1, 0);
+			continue;
+		}
+		if (input[i] === closeChar) return true;
+	}
+	return false;
+}
+
+function formatUsageLine(input: string): string {
+	let requiredDepth = 0;
+	let optionalDepth = 0;
+	let buffer = '';
+	let bufferStyle: UsageStyle = 'plain';
+	const parts: string[] = [];
+
+	const flush = () => {
+		if (!buffer) return;
+		parts.push(applyUsageStyle(buffer, bufferStyle));
+		buffer = '';
+	};
+
+	const append = (ch: string, style: UsageStyle) => {
+		if (style !== bufferStyle) {
+			flush();
+			bufferStyle = style;
+		}
+		buffer += ch;
+	};
+
+	for (let i = 0; i < input.length; i += 1) {
+		const ch = input[i];
+		if (ch === '\x1b') {
+			const length = readAnsiSequence(input, i);
+			flush();
+			parts.push(input.slice(i, i + length));
+			i += Math.max(length - 1, 0);
+			continue;
+		}
+
+		if (ch === '<' && hasClosing(input, i + 1, '>')) {
+			const style: UsageStyle = optionalDepth > 0 ? 'optional' : 'required';
+			append(ch, style);
+			requiredDepth += 1;
+			continue;
+		}
+
+		if (ch === '>' && requiredDepth > 0) {
+			const style: UsageStyle = optionalDepth > 0 ? 'optional' : 'required';
+			append(ch, style);
+			requiredDepth -= 1;
+			continue;
+		}
+
+		if (ch === '[' && hasClosing(input, i + 1, ']')) {
+			const style: UsageStyle = 'optional';
+			append(ch, style);
+			optionalDepth += 1;
+			continue;
+		}
+
+		if (ch === ']' && optionalDepth > 0) {
+			const style: UsageStyle = 'optional';
+			append(ch, style);
+			optionalDepth -= 1;
+			continue;
+		}
+
+		const style: UsageStyle =
+			optionalDepth > 0 ? 'optional' : requiredDepth > 0 ? 'required' : 'plain';
+		append(ch, style);
+	}
+
+	flush();
+	return parts.join('');
+}
+
 /**
  * Display help information for a script
  */
@@ -40,12 +159,7 @@ export function displayScriptHelp(script: Script, namespace?: string): void {
 		}
 	}
 
-	// Highlight required parameters in yellow
-	usageLine = usageLine.replace(/<([^>]+)>/g, (_match, param) => ansis.yellow(`<${param}>`));
-	// Highlight optional parameters in dim yellow
-	usageLine = usageLine.replace(/\[([^\]]+)\]/g, (_match, param) =>
-		ansis.dim(ansis.yellow(`[${param}]`)),
-	);
+	usageLine = formatUsageLine(usageLine);
 	console.log(`    ${usageLine}`);
 
 	// Display flags
@@ -141,7 +255,10 @@ export function displayScriptHelp(script: Script, namespace?: string): void {
 				let paramStr = '';
 				if (pf.param) {
 					const paramDisplay = pf.isOptional ? `[${pf.param}]` : pf.param;
-					paramStr = ` ${ansis.yellow(paramDisplay)}`;
+					const paramStyled = pf.isOptional
+						? ansis.dim(ansis.yellow(paramDisplay))
+						: ansis.yellow(paramDisplay);
+					paramStr = ` ${paramStyled}`;
 				}
 
 				const paramLength = pf.param ? (pf.isOptional ? pf.param.length + 2 : pf.param.length) : 0;
@@ -156,7 +273,8 @@ export function displayScriptHelp(script: Script, namespace?: string): void {
 	for (const [section, items] of Object.entries(script.meta || {})) {
 		if (section === 'flags') continue; // Already displayed above
 
-		console.log(`\n  ${ansis.bold(section.charAt(0).toUpperCase() + section.slice(1))}:`);
+		const sectionTitle = section.charAt(0).toUpperCase() + section.slice(1);
+		console.log(`\n  ${ansis.bold(`${sectionTitle}:`)}`);
 
 		// For examples section, strip namespace prefix to avoid redundancy
 		if (section === 'example' && namespace?.trim()) {
