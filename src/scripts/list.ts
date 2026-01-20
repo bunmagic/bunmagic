@@ -86,9 +86,9 @@ export default async function listScripts() {
 			const displaySlug = source.namespace ? `${source.namespace} ${script.slug}` : script.slug;
 			const formattedSlug = `${symbol} ${displaySlug}`;
 
-				if (sources.length === 1 || flags.i || flags.info) {
-					displayScriptInfo(columns, script, formattedSlug);
-				} else {
+			if (sources.length === 1 || flags.i || flags.info) {
+				displayScriptInfo(columns, script, formattedSlug);
+			} else {
 				columns.log([ansis.bold(formattedSlug), script.desc || '']);
 			}
 
