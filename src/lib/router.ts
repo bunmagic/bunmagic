@@ -1,4 +1,5 @@
 import { Columns } from '@lib/columns';
+import { run } from '../run';
 import { create } from '../scripts/create';
 import { SUPPORTED_FILES } from './config';
 import type { Script } from './script';

@@ -2,13 +2,14 @@ import { Columns } from '@lib/columns';
 import ansis from 'ansis';
 import type { Script } from './script';
 
-export function displayScriptInfo(columns: Columns, script: Script) {
+export function displayScriptInfo(columns: Columns, script: Script, displaySlug?: string) {
 	let description = script.desc || '';
 	if (script.alias.length > 0) {
 		description += ` ${ansis.dim(`(alias: ${script.alias.join(', ')})`)}`;
 	}
 
-	columns.log([ansis.bold(script.slug), description]);
+	const slug = displaySlug ?? script.slug;
+	columns.log([ansis.bold(slug), description]);
 
 	if (script.usage?.name) {
 		columns.log([`  ${ansis.dim(script.usage.name)}`, script.usage.description || '']);

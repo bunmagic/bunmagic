@@ -1,11 +1,11 @@
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test';
 import ansis from 'ansis';
+import path from 'node:path';
 import { displayScriptHelp } from '../help-display';
 import { Script } from '../script';
 
 // Mock globals for tests
-global.path = require('node:path');
-global.ansis = ansis;
+Object.assign(globalThis, { path, ansis });
 
 // Mock console.log to capture output
 let consoleOutput: string[] = [];
