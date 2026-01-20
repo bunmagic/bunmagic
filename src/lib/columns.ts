@@ -238,12 +238,11 @@ export class Columns<T extends number = number, Row extends string | string[] = 
 		const widthSum = widths.reduce((sum, width) => sum + width, 0);
 		const columnSum = this.calculateColumnWidths().reduce((sum, width) => sum + width, 0);
 		if (widths.some(value => value <= 0) || widthSum / columnSum <= 0.48) {
-			// Create a vertical layout with better formatting
-			let result = '';
 			const termWidth = process.stdout.columns || 80;
 
-			// For scripts/commands, show them in a structured format
-			if (columns.length >= 2) {
+			// For scripts/commands (3+ columns), show them in a structured format
+			if (columns.length >= 3) {
+				let result = '';
 				const [command, args, description] = columns;
 				result += `${' '.repeat(this.indent)}${command}\n`;
 
@@ -259,12 +258,15 @@ export class Columns<T extends number = number, Row extends string | string[] = 
 						result += `${' '.repeat(this.indent + 2)}${line}\n`;
 					}
 				}
-			} else {
-				// Fallback for single column or other layouts
-				result = `${columns.map(col => `${' '.repeat(this.indent)}${col}`).join('\n')}\n`;
+
+				return result;
 			}
 
-			return result;
+			// Fallback for 1-2 columns: print each column as-is, then a separator
+			const indent = ' '.repeat(this.indent);
+			const vertical = columns.map(col => `${indent}${col.trimEnd()}`).join('\n');
+			const separatorWidth = Math.max(termWidth - this.indent, 0);
+			return `${vertical}\n${indent}${'┈'.repeat(separatorWidth)}\n`;
 		}
 
 		for (const [column, content] of columns.entries()) {

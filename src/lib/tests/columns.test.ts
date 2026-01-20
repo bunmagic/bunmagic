@@ -175,6 +175,11 @@ test('give up on columns if the terminal is too narrow and content too wide', ()
 	const result = columns.flush();
 	expect(ansis.strip(result)).toBe(
 		// biome-ignore lint/style/useTemplate: String concatenation is more readable here
-		'x'.repeat(10) + '\n' + 'o'.repeat(30) + `\n${'┈'.repeat(process.stdout.columns)}\n`,
+		'  ' +
+			'x'.repeat(10) +
+			'\n' +
+			'  ' +
+			'o'.repeat(30) +
+			`\n  ${'┈'.repeat(process.stdout.columns - 2)}\n`,
 	);
 });
