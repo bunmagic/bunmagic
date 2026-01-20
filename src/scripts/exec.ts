@@ -1,5 +1,7 @@
 /**
  * Execute any file with the full bunmagic context
+ *
+ * @autohelp
  * @usage exec <file> [args...]
  * @flag --namespace <name> Set namespace for the executed script (for testing)
  * @example exec ./scripts/my-script.ts
