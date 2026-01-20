@@ -1,6 +1,9 @@
+import path from 'node:path';
+
 import { displayScriptHelp } from '../lib/help-display';
 import { parseHeader } from '../lib/parse-file-meta';
 import { Script } from '../lib/script';
+import { findCallerScriptPath } from '../lib/stack-trace';
 
 /**
  * Display help information for the current script.
@@ -24,17 +27,17 @@ export async function showHelp(): Promise<void> {
 		return;
 	}
 
-	// Extract file path from stack trace
-	// Stack trace format: "at ... (file:///path/to/file.ts:line:col)"
-	const callerLine = stack[2]; // Skip this function and the immediate caller
-	const match = callerLine.match(/\((.+?):\d+:\d+\)/);
-
-	if (!match || !match[1]) {
-		console.error('Unable to parse script location from stack trace');
+	const bunmagicRoot = path.resolve(import.meta.dir, '..');
+	const scriptPath = findCallerScriptPath(stack, bunmagicRoot);
+	if (!scriptPath) {
+		console.error('Unable to determine calling script');
 		return;
 	}
 
-	const scriptPath = match[1].replace('file://', '');
+	if (!(await Bun.file(scriptPath).exists())) {
+		console.error('Unable to read calling script');
+		return;
+	}
 
 	// Parse the script's metadata
 	const meta = await parseHeader.fromFile(scriptPath);

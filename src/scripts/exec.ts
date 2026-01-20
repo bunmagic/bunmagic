@@ -17,12 +17,7 @@ export default async function exec() {
 
 	// Only show help if no file is provided
 	if (!filePath) {
-		showHelp({
-			name: 'exec',
-			description: 'Execute any file with the full bunmagic context',
-			usage: 'exec <file> [args...]',
-			examples: ['exec ./scripts/my-script.ts', 'exec /path/to/docblocks.ts --verbose'],
-		});
+		await showHelp();
 		throw new Exit(0);
 	}
 
