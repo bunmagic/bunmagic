@@ -52,6 +52,7 @@ type Properties = {
 	source: string;
 	slug: string;
 	alias: string[];
+	globalAliases: string[];
 	autohelp: boolean;
 };
 async function parseContent(contents: string) {
@@ -75,6 +76,7 @@ async function parseContent(contents: string) {
 		source: '',
 		slug: '',
 		alias: [],
+		globalAliases: [],
 		meta: {},
 		autohelp: false,
 	};
@@ -110,6 +112,13 @@ async function parseContent(contents: string) {
 
 		if (tag === 'alias') {
 			properties.alias.push(spec.name);
+			continue;
+		}
+
+		if (tag === 'global') {
+			if (spec.name) {
+				properties.globalAliases.push(spec.name);
+			}
 			continue;
 		}
 

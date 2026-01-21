@@ -6,7 +6,7 @@
  * @flag --info, -i Display more information about each script.
  */
 import path from 'node:path';
-import { displayScriptInfo, setupScriptColumns } from '@lib/display-utils';
+import { displayScriptInfo, formatScriptDescription, setupScriptColumns } from '@lib/display-utils';
 import { getSources, type Source } from '@lib/sources';
 import ansis from 'ansis';
 import fuzzysort from 'fuzzysort';
@@ -34,7 +34,9 @@ async function getSourcesToDisplay(query: string[]): Promise<Source[]> {
 		r.scripts.map(script => ({
 			script,
 			namespace: r.namespace,
-			searchString: [script.slug, r.namespace, script.desc].filter(Boolean).join(' '),
+			searchString: [script.slug, r.namespace, script.desc, ...script.globalAliases]
+				.filter(Boolean)
+				.join(' '),
 		})),
 	);
 
@@ -89,7 +91,7 @@ export default async function listScripts() {
 			if (sources.length === 1 || flags.i || flags.info) {
 				displayScriptInfo(columns, script, formattedSlug);
 			} else {
-				columns.log([ansis.bold(formattedSlug), script.desc || '']);
+				columns.log([ansis.bold(formattedSlug), formatScriptDescription(script)]);
 			}
 
 			if (!hasBinaryFile) {

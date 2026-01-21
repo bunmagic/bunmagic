@@ -49,6 +49,7 @@ describe('parseContent', () => {
 			source: 'test.ts',
 			slug: 'test-command',
 			alias: ['t', 'other'],
+			globalAliases: [],
 			autohelp: false,
 		});
 	});
@@ -69,6 +70,7 @@ describe('parseContent', () => {
 			source: '',
 			slug: '',
 			alias: [],
+			globalAliases: [],
 			autohelp: false,
 		});
 	});
@@ -90,7 +92,30 @@ describe('parseContent', () => {
 			source: '',
 			slug: '',
 			alias: [],
+			globalAliases: [],
 			autohelp: true,
+		});
+	});
+
+	test('should parse @global tag correctly', async () => {
+		const content = `
+      /**
+	   * Global alias test
+       * @global bananas
+       * @global kiwi
+       */
+    `;
+		const properties = await parseContent(content);
+		expect(properties).toEqual({
+			name: '',
+			description: 'Global alias test',
+			usage: { name: '', description: '' },
+			meta: {},
+			source: '',
+			slug: '',
+			alias: [],
+			globalAliases: ['bananas', 'kiwi'],
+			autohelp: false,
 		});
 	});
 });

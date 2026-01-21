@@ -37,6 +37,11 @@ export class Script {
 	 */
 	alias: string[];
 
+	/**
+	 * Global aliases that escape the namespace.
+	 */
+	globalAliases: string[];
+
 	namespace: string | undefined;
 
 	meta?: Record<string, Array<{ name: string; description: string; group?: string }>>;
@@ -53,6 +58,7 @@ export class Script {
 		desc,
 		usage,
 		alias,
+		globalAliases,
 		meta,
 		autohelp = false,
 	}: {
@@ -62,6 +68,7 @@ export class Script {
 		desc?: string;
 		usage?: { name: string; description: string };
 		alias?: string[];
+		globalAliases?: string[];
 		meta?: Record<string, Array<{ name: string; description: string; group?: string }>>;
 		autohelp?: boolean;
 	}) {
@@ -71,6 +78,7 @@ export class Script {
 		this.desc = desc;
 		this.usage = usage;
 		this.alias = alias ?? [];
+		this.globalAliases = globalAliases ?? [];
 		this.namespace = namespace;
 		this.meta = meta;
 		this.autohelp = autohelp;

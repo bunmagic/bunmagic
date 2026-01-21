@@ -15,6 +15,7 @@ export async function run(scriptFile: string, skipAutoHelp = false) {
 				source: scriptFile,
 				usage: meta.usage,
 				alias: meta.alias,
+				globalAliases: meta.globalAliases,
 				desc: meta.description,
 				meta: meta.meta,
 				autohelp: meta.autohelp,

@@ -4,9 +4,18 @@
  * @usage <script-name>
  * @alias rm
  */
-import { update } from '@lib/config';
+import { PATHS, update } from '@lib/config';
 import { Script } from '@lib/script';
 import { findAny, findNamespace, getSources, type Source } from '@lib/sources';
+
+async function binTargetsScript(binPath: string, scriptSource: string) {
+	try {
+		const content = await Bun.file(binPath).text();
+		return content.includes(scriptSource);
+	} catch {
+		return false;
+	}
+}
 
 async function removeNamespace(query: string) {
 	const source = await findNamespace(query);
@@ -36,6 +45,15 @@ async function removeScript(script: Script) {
 	console.log(ansis.gray(`Removing "${script.bin}"`));
 	if (binaryFileExists && ack('Remove the binary?')) {
 		await $`rm ${script.bin}`;
+	}
+
+	for (const alias of new Set([...script.alias, ...script.globalAliases])) {
+		const aliasBin = `${PATHS.bins}/${alias}`;
+		const aliasFileExists = await Bun.file(aliasBin).exists();
+		const aliasMatches = aliasFileExists && (await binTargetsScript(aliasBin, script.source));
+		if (aliasMatches && ack(`Remove alias binary "${ansis.bold(alias)}"?`)) {
+			await $`rm ${aliasBin}`;
+		}
 	}
 
 	console.log(ansis.gray(`Removing "${script.source}"`));

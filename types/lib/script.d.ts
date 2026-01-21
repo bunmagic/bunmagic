@@ -33,6 +33,10 @@ export declare class Script {
      * Creates bin files for each alias.
      */
     alias: string[];
+    /**
+     * Global aliases that escape the namespace.
+     */
+    globalAliases: string[];
     namespace: string | undefined;
     meta?: Record<string, Array<{
         name: string;
@@ -43,7 +47,7 @@ export declare class Script {
      * Whether the script should automatically show help when --help is passed.
      */
     autohelp: boolean;
-    constructor({ source, namespace, slug, desc, usage, alias, meta, autohelp, }: {
+    constructor({ source, namespace, slug, desc, usage, alias, globalAliases, meta, autohelp, }: {
         source: string;
         namespace?: string;
         slug?: string;
@@ -53,6 +57,7 @@ export declare class Script {
             description: string;
         };
         alias?: string[];
+        globalAliases?: string[];
         meta?: Record<string, Array<{
             name: string;
             description: string;

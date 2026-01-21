@@ -13,6 +13,7 @@ type Properties = {
     source: string;
     slug: string;
     alias: string[];
+    globalAliases: string[];
     autohelp: boolean;
 };
 declare function parseContent(contents: string): Promise<Properties>;

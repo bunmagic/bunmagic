@@ -2,6 +2,7 @@ import { Columns } from '@lib/columns';
 import { run } from '../run';
 import { create } from '../scripts/create';
 import { SUPPORTED_FILES } from './config';
+import { formatScriptDescription } from './display-utils';
 import type { Script } from './script';
 
 export type Route = {
@@ -55,10 +56,7 @@ export const displayScripts = (scripts: Map<string, Script>, namespace?: string)
 			continue;
 		}
 
-		let description = script.desc || '';
-		if (script.alias.length > 0) {
-			description += ` ${ansis.dim(`(alias: ${script.alias.join(', ')})`)}`;
-		}
+		const description = formatScriptDescription(script);
 
 		const usage = script.usage || { name: '', description: '' };
 		if (usage?.name && usage?.description) {

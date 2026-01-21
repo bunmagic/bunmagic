@@ -9,6 +9,7 @@ async function describeScript(source: string, namespace?: string): Promise<Scrip
 		source,
 		usage: meta?.usage,
 		alias: meta?.alias,
+		globalAliases: meta?.globalAliases,
 		desc: meta?.description,
 		meta: meta?.meta,
 		autohelp: meta?.autohelp,

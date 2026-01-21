@@ -19,7 +19,11 @@ export async function getBins(): Promise<string[]> {
 	return glob('*', { cwd: PATHS.bins });
 }
 
-export async function ensureScriptBin(script: Script) {
+export async function ensureScriptBin(
+	script: Script,
+	aliases: string[] = script.alias,
+	globalAliases: string[] = script.globalAliases,
+) {
 	const exec = 'bunmagic-exec';
 	const bin = SAF.from(PATHS.bins, script.slug);
 	if (flags.force === true && (await bin.file.exists())) {
@@ -27,25 +31,50 @@ export async function ensureScriptBin(script: Script) {
 		await bin.delete('keep_handle');
 	}
 
-	if (await bin.exists()) {
-		return false;
+	const binExists = await bin.exists();
+
+	let created = 0;
+
+	if (!binExists) {
+		// Create script bin
+		await ensureDirectory(PATHS.bins);
+		await bin.write(template(script.slug, script.source, exec));
+		await $`chmod +x ${script.bin}`;
+		created += 1;
 	}
 
-	// Create script bin
-	await ensureDirectory(PATHS.bins);
-	await bin.write(template(script.slug, script.source, exec));
-	await $`chmod +x ${script.bin}`;
+	created += await ensureAliasBins(script, aliases);
+	created += await ensureAliasBins(script, globalAliases);
 
-	if (script.alias.length > 0) {
-		for (const alias of script.alias) {
-			const aliasBin = SAF.from(PATHS.bins, alias);
-			await aliasBin.write(template(script.slug, script.source, exec));
-			await $`chmod +x ${aliasBin}`;
-			console.log(`Created new script bin: ${script.slug} -> ${aliasBin.file.name}\n`);
+	return created > 0 ? script.bin : false;
+}
+
+async function ensureAliasBins(script: Script, aliases: string[]) {
+	const exec = 'bunmagic-exec';
+	if (aliases.length === 0) {
+		return 0;
+	}
+
+	let created = 0;
+	for (const alias of new Set(aliases)) {
+		if (!alias) {
+			continue;
 		}
+
+		const aliasBin = SAF.from(PATHS.bins, alias);
+		const aliasExists = await aliasBin.exists();
+		if (aliasExists && flags.force !== true) {
+			continue;
+		}
+
+		await ensureDirectory(PATHS.bins);
+		await aliasBin.write(template(script.slug, script.source, exec));
+		await $`chmod +x ${aliasBin}`;
+		console.log(`Created new script bin: ${script.slug} -> ${aliasBin.file.name}\n`);
+		created += 1;
 	}
 
-	return script.bin;
+	return created;
 }
 
 export async function ensureNamespaceBin(binaryName: string, targetPath: string) {
@@ -72,6 +101,7 @@ export async function ensureNamespaceBin(binaryName: string, targetPath: string)
 
 export async function reloadBins() {
 	let count = 0;
+	const claimedAliases = new Set<string>();
 	for (const source of await getSources()) {
 		if (flags.symlink === true) {
 			const directory = source.dir;
@@ -86,23 +116,57 @@ export async function reloadBins() {
 			}
 		}
 
+		const { scripts } = source;
+		const seenSources = new Set<string>();
+
 		if (source.namespace) {
 			if (await ensureNamespaceBin(source.namespace, source.dir)) {
 				count++;
 			}
 
+			for (const script of scripts) {
+				if (seenSources.has(script.source)) {
+					continue;
+				}
+
+				seenSources.add(script.source);
+				const globals = claimAliases(script.globalAliases, claimedAliases);
+				count += await ensureAliasBins(script, globals);
+			}
+
 			continue;
 		}
 
-		const { scripts } = source;
 		for (const script of scripts) {
-			if (await ensureScriptBin(script)) {
+			if (seenSources.has(script.source)) {
+				continue;
+			}
+
+			seenSources.add(script.source);
+			const aliases = claimAliases(script.alias, claimedAliases);
+			const globals = claimAliases(script.globalAliases, claimedAliases);
+			if (await ensureScriptBin(script, aliases, globals)) {
 				count++;
 			}
 		}
 	}
 
 	return count > 0;
+}
+
+function claimAliases(aliases: string[], claimed: Set<string>) {
+	const unique = new Set(aliases);
+	const result: string[] = [];
+	for (const alias of unique) {
+		if (!alias || claimed.has(alias)) {
+			continue;
+		}
+
+		claimed.add(alias);
+		result.push(alias);
+	}
+
+	return result;
 }
 
 export default async function () {

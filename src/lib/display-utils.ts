@@ -2,11 +2,29 @@ import { Columns } from '@lib/columns';
 import ansis from 'ansis';
 import type { Script } from './script';
 
-export function displayScriptInfo(columns: Columns, script: Script, displaySlug?: string) {
-	let description = script.desc || '';
-	if (script.alias.length > 0) {
-		description += ` ${ansis.dim(`(alias: ${script.alias.join(', ')})`)}`;
+export function formatScriptDescription(script: Script): string {
+	const extras: string[] = [];
+	const aliasList = Array.from(new Set(script.alias));
+	const globalList = Array.from(new Set(script.globalAliases));
+	if (aliasList.length > 0) {
+		extras.push(`alias: ${aliasList.join(', ')}`);
 	}
+	if (globalList.length > 0) {
+		extras.push(`global: ${globalList.join(', ')}`);
+	}
+
+	const extraText = extras.length > 0 ? ansis.dim(`(${extras.join('; ')})`) : '';
+	if (!script.desc) {
+		return extraText;
+	}
+	if (!extraText) {
+		return script.desc;
+	}
+	return `${script.desc} ${extraText}`;
+}
+
+export function displayScriptInfo(columns: Columns, script: Script, displaySlug?: string) {
+	const description = formatScriptDescription(script);
 
 	const slug = displaySlug ?? script.slug;
 	columns.log([ansis.bold(slug), description]);

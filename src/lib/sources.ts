@@ -77,6 +77,14 @@ export async function findScript<T extends string>(query: T): Promise<Script | u
 				return result;
 			}
 		}
+
+		// Check for global aliases that escape namespaces.
+		for (const source of sources) {
+			const result = source.scripts.find(s => s.globalAliases.includes(slug));
+			if (result) {
+				return result;
+			}
+		}
 	}
 }
 
