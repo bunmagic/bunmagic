@@ -3,6 +3,7 @@
  * @autohelp
  */
 import { getSources, type Source } from '@lib/sources';
+import { PATHS } from '@lib/config';
 import { getBins } from './reload';
 
 export async function getExpectedBins(sources: Source[]) {
@@ -36,6 +37,9 @@ export default async function () {
 	const sources = await getSources();
 
 	const expectedBins = await getExpectedBins(sources);
+	if (await Bun.file(path.join(PATHS.bins, 'bm')).exists()) {
+		expectedBins.add('bm');
+	}
 
 	for (const binary of realBins) {
 		const name = path.basename(binary);
