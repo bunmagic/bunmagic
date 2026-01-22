@@ -24,6 +24,14 @@ export async function getPathScripts(
 	const scripts = new Map<string, Script>();
 	const descriptions: Promise<Script | false>[] = [];
 	for await (const fileName of glob.scan({ onlyFiles: true, absolute: false, cwd: target })) {
+		if (fileName.endsWith('.d.ts')) {
+			if (flags.debug) {
+				console.log(`Ignoring type definitions: ${fileName}`);
+			}
+
+			continue;
+		}
+
 		if (fileName.startsWith('_')) {
 			if (flags.debug) {
 				console.log(`Ignoring: ${fileName}`);
