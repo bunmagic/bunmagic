@@ -3,6 +3,7 @@ import * as path from 'node:path';
 import ansis from 'ansis';
 import { $ } from 'bun';
 import { notMinimist } from './globals/not-minimist';
+import { getRuntimeArgs } from './lib/runtime-args';
 
 export { $spinner } from './globals/spinner';
 export { openEditor, slugify } from './lib/utils';
@@ -46,7 +47,6 @@ export * from './globals/selection';
 export { $stdin } from './globals/stdin';
 export * from './globals/utils';
 
-const { args, flags } = notMinimist(Bun.argv.slice(2) || []);
-const argv = { _: args, ...flags };
+const { args, flags, argv } = getRuntimeArgs();
 export const $HOME = os.homedir();
 export { $, path, ansis, ansis as chalk, os, args, argv, flags };
