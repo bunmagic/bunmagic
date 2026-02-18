@@ -6,9 +6,52 @@ import { afterEach, beforeEach, describe, expect, test } from 'bun:test';
 import { SAF } from './saf';
 
 const TEST_DIR = '/tmp/bunmagic-saf-test';
+const PROJECT_ROOT = path.resolve(import.meta.dir, '..', '..');
+const SAF_DEPRECATION_MESSAGE =
+	'[bunmagic] SAF is deprecated and will be removed in v1.5.0. Use files.* helpers. See docs: https://bunmagic.com/migrations/saf-to-files';
 
 function getTestFile(file: string) {
 	return SAF.from(TEST_DIR, file);
+}
+
+function countOccurrences(content: string, needle: string) {
+	return content.split(needle).length - 1;
+}
+
+async function runSafDeprecationProbe(silenceDeprecations = false) {
+	const env = { ...process.env };
+	if (silenceDeprecations) {
+		env.BUNMAGIC_SILENCE_DEPRECATIONS = '1';
+	} else {
+		delete env.BUNMAGIC_SILENCE_DEPRECATIONS;
+	}
+
+	const processResult = Bun.spawn({
+		cmd: [
+			'bun',
+			'--eval',
+			`import { SAF } from './src/extras/saf.ts';
+new SAF('constructor.txt');
+SAF.from('static-from.txt');
+await SAF.prepare('static-prepare.txt');`,
+		],
+		cwd: PROJECT_ROOT,
+		env,
+		stdout: 'pipe',
+		stderr: 'pipe',
+	});
+
+	const [stdout, stderr, exitCode] = await Promise.all([
+		new Response(processResult.stdout).text(),
+		new Response(processResult.stderr).text(),
+		processResult.exited,
+	]);
+
+	return {
+		stdout,
+		stderr,
+		exitCode,
+	};
 }
 
 describe('SAF', () => {
@@ -20,6 +63,21 @@ describe('SAF', () => {
 	afterEach(async () => {
 		cd('~');
 		await rm(TEST_DIR, { recursive: true, force: true });
+	});
+
+	describe('deprecation warnings', () => {
+		test('emits deprecation warning once per process', async () => {
+			const result = await runSafDeprecationProbe();
+			expect(result.exitCode).toBe(0);
+			expect(result.stdout).toBe('');
+			expect(countOccurrences(result.stderr, SAF_DEPRECATION_MESSAGE)).toBe(1);
+		});
+
+		test('suppresses deprecation warning when BUNMAGIC_SILENCE_DEPRECATIONS=1', async () => {
+			const result = await runSafDeprecationProbe(true);
+			expect(result.exitCode).toBe(0);
+			expect(result.stderr).not.toContain(SAF_DEPRECATION_MESSAGE);
+		});
 	});
 
 	test('can create a SAF instance from directory and target', () => {
