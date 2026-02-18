@@ -72,9 +72,7 @@ await cp(SOURCE_TYPES, TMP_TYPES, { recursive: true });
 const entryContents = [
 	'import "./types/globals";',
 	'export * from "./types/index";',
-	'export * from "./types/run";',
 	'export * from "./types/extras";',
-	'export * from "./types/lib";',
 	'',
 ].join('\n');
 

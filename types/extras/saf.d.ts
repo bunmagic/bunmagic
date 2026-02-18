@@ -1,6 +1,7 @@
 import type { BunFile } from 'bun';
 /**
  * Swiss Army File manager
+ * @deprecated SAF is deprecated and will be removed in v1.5.0. Use `files.*` helpers.
  */
 export declare class SAF {
     #private;
@@ -16,11 +17,13 @@ export declare class SAF {
     constructor(handle: string);
     /**
      * Get a SAF instance from a target path
+     * @deprecated SAF is deprecated and will be removed in v1.5.0. Use `files.*` helpers.
      */
     static from(dir: string, target: string): SAF;
     static from(target: string): SAF;
     /**
      * Prepare a target path for writing
+     * @deprecated SAF is deprecated and will be removed in v1.5.0. Use `files.*` helpers.
      */
     static prepare(target: string): Promise<SAF>;
     /**

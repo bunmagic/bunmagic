@@ -20,6 +20,7 @@ declare global {
     const $HOME: typeof globals.$HOME;
     const $get: typeof globals.$get;
     const glob: typeof globals.glob;
+    const files: typeof globals.files;
     const openEditor: typeof globals.openEditor;
     const slugify: typeof globals.slugify;
     const resolveTilde: typeof globals.resolveTilde;

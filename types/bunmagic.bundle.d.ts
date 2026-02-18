@@ -78,6 +78,7 @@ export declare function isMacOS(): Promise<boolean>;
 declare function copyToClipboard$1(text: string): Promise<void>;
 /**
  * Swiss Army File manager
+ * @deprecated SAF is deprecated and will be removed in v1.5.0. Use `files.*` helpers.
  */
 declare class SAF$1 {
 	#private;
@@ -93,11 +94,13 @@ declare class SAF$1 {
 	constructor(handle: string);
 	/**
 	 * Get a SAF instance from a target path
+	 * @deprecated SAF is deprecated and will be removed in v1.5.0. Use `files.*` helpers.
 	 */
 	static from(dir: string, target: string): SAF$1;
 	static from(target: string): SAF$1;
 	/**
 	 * Prepare a target path for writing
+	 * @deprecated SAF is deprecated and will be removed in v1.5.0. Use `files.*` helpers.
 	 */
 	static prepare(target: string): Promise<SAF$1>;
 	/**
@@ -163,9 +166,74 @@ declare class SAF$1 {
 	 */
 	private getSafePath;
 }
-declare function isDirectory$1(path: string): Promise<boolean>;
-declare function ensureDirectory$1(path: string): Promise<boolean>;
-declare function cd$1(path: string | SAF$1): void;
+export type PathLike = string;
+export type BlobInput = Blob | NodeJS.TypedArray | ArrayBufferLike | string | Bun.BlobPart[] | BunFile;
+export type SuffixOptions = {
+	separator?: string;
+	start?: number;
+	maxAttempts?: number;
+};
+export type MoveCopyOptions = {
+	overwrite?: boolean;
+	errorOnExist?: boolean;
+};
+export type WriteTextOptions = {
+	flag?: "w" | "wx";
+	atomic?: boolean;
+};
+export declare function resolve(input: PathLike, ...rest: PathLike[]): string;
+export declare function stem(input: PathLike): string;
+export declare function pathExists(target: PathLike): Promise<boolean>;
+export declare function isFile(target: PathLike): Promise<boolean>;
+export declare function isDir(target: PathLike): Promise<boolean>;
+export declare function ensureDir(target: PathLike): Promise<string>;
+export declare function ensureFile(target: PathLike): Promise<string>;
+export declare function emptyDir(target: PathLike): Promise<string>;
+export declare function readFile(target: PathLike): Promise<string>;
+export declare function readBytes(target: PathLike): Promise<Uint8Array<ArrayBuffer>>;
+export declare function writeFile(target: PathLike, input: BlobInput, options?: WriteTextOptions): Promise<number>;
+export declare function outputFile(target: PathLike, input: BlobInput, options?: WriteTextOptions): Promise<number>;
+export declare function editFile(target: PathLike, updater: (content: string) => string | Promise<string>, options?: WriteTextOptions): Promise<string>;
+export declare function copy(source: PathLike, destination: PathLike, options?: MoveCopyOptions): Promise<string>;
+export declare function move(source: PathLike, destination: PathLike, options?: MoveCopyOptions): Promise<string>;
+export declare function remove(target: PathLike): Promise<string>;
+declare function glob$1(pattern?: string, options?: GlobScanOptions): Promise<string[]>;
+export declare function ensureUniquePath(target: PathLike, options?: SuffixOptions): Promise<string>;
+export declare function writeFileSafe(target: PathLike, input: BlobInput, options?: WriteTextOptions & {
+	suffix?: SuffixOptions;
+}): Promise<string>;
+export declare function copySafe(source: PathLike, destination: PathLike, options?: MoveCopyOptions & {
+	suffix?: SuffixOptions;
+}): Promise<string>;
+export declare function moveSafe(source: PathLike, destination: PathLike, options?: MoveCopyOptions & {
+	suffix?: SuffixOptions;
+}): Promise<string>;
+declare const files$1: {
+	readonly resolve: typeof resolve;
+	readonly stem: typeof stem;
+	readonly pathExists: typeof pathExists;
+	readonly isFile: typeof isFile;
+	readonly isDir: typeof isDir;
+	readonly ensureDir: typeof ensureDir;
+	readonly ensureFile: typeof ensureFile;
+	readonly emptyDir: typeof emptyDir;
+	readonly readFile: typeof readFile;
+	readonly readBytes: typeof readBytes;
+	readonly writeFile: typeof writeFile;
+	readonly outputFile: typeof outputFile;
+	readonly editFile: typeof editFile;
+	readonly copy: typeof copy;
+	readonly move: typeof move;
+	readonly remove: typeof remove;
+	readonly glob: typeof glob$1;
+	readonly ensureUniquePath: typeof ensureUniquePath;
+	readonly writeFileSafe: typeof writeFileSafe;
+	readonly copySafe: typeof copySafe;
+	readonly moveSafe: typeof moveSafe;
+};
+declare function isDirectory$1(target: string): Promise<boolean>;
+declare function ensureDirectory$1(target: string): Promise<boolean>;
+declare function cd$1(target: string | SAF$1): void;
 declare function cwd$1(): Promise<string>;
 declare function resolveTilde$1(input: string): string;
 declare function glob$1(pattern?: string, options?: GlobScanOptions): Promise<string[]>;
@@ -249,6 +317,7 @@ declare global {
 	const $HOME: typeof $HOME$1;
 	const $get: typeof $get$1;
 	const glob: typeof glob$1;
+	const files: typeof files$1;
 	const openEditor: typeof openEditor$1;
 	const slugify: typeof slugify$1;
 	const resolveTilde: typeof resolveTilde$1;
@@ -319,6 +388,7 @@ export {
 	cwd$1 as cwd,
 	die$1 as die,
 	ensureDirectory$1 as ensureDirectory,
+	files$1 as files,
 	flags$1 as flags,
 	getPassword$1 as getPassword,
 	glob$1 as glob,
