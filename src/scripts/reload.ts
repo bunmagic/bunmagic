@@ -8,6 +8,7 @@
 import { PATHS } from '@lib/config';
 import type { Script } from '@lib/script';
 import { getSources } from '@lib/sources';
+import { pathExists, remove, resolve, writeFile } from '../files';
 
 function template(name: string, scriptPath: string, exec: string): string {
 	let output = '#!/bin/bash\n';
@@ -25,20 +26,20 @@ export async function ensureScriptBin(
 	globalAliases: string[] = script.globalAliases,
 ) {
 	const exec = 'bunmagic-exec';
-	const bin = SAF.from(PATHS.bins, script.slug);
-	if (flags.force === true && (await bin.file.exists())) {
+	const binPath = resolve(PATHS.bins, script.slug);
+	if (flags.force === true && (await pathExists(binPath))) {
 		console.log(`Removing ${ansis.bold(script.slug)} script bin file`);
-		await bin.delete('keep_handle');
+		await remove(binPath);
 	}
 
-	const binExists = await bin.exists();
+	const binExists = await pathExists(binPath);
 
 	let created = 0;
 
 	if (!binExists) {
 		// Create script bin
 		await ensureDirectory(PATHS.bins);
-		await bin.write(template(script.slug, script.source, exec));
+		await writeFile(binPath, template(script.slug, script.source, exec));
 		await $`chmod +x ${script.bin}`;
 		created += 1;
 	}
@@ -61,16 +62,16 @@ async function ensureAliasBins(script: Script, aliases: string[]) {
 			continue;
 		}
 
-		const aliasBin = SAF.from(PATHS.bins, alias);
-		const aliasExists = await aliasBin.exists();
+		const aliasBinPath = resolve(PATHS.bins, alias);
+		const aliasExists = await pathExists(aliasBinPath);
 		if (aliasExists && flags.force !== true) {
 			continue;
 		}
 
 		await ensureDirectory(PATHS.bins);
-		await aliasBin.write(template(script.slug, script.source, exec));
-		await $`chmod +x ${aliasBin}`;
-		console.log(`Created new script bin: ${script.slug} -> ${aliasBin.file.name}\n`);
+		await writeFile(aliasBinPath, template(script.slug, script.source, exec));
+		await $`chmod +x ${aliasBinPath}`;
+		console.log(`Created new script bin: ${script.slug} -> ${path.basename(aliasBinPath)}\n`);
 		created += 1;
 	}
 

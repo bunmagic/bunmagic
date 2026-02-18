@@ -1,3 +1,6 @@
+import { resolve } from '../files';
+import { readJsonFile } from '../lib/json';
+
 /**
  * Display the current version of bunmagic
  * @autohelp
@@ -9,9 +12,9 @@ type PackageJson = {
 };
 
 export async function getVersion() {
-	const packageFile = SAF.from(import.meta.dir, '../../package.json');
-	const json = await packageFile.json<PackageJson>();
-	if ('version' in json !== true) {
+	const packageFile = resolve(import.meta.dir, '../../package.json');
+	const json = await readJsonFile<PackageJson>(packageFile);
+	if (!json || 'version' in json !== true) {
 		throw new Exit('package.json is missing the version field');
 	}
 

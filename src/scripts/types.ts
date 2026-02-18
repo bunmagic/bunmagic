@@ -1,3 +1,5 @@
+import { pathExists, readFile, writeFile } from '../files';
+
 /**
  * Copy prebuilt bunmagic.d.ts into the current directory.
  * @autohelp
@@ -22,16 +24,16 @@ export default async function copyTypesBundle() {
 	console.log(ansis.green(`Wrote ${OUTPUT_FILE}`));
 
 	if (!outputExists && ack('Add bunmagic.d.ts to .gitignore?')) {
-		const gitignore = SAF.from('.gitignore');
-		if ((await gitignore.exists()) === false) {
-			await Bun.write(gitignore.path, 'bunmagic.d.ts\n');
+		const gitignorePath = '.gitignore';
+		if ((await pathExists(gitignorePath)) === false) {
+			await writeFile(gitignorePath, 'bunmagic.d.ts\n');
 		} else {
-			const content = await Bun.file(gitignore.path).text();
+			const content = await readFile(gitignorePath);
 			if (!content.includes('bunmagic.d.ts')) {
 				const newContent = content.endsWith('\n')
 					? `${content}bunmagic.d.ts\n`
 					: `${content}\nbunmagic.d.ts\n`;
-				await Bun.write(gitignore.path, newContent);
+				await writeFile(gitignorePath, newContent);
 			}
 		}
 	}

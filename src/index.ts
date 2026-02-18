@@ -10,7 +10,37 @@ export { notMinimist };
 export { CLI } from './extras/cli';
 export * from './extras/mac';
 export { SAF } from './extras/saf';
-export * from './globals/fs';
+export type {
+	BlobInput,
+	MoveCopyOptions,
+	PathLike,
+	SuffixOptions,
+	WriteTextOptions,
+} from './files';
+export {
+	copy,
+	copySafe,
+	editFile,
+	emptyDir,
+	ensureDir,
+	ensureFile,
+	ensureUniquePath,
+	files,
+	isDir,
+	isFile,
+	move,
+	moveSafe,
+	outputFile,
+	pathExists,
+	readBytes,
+	readFile,
+	remove,
+	resolve,
+	stem,
+	writeFile,
+	writeFileSafe,
+} from './files';
+export { cd, cwd, ensureDirectory, glob, isDirectory, resolveTilde } from './globals/fs';
 export { showHelp } from './globals/help';
 export * from './globals/selection';
 export { $stdin } from './globals/stdin';

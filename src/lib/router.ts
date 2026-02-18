@@ -1,4 +1,5 @@
 import { Columns } from '@lib/columns';
+import { stem } from '../files';
 import { run } from '../run';
 import { create } from '../scripts/create';
 import { SUPPORTED_FILES } from './config';
@@ -52,7 +53,8 @@ export const displayScripts = (scripts: Map<string, Script>, namespace?: string)
 			continue;
 		}
 
-		if (SAF.from(script.source).base?.startsWith('_')) {
+		const baseName = stem(script.source);
+		if (baseName.startsWith('_')) {
 			continue;
 		}
 

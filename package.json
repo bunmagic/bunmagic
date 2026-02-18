@@ -37,7 +37,8 @@
     "./run": "./src/run.ts",
     "./globals": "./src/globals.ts",
     "./extras": "./src/extras.ts",
-    "./lib": "./src/lib.ts"
+    "./lib": "./src/lib.ts",
+    "./files": "./src/files.ts"
   },
   "peerDependencies": {
     "typescript": "^5.8.3"

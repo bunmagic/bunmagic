@@ -1,3 +1,5 @@
+import { readJsonFile } from './json';
+
 export const PATHS = {
 	get bunmagic() {
 		return `${$HOME}/.bunmagic`;
@@ -25,13 +27,14 @@ export type Config = {
 export type ConfigKey = keyof Config;
 
 async function config(): Promise<Config> {
-	try {
-		return await SAF.from(PATHS.config).json<Config>();
-	} catch {
-		return {
-			extension: 'ts',
-		};
+	const parsed = await readJsonFile<Config>(PATHS.config);
+	if (parsed !== undefined) {
+		return parsed;
 	}
+
+	return {
+		extension: 'ts',
+	};
 }
 
 export async function get<K extends ConfigKey>(key: K): Promise<Config[K]> {

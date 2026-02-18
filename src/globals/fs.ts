@@ -1,22 +1,21 @@
 import type { GlobScanOptions } from 'bun';
 import type { SAF as SAFType } from '../extras/saf';
+import { ensureDir, isDir } from '../files';
 
-export async function isDirectory(path: string) {
-	const saf = await SAF.prepare(path);
-	return saf.isDirectory();
+export async function isDirectory(target: string) {
+	return isDir(target);
 }
 
-export async function ensureDirectory(path: string) {
-	const saf = await SAF.prepare(path);
-	await saf.ensureDirectory();
+export async function ensureDirectory(target: string) {
+	await ensureDir(target);
 	return true;
 }
 
-export function cd(path: string | SAFType) {
-	if (typeof path === 'string') {
-		$.cwd(resolveTilde(path));
+export function cd(target: string | SAFType) {
+	if (typeof target === 'string') {
+		$.cwd(resolveTilde(target));
 	} else {
-		$.cwd(path.path);
+		$.cwd(target.path);
 	}
 }
 
