@@ -2,8 +2,9 @@
  * Remove bin files from the bin directory that don't have a matching script.
  * @autohelp
  */
-import { getSources, type Source } from '@lib/sources';
+
 import { PATHS } from '@lib/config';
+import { getSources, type Source } from '@lib/sources';
 import { getBins } from './reload';
 
 export async function getExpectedBins(sources: Source[]) {

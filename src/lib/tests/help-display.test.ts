@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test';
-import ansis from 'ansis';
 import path from 'node:path';
+import ansis from 'ansis';
 import { displayScriptHelp } from '../help-display';
 import { Script } from '../script';
 
@@ -100,8 +100,6 @@ describe('displayScriptHelp', () => {
 
 		displayScriptHelp(script, 'n8');
 
-		const output = consoleOutput.join('\n');
-
 		// Check that parameters are highlighted with ansi colors
 		const usageLineIndex = consoleOutput.findIndex(line => line.includes('workflow-id'));
 
@@ -132,10 +130,6 @@ describe('displayScriptHelp', () => {
 		});
 
 		displayScriptHelp(script, 'n8');
-
-		const output = consoleOutput.join('\n');
-		const usageLineIndex = consoleOutput.findIndex(line => line.includes('activate'));
-		const usageLine = consoleOutput[usageLineIndex];
 
 		// The title line is different from usage line
 		// Find the actual usage content line
@@ -219,9 +213,6 @@ describe('displayScriptHelp', () => {
 		});
 
 		displayScriptHelp(script, 'n8');
-
-		const usageLineIndex = consoleOutput.findIndex(line => line.includes('update'));
-		const usageLine = consoleOutput[usageLineIndex];
 
 		// Find the actual usage line (not the title)
 		const titleIndex = consoleOutput.findIndex(line => line === `\n  ${ansis.bold('update')}`);
@@ -373,7 +364,8 @@ describe('displayScriptHelp usage edge cases', () => {
 
 		const strippedUsage = ansis.strip(usageLine);
 		expect(strippedUsage).toContain('@usage <insert your <head>> [args...]');
-		expect(usageLine).not.toMatch(/(^|[^\x1b])\[33m/);
+		const usageWithoutYellowAnsi = usageLine.replaceAll('\x1b[33m', '');
+		expect(usageWithoutYellowAnsi).not.toContain('[33m');
 	});
 
 	test('handles ANSI CSI sequences inside usage text without breaking parsing', () => {
@@ -396,7 +388,7 @@ describe('displayScriptHelp usage edge cases', () => {
 
 		const strippedUsage = ansis.strip(usageLine);
 		expect(strippedUsage).toContain('@usage <insert head> [args...]');
-		expect(usageLine).not.toMatch(/(^|[^\x1b])\[33m/);
+		const usageWithoutYellowAnsi = usageLine.replaceAll('\x1b[33m', '');
+		expect(usageWithoutYellowAnsi).not.toContain('[33m');
 	});
-
 });

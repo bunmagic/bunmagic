@@ -144,7 +144,7 @@ const defaultRouter: Router['callback'] = async ({ namespace, name, exec, comman
 		if (process.env.BUNMAGIC_STRICT === '1') {
 			throw new Exit(`Command not found: ${ansis.bold(input)}`);
 		}
-		
+
 		await runWithFallback(scripts, 'create', async () => {
 			try {
 				await create(args[0] ? `${namespace} ${args[0]}` : input);

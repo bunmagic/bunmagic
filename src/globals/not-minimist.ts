@@ -49,7 +49,7 @@ export function notMinimist(input: string[]): StructuredArguments {
 				// Look ahead to see if we should concatenate more values
 				let lookAheadIndex = index + 1;
 				while (lookAheadIndex < input.length && !input[lookAheadIndex].startsWith('-')) {
-					value += ' ' + input[lookAheadIndex];
+					value += ` ${input[lookAheadIndex]}`;
 					lookAheadIndex++;
 				}
 
@@ -68,7 +68,7 @@ export function notMinimist(input: string[]): StructuredArguments {
 					// Continue concatenating non-flag values
 					let lookAheadIndex = index + 1;
 					while (lookAheadIndex < input.length && !input[lookAheadIndex].startsWith('-')) {
-						value += ' ' + input[lookAheadIndex];
+						value += ` ${input[lookAheadIndex]}`;
 						lookAheadIndex++;
 					}
 

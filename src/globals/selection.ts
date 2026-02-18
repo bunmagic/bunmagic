@@ -348,7 +348,6 @@ export async function ask(
 
 	q = cliMarkdown(q);
 	const display = (text: string) => text || "''";
-	const columns = process.stdout.columns;
 
 	const stream = CLI.stream();
 	let answer = '';
@@ -512,10 +511,9 @@ export async function ask(
 
 			// Space handling
 			if (input.key === ' ') {
-				answer = answer.slice(0, cursorPosition) + ' ' + answer.slice(cursorPosition);
+				answer = `${answer.slice(0, cursorPosition)} ${answer.slice(cursorPosition)}`;
 				cursorPosition++;
 				await renderInput();
-				continue;
 			}
 		} else if (typeof input === 'number' || typeof input === 'string') {
 			// Insert character at cursor position

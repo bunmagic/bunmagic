@@ -28,7 +28,7 @@ describe('ANSI color code regression', () => {
 		// Step 2: Apply color formatting to parameters (manually add ANSI codes)
 		usageLine = usageLine.replace(
 			/\[([^\]]+)\]/g,
-			(match, param) => `\x1b[2m\x1b[33m[${param}]\x1b[39m\x1b[22m`,
+			(_match, param) => `\x1b[2m\x1b[33m[${param}]\x1b[39m\x1b[22m`,
 		);
 
 		// Now usageLine = "n8 docblocks list \x1b[2m\x1b[33m[options]\x1b[39m\x1b[22m"
@@ -62,7 +62,7 @@ describe('ANSI color code regression', () => {
 		const text = 'test [options]';
 		const colored = text.replace(
 			/\[([^\]]+)\]/g,
-			(match, param) => `\x1b[2m\x1b[33m[${param}]\x1b[39m\x1b[22m`,
+			(_match, param) => `\x1b[2m\x1b[33m[${param}]\x1b[39m\x1b[22m`,
 		);
 
 		// Verify ANSI codes are present

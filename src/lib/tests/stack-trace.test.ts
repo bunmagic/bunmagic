@@ -28,10 +28,7 @@ describe('findCallerScriptPath', () => {
 
 	test('returns undefined when no caller is found', () => {
 		const root = '/fake/bunmagic/src';
-		const stack: string[] = [
-			'Error',
-			'    at showHelp (/fake/bunmagic/src/globals/help.ts:10:5)',
-		];
+		const stack: string[] = ['Error', '    at showHelp (/fake/bunmagic/src/globals/help.ts:10:5)'];
 
 		expect(findCallerScriptPath(stack, root)).toBeUndefined();
 	});
