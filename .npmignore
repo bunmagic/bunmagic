@@ -2,3 +2,7 @@ docs/*
 resources/*
 bunmagic.code-workspace
 xo.config.js
+.claude/
+**/*.test.ts
+**/__tests__/
+src/test/
