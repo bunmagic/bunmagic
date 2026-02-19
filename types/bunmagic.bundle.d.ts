@@ -289,6 +289,9 @@ declare class Exit$1 extends Error {
 	private indent;
 	private exit;
 }
+/**
+ * @deprecated `die()` is deprecated and will be removed in v1.5.0. Use `throw new Exit(...)` instead.
+ */
 declare function die$1(output: unknown): void;
 export declare const sleep: (ms: number) => Promise<void>;
 declare const args$1: string[], flags$1: Record<string, string | number | boolean>;
