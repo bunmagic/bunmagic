@@ -32,6 +32,14 @@ export async function getPathScripts(
 			continue;
 		}
 
+		if (/\.(test|spec)\.(ts|js|mjs)$/.test(fileName)) {
+			if (flags.debug) {
+				console.log(`Ignoring test file: ${fileName}`);
+			}
+
+			continue;
+		}
+
 		if (fileName.startsWith('_')) {
 			if (flags.debug) {
 				console.log(`Ignoring: ${fileName}`);
