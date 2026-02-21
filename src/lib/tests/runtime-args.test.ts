@@ -26,6 +26,24 @@ describe('runtime args typed accessors', () => {
 		expect(runtimeArgs.flag('debug').boolean().default(false)).toBe(true);
 	});
 
+	test('supports custom validate callbacks for flags and args', () => {
+		const runtimeArgs = setRuntimeArgv(['42', '--age', '50']);
+		expect(
+			runtimeArgs
+				.flag('age')
+				.int()
+				.validate(value => value > 30 && value < 100)
+				.required(),
+		).toBe(50);
+		expect(
+			runtimeArgs
+				.arg(0)
+				.int()
+				.validate(value => value > 30 && value < 100)
+				.required(),
+		).toBe(42);
+	});
+
 	test('supports chain-only typed arg access', () => {
 		const runtimeArgs = setRuntimeArgv(['file.ts', '5', 'fast']);
 		expect(runtimeArgs.arg(0).string().required()).toBe('file.ts');
@@ -42,6 +60,63 @@ describe('runtime args typed accessors', () => {
 		expect(() => runtimeArgs.flag('mode').enum('fast', 'safe').required()).toThrow(
 			'Invalid value for --mode: expected one of [fast, safe], received "FAST"',
 		);
+	});
+
+	test('throws custom validation messages', () => {
+		const runtimeArgs = setRuntimeArgv(['--age', '12']);
+		expect(() =>
+			runtimeArgs
+				.flag('age')
+				.int()
+				.validate(value => value > 30 && value < 100, 'age must be between 31 and 99')
+				.required(),
+		).toThrow('age must be between 31 and 99');
+	});
+
+	test('uses default validation failure message when no custom message is provided', () => {
+		const runtimeArgs = setRuntimeArgv(['--age', '12']);
+		expect(() =>
+			runtimeArgs
+				.flag('age')
+				.int()
+				.validate(value => value > 30 && value < 100)
+				.required(),
+		).toThrow('Invalid value for --age: validation failed');
+	});
+
+	test('supports multiple validation callbacks in chain order', () => {
+		const passingArgs = setRuntimeArgv(['--age', '7']);
+		expect(
+			passingArgs
+				.flag('age')
+				.int()
+				.validate(value => value > 0)
+				.validate(value => value < 10, 'age must be below 10')
+				.required(),
+		).toBe(7);
+
+		const failingArgs = setRuntimeArgv(['--age', '12']);
+		expect(() =>
+			failingArgs
+				.flag('age')
+				.int()
+				.validate(value => value > 0)
+				.validate(value => value < 10, 'age must be below 10')
+				.required(),
+		).toThrow('age must be below 10');
+	});
+
+	test('does not run validation callback for missing optional/defaulted values', () => {
+		const runtimeArgs = setRuntimeArgv([]);
+		let validationsRun = 0;
+		const validateMissingInt = (value: number) => {
+			validationsRun += 1;
+			return value > 0;
+		};
+
+		expect(runtimeArgs.flag('age').int().validate(validateMissingInt).optional()).toBeUndefined();
+		expect(runtimeArgs.flag('age').int().validate(validateMissingInt).default(5)).toBe(5);
+		expect(validationsRun).toBe(0);
 	});
 
 	test('keeps mutable plain flags behavior used by commands', () => {

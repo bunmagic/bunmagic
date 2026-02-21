@@ -1,10 +1,11 @@
 type FlagValue = string | number | boolean | undefined;
-type TypedResolver<T> = {
+export type TypedResolver<T> = {
     default(defaultValue: T): T;
     required(message?: string): T;
     optional(): T | undefined;
+    validate(check: (value: T) => boolean, message?: string): TypedResolver<T>;
 };
-type TypedAccessor = {
+export type TypedAccessor = {
     string(): TypedResolver<string>;
     int(): TypedResolver<number>;
     number(): TypedResolver<number>;

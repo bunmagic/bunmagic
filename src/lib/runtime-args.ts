@@ -2,13 +2,14 @@ import { notMinimist } from '../globals/not-minimist';
 
 type FlagValue = string | number | boolean | undefined;
 
-type TypedResolver<T> = {
+export type TypedResolver<T> = {
 	default(defaultValue: T): T;
 	required(message?: string): T;
 	optional(): T | undefined;
+	validate(check: (value: T) => boolean, message?: string): TypedResolver<T>;
 };
 
-type TypedAccessor = {
+export type TypedAccessor = {
 	string(): TypedResolver<string>;
 	int(): TypedResolver<number>;
 	number(): TypedResolver<number>;
@@ -64,6 +65,11 @@ function createResolver<T>({
 	missingMessage: string;
 	parse: (value: unknown) => T | undefined;
 }): TypedResolver<T> {
+	type ValidationRule = {
+		check: (value: T) => boolean;
+		message?: string;
+	};
+
 	const parseValue = () => {
 		if (rawValue === undefined) {
 			return undefined;
@@ -79,13 +85,22 @@ function createResolver<T>({
 		);
 	};
 
-	return {
+	const validateValue = (value: T, rules: ValidationRule[]) => {
+		for (const rule of rules) {
+			if (!rule.check(value)) {
+				throw new Error(rule.message ?? `Invalid value for ${label}: validation failed`);
+			}
+		}
+	};
+
+	const createValidatedResolver = (rules: ValidationRule[]): TypedResolver<T> => ({
 		default(defaultValue: T) {
 			const parsedValue = parseValue();
 			if (parsedValue === undefined) {
 				return defaultValue;
 			}
 
+			validateValue(parsedValue, rules);
 			return parsedValue;
 		},
 		required(message?: string) {
@@ -94,12 +109,24 @@ function createResolver<T>({
 				throw new Error(message ?? missingMessage);
 			}
 
+			validateValue(parsedValue, rules);
 			return parsedValue;
 		},
 		optional() {
-			return parseValue();
+			const parsedValue = parseValue();
+			if (parsedValue === undefined) {
+				return undefined;
+			}
+
+			validateValue(parsedValue, rules);
+			return parsedValue;
 		},
-	};
+		validate(check: (value: T) => boolean, message?: string) {
+			return createValidatedResolver([...rules, { check, message }]);
+		},
+	});
+
+	return createValidatedResolver([]);
 }
 
 function parseString(value: unknown): string | undefined {
