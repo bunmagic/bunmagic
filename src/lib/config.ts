@@ -22,6 +22,9 @@ export type SourcePaths = {
 export type Config = {
 	extension: string;
 	sources?: SourcePaths[];
+	migrations?: {
+		wrapperArgvQuoted?: boolean;
+	};
 };
 
 export type ConfigKey = keyof Config;
