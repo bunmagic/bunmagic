@@ -127,12 +127,17 @@ Typed helpers available on both accessors:
 * `.number()`
 * `.boolean()`
 * `.enum("a", "b", ...)`
+* `.validate((value) => boolean, message?)`
 
 Chain form is also supported:
 
 ```ts
 const retries = flag("retries").int().default(3);
 const dryRun = flag("dry").boolean().optional();
+const age = flag("age")
+  .int()
+  .validate(value => value > 30 && value < 100, "age must be between 31 and 99")
+  .required();
 ```
 
 `.optional()` returns `undefined` when missing. `args` remains a plain array and `flags` remains a plain object.
