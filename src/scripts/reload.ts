@@ -10,10 +10,25 @@ import type { Script } from '@lib/script';
 import { getSources } from '@lib/sources';
 import { pathExists, remove, resolve, writeFile } from '../files';
 
+const SAFE_SHELL_WORD = /^[A-Za-z0-9_@%+=:,./-]+$/;
+
+function quoteShellArg(value: string) {
+	if (value.length === 0) {
+		return "''";
+	}
+
+	if (SAFE_SHELL_WORD.test(value)) {
+		return value;
+	}
+
+	return `'${value.replaceAll("'", `'\"'\"'`)}'`;
+}
+
 function template(name: string, scriptPath: string, exec: string): string {
-	let output = '#!/bin/bash\n';
-	output += `${exec} ${scriptPath} ${name} $@`;
-	return output;
+	const command = quoteShellArg(exec);
+	const quotedPath = quoteShellArg(scriptPath);
+	const quotedName = quoteShellArg(name);
+	return `#!/bin/bash\nexec ${command} ${quotedPath} ${quotedName} "$@"\n`;
 }
 
 export async function getBins(): Promise<string[]> {

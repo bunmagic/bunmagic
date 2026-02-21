@@ -8,7 +8,7 @@ export async function setupAlias(binaryPath: string) {
 		Bun.which('bm') === null &&
 		ack(bmAliasQuestion)
 	) {
-		await Bun.write(`${bmAliasBinary}`, '#!/bin/bash\nbunmagic $@');
+		await Bun.write(`${bmAliasBinary}`, '#!/bin/bash\nexec bunmagic "$@"\n');
 		await $`chmod +x ${bmAliasBinary}`;
 		console.log(`\n- Created a new bin: ${ansis.bold('bm')} -> ${bmAliasBinary} \n`);
 		return true;
