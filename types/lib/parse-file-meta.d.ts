@@ -16,7 +16,7 @@ type Properties = {
     globalAliases: string[];
     autohelp: boolean;
 };
-declare function parseContent(contents: string): Promise<Properties>;
+declare function parseContent(contents: string): Promise<Properties | undefined>;
 export declare const parseHeader: {
     fromFile: typeof parseFile;
     fromContent: typeof parseContent;

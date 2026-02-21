@@ -23,7 +23,7 @@
     "format": "biome format --write src",
     "check": "biome check src",
     "typecheck": "tsc --project tsconfig.typecheck.json",
-    "build": "tsc src/globals.ts --declaration --emitDeclarationOnly --outdir types --skipLibCheck --downlevelIteration --target ES2021 --module ESNext --moduleResolution bundler"
+    "build": "tsc src/globals.ts --declaration --emitDeclarationOnly --outdir types --skipLibCheck --downlevelIteration --target ES2021 --module ESNext --moduleResolution bundler --strictNullChecks"
   },
   "types": "types/index.d.ts",
   "module": "src/index.ts",
