@@ -114,6 +114,7 @@ Arguments passed to the script are available in 3 global variables:
 * `argv` - a minimist-like object with all the arguments and flags.
 
 Arguments are parsed by [`notMinimist`](./src/globals/not-minimist.ts) - a tiny utility that's inspired by [Minimist](https://www.npmjs.com/package/minimist), but with a smaller footprint.
+Flag values consume one token (`--name value`) or an inline value (`--name=value`). For multi-word values, quote them in your shell (`--name "hello world"`).
 
 **Example:**
 
@@ -126,7 +127,7 @@ Produces an object like this:
 ```ts
 const args = [ "one", "two" ];
 const flags = {
-  not: "false",
+  not: false,
   yes: true,
   n: 10,
   equals: "is-optional",
@@ -134,7 +135,7 @@ const flags = {
 
 // Minimist-like `argv` object:
 const argv = {
-  _: args
+  _: args,
   ...flags
 };
 ```

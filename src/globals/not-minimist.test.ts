@@ -24,21 +24,34 @@ describe('notMinimist', () => {
 		expect(result.flags.number3).toBe(123);
 	});
 
-	it('should support flag values with spaces', () => {
+	it('should not greedily merge extra args into --key=value', () => {
 		const result = notMinimist(['--key=value', 'with', 'spaces']);
-		expect(result.flags.key).toBe('value with spaces');
-
-		const groupedResult = notMinimist(['--key=value with spaces']);
-		expect(groupedResult.flags.key).toBe('value with spaces');
+		expect(result.flags.key).toBe('value');
+		expect(result.args).toEqual(['with', 'spaces']);
 	});
 
-	it('should support multiple flag values with spaces', () => {
+	it('should not greedily merge extra args into --key value', () => {
+		const result = notMinimist(['--key', 'value', 'with', 'spaces']);
+		expect(result.flags.key).toBe('value');
+		expect(result.args).toEqual(['with', 'spaces']);
+	});
+
+	it('should preserve grouped multi-word values passed as one token', () => {
+		const equalsResult = notMinimist(['--key=value with spaces']);
+		expect(equalsResult.flags.key).toBe('value with spaces');
+
+		const spaceResult = notMinimist(['--key', 'value with spaces']);
+		expect(spaceResult.flags.key).toBe('value with spaces');
+	});
+
+	it('should support multiple flags while leaving trailing positionals intact', () => {
 		const result = notMinimist(['--key1=value1', 'with', 'spaces', '--key2=value2 with spaces']);
-		expect(result.flags.key1).toBe('value1 with spaces');
+		expect(result.flags.key1).toBe('value1');
 		expect(result.flags.key2).toBe('value2 with spaces');
+		expect(result.args).toEqual(['with', 'spaces']);
 	});
 
-	it('should support args and multiple flag values with spaces', () => {
+	it('should support args and flags without greedy value capture', () => {
 		const result = notMinimist([
 			'arg1',
 			'arg2',
@@ -47,9 +60,9 @@ describe('notMinimist', () => {
 			'spaces',
 			'--key2=value2 with spaces',
 		]);
-		expect(result.flags.key1).toBe('value1 with spaces');
+		expect(result.flags.key1).toBe('value1');
 		expect(result.flags.key2).toBe('value2 with spaces');
-		expect(result.args).toEqual(['arg1', 'arg2']);
+		expect(result.args).toEqual(['arg1', 'arg2', 'with', 'spaces']);
 	});
 
 	it('should handle mixed arguments and flags correctly', () => {
