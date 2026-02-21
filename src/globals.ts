@@ -13,6 +13,8 @@ declare global {
 	const argv: typeof globals.argv;
 	const args: typeof globals.args;
 	const flags: typeof globals.flags;
+	const arg: typeof globals.arg;
+	const flag: typeof globals.flag;
 	const select: typeof globals.select;
 	const autoselect: typeof globals.autoselect;
 	const getPassword: typeof globals.getPassword;

@@ -113,6 +113,30 @@ Arguments passed to the script are available in 3 global variables:
 * `flags` - an object with all the flags passed to the script.
 * `argv` - a minimist-like object with all the arguments and flags.
 
+For typed reads, use singular accessors:
+
+```ts
+const retries = flag("retries").int().default(3);
+const mode = flag("mode").enum("fast", "safe").required();
+const input = arg(0).string().required();
+```
+
+Typed helpers available on both accessors:
+* `.string()`
+* `.int()`
+* `.number()`
+* `.boolean()`
+* `.enum("a", "b", ...)`
+
+Chain form is also supported:
+
+```ts
+const retries = flag("retries").int().default(3);
+const dryRun = flag("dry").boolean().optional();
+```
+
+`.optional()` returns `undefined` when missing. `args` remains a plain array and `flags` remains a plain object.
+
 Arguments are parsed by [`notMinimist`](./src/globals/not-minimist.ts) - a tiny utility that's inspired by [Minimist](https://www.npmjs.com/package/minimist), but with a smaller footprint.
 Flag values consume one token (`--name value`) or an inline value (`--name=value`). For multi-word values, quote them in your shell (`--name "hello world"`).
 
