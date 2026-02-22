@@ -110,8 +110,9 @@ Bun [Shell](https://bun.sh/docs/runtime/shell) is available as `$` globally. Use
 Arguments passed to the script are available in 3 global variables:
 
 * `args` - an array of arguments without flags.
+* `passthroughArgs` - tokens after a `--` terminator (left unparsed).
 * `flags` - an object with all the flags passed to the script.
-* `argv` - a minimist-like object with all the arguments and flags.
+* `argv` - a minimist-like object with all the arguments and flags (`argv._` for positionals, `argv["--"]` for passthrough).
 
 For typed reads, use singular accessors:
 
@@ -144,6 +145,7 @@ const age = flag("age")
 
 Arguments are parsed by [`notMinimist`](./src/globals/not-minimist.ts) - a tiny utility that's inspired by [Minimist](https://www.npmjs.com/package/minimist), but with a smaller footprint.
 Flag values consume one token (`--name value`) or an inline value (`--name=value`). For multi-word values, quote them in your shell (`--name "hello world"`).
+`--` is treated as a terminator: everything after it is exposed via `passthroughArgs` and is not parsed as flags.
 
 **Example:**
 
@@ -165,7 +167,8 @@ const flags = {
 // Minimist-like `argv` object:
 const argv = {
   _: args,
-  ...flags
+  ...flags,
+  "--": passthroughArgs
 };
 ```
 
