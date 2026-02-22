@@ -78,7 +78,7 @@ export declare function isMacOS(): Promise<boolean>;
 declare function copyToClipboard$1(text: string): Promise<void>;
 /**
  * Swiss Army File manager
- * @deprecated SAF is deprecated and will be removed in v1.5.0. Use `files.*` helpers.
+ * @deprecated SAF is deprecated and will be removed in v2.0.0. Use `files.*` helpers.
  */
 declare class SAF$1 {
 	#private;
@@ -94,13 +94,13 @@ declare class SAF$1 {
 	constructor(handle: string);
 	/**
 	 * Get a SAF instance from a target path
-	 * @deprecated SAF is deprecated and will be removed in v1.5.0. Use `files.*` helpers.
+	 * @deprecated SAF is deprecated and will be removed in v2.0.0. Use `files.*` helpers.
 	 */
 	static from(dir: string, target: string): SAF$1;
 	static from(target: string): SAF$1;
 	/**
 	 * Prepare a target path for writing
-	 * @deprecated SAF is deprecated and will be removed in v1.5.0. Use `files.*` helpers.
+	 * @deprecated SAF is deprecated and will be removed in v2.0.0. Use `files.*` helpers.
 	 */
 	static prepare(target: string): Promise<SAF$1>;
 	/**
@@ -290,7 +290,7 @@ declare class Exit$1 extends Error {
 	private exit;
 }
 /**
- * @deprecated `die()` is deprecated and will be removed in v1.5.0. Use `throw new Exit(...)` instead.
+ * @deprecated `die()` is deprecated and will be removed in v2.0.0. Use `throw new Exit(...)` instead.
  */
 declare function die$1(output: unknown): void;
 export declare const sleep: (ms: number) => Promise<void>;

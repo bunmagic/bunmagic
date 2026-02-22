@@ -10,7 +10,7 @@ export declare class Exit extends Error {
     private exit;
 }
 /**
- * @deprecated `die()` is deprecated and will be removed in v1.5.0. Use `throw new Exit(...)` instead.
+ * @deprecated `die()` is deprecated and will be removed in v2.0.0. Use `throw new Exit(...)` instead.
  */
 export declare function die(output: unknown): void;
 export declare const sleep: (ms: number) => Promise<void>;

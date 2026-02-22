@@ -8,7 +8,7 @@ import { SAF } from './saf';
 const TEST_DIR = '/tmp/bunmagic-saf-test';
 const PROJECT_ROOT = path.resolve(import.meta.dir, '..', '..');
 const SAF_DEPRECATION_MESSAGE =
-	'[bunmagic] SAF is deprecated and will be removed in v1.5.0. Use files.* helpers. See docs: https://bunmagic.com/migrations/saf-to-files';
+	'[bunmagic] SAF is deprecated and will be removed in v2.0.0. Use files.* helpers. See docs: https://bunmagic.com/migrations/saf-to-files';
 
 function getTestFile(file: string) {
 	return SAF.from(TEST_DIR, file);

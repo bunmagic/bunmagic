@@ -2,7 +2,7 @@ import { warnDeprecationOnce } from '../lib/deprecations';
 
 const DIE_DEPRECATION_KEY = 'die';
 const DIE_DEPRECATION_MESSAGE =
-	'[bunmagic] die() is deprecated and will be removed in v1.5.0. Use `throw new Exit(...)` instead.';
+	'[bunmagic] die() is deprecated and will be removed in v2.0.0. Use `throw new Exit(...)` instead.';
 
 /**
  * Run a shell command and return the result as text,
@@ -85,7 +85,7 @@ export class Exit extends Error {
 }
 
 /**
- * @deprecated `die()` is deprecated and will be removed in v1.5.0. Use `throw new Exit(...)` instead.
+ * @deprecated `die()` is deprecated and will be removed in v2.0.0. Use `throw new Exit(...)` instead.
  */
 export function die(output: unknown) {
 	warnDeprecationOnce(DIE_DEPRECATION_KEY, DIE_DEPRECATION_MESSAGE);

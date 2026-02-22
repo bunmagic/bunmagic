@@ -4,11 +4,11 @@ import { warnDeprecationOnce } from '../lib/deprecations';
 
 const SAF_DEPRECATION_KEY = 'saf';
 const SAF_DEPRECATION_MESSAGE =
-	'[bunmagic] SAF is deprecated and will be removed in v1.5.0. Use files.* helpers. See docs: https://bunmagic.com/migrations/saf-to-files';
+	'[bunmagic] SAF is deprecated and will be removed in v2.0.0. Use files.* helpers. See docs: https://bunmagic.com/migrations/saf-to-files';
 
 /**
  * Swiss Army File manager
- * @deprecated SAF is deprecated and will be removed in v1.5.0. Use `files.*` helpers.
+ * @deprecated SAF is deprecated and will be removed in v2.0.0. Use `files.*` helpers.
  */
 export class SAF {
 	/**
@@ -40,7 +40,7 @@ export class SAF {
 
 	/**
 	 * Get a SAF instance from a target path
-	 * @deprecated SAF is deprecated and will be removed in v1.5.0. Use `files.*` helpers.
+	 * @deprecated SAF is deprecated and will be removed in v2.0.0. Use `files.*` helpers.
 	 */
 	public static from(dir: string, target: string): SAF;
 	public static from(target: string): SAF;
@@ -62,7 +62,7 @@ export class SAF {
 
 	/**
 	 * Prepare a target path for writing
-	 * @deprecated SAF is deprecated and will be removed in v1.5.0. Use `files.*` helpers.
+	 * @deprecated SAF is deprecated and will be removed in v2.0.0. Use `files.*` helpers.
 	 */
 	public static async prepare(target: string) {
 		warnDeprecationOnce(SAF_DEPRECATION_KEY, SAF_DEPRECATION_MESSAGE);

@@ -3,7 +3,7 @@ import path from 'node:path';
 
 const PROJECT_ROOT = path.resolve(import.meta.dir, '..', '..');
 const DIE_DEPRECATION_MESSAGE =
-	'[bunmagic] die() is deprecated and will be removed in v1.5.0. Use `throw new Exit(...)` instead.';
+	'[bunmagic] die() is deprecated and will be removed in v2.0.0. Use `throw new Exit(...)` instead.';
 
 function countOccurrences(content: string, needle: string) {
 	return content.split(needle).length - 1;
