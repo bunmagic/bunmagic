@@ -47,6 +47,6 @@ export * from './globals/selection';
 export { $stdin } from './globals/stdin';
 export * from './globals/utils';
 
-const { args, flags, argv, arg, flag } = getRuntimeArgs();
+const { args, passthroughArgs, flags, argv, arg, flag } = getRuntimeArgs();
 export const $HOME = os.homedir();
-export { $, path, ansis, ansis as chalk, os, args, argv, flags, arg, flag };
+export { $, path, ansis, ansis as chalk, os, args, passthroughArgs, argv, flags, arg, flag };

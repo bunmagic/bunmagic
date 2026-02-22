@@ -19,6 +19,7 @@ export type TypedAccessor = {
 
 type RuntimeArgs = {
 	args: string[];
+	passthroughArgs: string[];
 	flags: Record<string, FlagValue>;
 	argv: Record<string, string | number | boolean | string[] | undefined>;
 	arg: (index: number) => TypedAccessor;
@@ -261,7 +262,7 @@ class ValueAccessor implements TypedAccessor {
 }
 
 function parseArgv(input: string[]): RuntimeArgs {
-	const { args, flags } = notMinimist(input);
+	const { args, flags, passthroughArgs } = notMinimist(input);
 	const arg = (index: number) => {
 		const normalizedIndex = Number(index);
 		return new ValueAccessor(
@@ -277,8 +278,9 @@ function parseArgv(input: string[]): RuntimeArgs {
 
 	return {
 		args,
+		passthroughArgs,
 		flags,
-		argv: { _: args, ...flags },
+		argv: { _: args, ...flags, '--': passthroughArgs },
 		arg,
 		flag,
 	};

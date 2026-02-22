@@ -55,9 +55,12 @@ async function createFixture(mode: PackageMode, probeName = 'probe.ts'): Promise
 	await symlink(packagePath, path.join(nodeModules, 'bunmagic'));
 	await writeFile(
 		probePath,
-		["import { args } from 'bunmagic';", `console.log(\`ARGS=\${JSON.stringify(args)}\`);`].join(
-			'\n',
-		),
+		[
+			"import { args, flags, passthroughArgs } from 'bunmagic';",
+			'console.log("ARGS=" + JSON.stringify(args));',
+			'console.log("PASSTHROUGH=" + JSON.stringify(passthroughArgs));',
+			'console.log("FLAGS=" + JSON.stringify(flags));',
+		].join('\n'),
 	);
 
 	return {
@@ -96,6 +99,24 @@ function parseReportedArgs(stdout: string): string[] {
 	}
 
 	return JSON.parse(match[1]) as string[];
+}
+
+function parseReportedPassthrough(stdout: string): string[] {
+	const match = stdout.match(/PASSTHROUGH=(\[[^\n]*\])/);
+	if (!match) {
+		throw new Error(`Probe script did not report passthrough args.\nstdout:\n${stdout}`);
+	}
+
+	return JSON.parse(match[1]) as string[];
+}
+
+function parseReportedFlags(stdout: string): Record<string, string | number | boolean | undefined> {
+	const match = stdout.match(/FLAGS=(\{[^\n]*\})/);
+	if (!match) {
+		throw new Error(`Probe script did not report flags.\nstdout:\n${stdout}`);
+	}
+
+	return JSON.parse(match[1]) as Record<string, string | number | boolean | undefined>;
 }
 
 function expectOk(result: CommandResult) {
@@ -157,6 +178,30 @@ describe('bunmagic exec argument ordering', () => {
 
 		expectOk(result);
 		expect(parseReportedArgs(result.stdout)).toEqual(['SRC', 'DOC']);
+	});
+
+	test('bunmagic exec exposes tokens after -- via passthroughArgs without empty-key flags', async () => {
+		const fixture = await createFixture('second-instance');
+		const result = await run(
+			[
+				'bun',
+				BUNMAGIC_BIN,
+				'exec',
+				`./${fixture.probeName}`,
+				'auth issue',
+				'--',
+				'--min-score',
+				'0.2',
+				'-n',
+				'5',
+			],
+			fixture.scriptDir,
+		);
+
+		expectOk(result);
+		expect(parseReportedArgs(result.stdout)).toEqual(['auth issue']);
+		expect(parseReportedPassthrough(result.stdout)).toEqual(['--min-score', '0.2', '-n', '5']);
+		expect(parseReportedFlags(result.stdout)).toEqual({});
 	});
 
 	test('bunmagic exec handles script paths with spaces without shifting args', async () => {

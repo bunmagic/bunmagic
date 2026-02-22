@@ -6,6 +6,7 @@
 type StructuredArguments = {
     flags: Record<string, string | number | boolean | undefined>;
     args: string[];
+    passthroughArgs: string[];
 };
 export declare function notMinimist(input: string[]): StructuredArguments;
 export {};

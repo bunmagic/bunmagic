@@ -5,6 +5,7 @@ declare global {
     const path: typeof globals.path;
     const argv: typeof globals.argv;
     const args: typeof globals.args;
+    const passthroughArgs: typeof globals.passthroughArgs;
     const flags: typeof globals.flags;
     const arg: typeof globals.arg;
     const flag: typeof globals.flag;

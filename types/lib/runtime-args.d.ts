@@ -14,6 +14,7 @@ export type TypedAccessor = {
 };
 type RuntimeArgs = {
     args: string[];
+    passthroughArgs: string[];
     flags: Record<string, FlagValue>;
     argv: Record<string, string | number | boolean | string[] | undefined>;
     arg: (index: number) => TypedAccessor;

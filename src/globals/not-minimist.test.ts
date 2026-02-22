@@ -4,7 +4,7 @@ import { notMinimist } from './not-minimist';
 describe('notMinimist', () => {
 	it('should parse arguments without flags as args array', () => {
 		const result = notMinimist(['arg1', 'arg2']);
-		expect(result).toEqual({ flags: {}, args: ['arg1', 'arg2'] });
+		expect(result).toEqual({ flags: {}, args: ['arg1', 'arg2'], passthroughArgs: [] });
 	});
 
 	it('should parse flags with boolean true if no value is provided', () => {
@@ -70,6 +70,7 @@ describe('notMinimist', () => {
 		expect(result).toEqual({
 			flags: { flag: 'arg2', key: 'value', number: 123 },
 			args: ['arg1'],
+			passthroughArgs: [],
 		});
 	});
 
@@ -104,5 +105,27 @@ describe('notMinimist', () => {
 		const result = notMinimist(['--key', '--anotherKey']);
 		expect(result.flags.key).toBe(true);
 		expect(result.flags.anotherKey).toBe(true);
+	});
+
+	it('should treat -- as a flags terminator and expose trailing passthrough tokens', () => {
+		const result = notMinimist(['auth issue', '--', '--min-score', '0.2', '-n', '5']);
+		expect(result.args).toEqual(['auth issue']);
+		expect(result.flags).toEqual({});
+		expect(result.passthroughArgs).toEqual(['--min-score', '0.2', '-n', '5']);
+	});
+
+	it('should never create an empty-string flag key around --', () => {
+		const result = notMinimist(['auth issue', '--', 'foo', 'bar']);
+		expect(result.args).toEqual(['auth issue']);
+		expect(result.passthroughArgs).toEqual(['foo', 'bar']);
+		expect(result.flags).toEqual({});
+		expect(Object.hasOwn(result.flags, '')).toBe(false);
+	});
+
+	it('should keep parsing pre-terminator flags while leaving post-terminator tokens untouched', () => {
+		const result = notMinimist(['--namespace', 'docs', 'query', '--', '--namespace', 'prod']);
+		expect(result.flags.namespace).toBe('docs');
+		expect(result.args).toEqual(['query']);
+		expect(result.passthroughArgs).toEqual(['--namespace', 'prod']);
 	});
 });

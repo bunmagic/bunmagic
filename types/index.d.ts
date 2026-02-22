@@ -16,6 +16,6 @@ export { showHelp } from './globals/help';
 export * from './globals/selection';
 export { $stdin } from './globals/stdin';
 export * from './globals/utils';
-declare const args: string[], flags: Record<string, string | number | boolean | undefined>, argv: Record<string, string | number | boolean | string[] | undefined>, arg: (index: number) => import("./lib/runtime-args").TypedAccessor, flag: (name: string) => import("./lib/runtime-args").TypedAccessor;
+declare const args: string[], passthroughArgs: string[], flags: Record<string, string | number | boolean | undefined>, argv: Record<string, string | number | boolean | string[] | undefined>, arg: (index: number) => import("./lib/runtime-args").TypedAccessor, flag: (name: string) => import("./lib/runtime-args").TypedAccessor;
 export declare const $HOME: string;
-export { $, path, ansis, ansis as chalk, os, args, argv, flags, arg, flag };
+export { $, path, ansis, ansis as chalk, os, args, passthroughArgs, argv, flags, arg, flag };

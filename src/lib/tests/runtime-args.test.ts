@@ -11,11 +11,32 @@ describe('runtime args typed accessors', () => {
 		expect(runtimeArgs.flags.debug).toBe(true);
 		expect(runtimeArgs.flags.target).toBe('project');
 		expect(runtimeArgs.args[0]).toBe('alpha');
+		expect(runtimeArgs.passthroughArgs).toEqual([]);
 		expect(runtimeArgs.args.join(' ')).toBe('alpha 42');
 		expect(runtimeArgs.args.slice(1)).toEqual(['42']);
 		expect([...runtimeArgs.args]).toEqual(['alpha', '42']);
 		expect(Array.isArray(runtimeArgs.args)).toBe(true);
 		expect(typeof runtimeArgs.flags).toBe('object');
+		expect(runtimeArgs.argv['--']).toEqual([]);
+	});
+
+	test('stops flag parsing at -- and exposes trailing tokens via passthroughArgs', () => {
+		const runtimeArgs = setRuntimeArgv([
+			'query',
+			'--namespace',
+			'docs',
+			'--',
+			'--min-score',
+			'0.2',
+			'-n',
+			'5',
+		]);
+		expect(runtimeArgs.args).toEqual(['query']);
+		expect(runtimeArgs.flags.namespace).toBe('docs');
+		expect(runtimeArgs.flags['']).toBeUndefined();
+		expect(runtimeArgs.passthroughArgs).toEqual(['--min-score', '0.2', '-n', '5']);
+		expect(runtimeArgs.argv._).toEqual(['query']);
+		expect(runtimeArgs.argv['--']).toEqual(['--min-score', '0.2', '-n', '5']);
 	});
 
 	test('supports chain-only typed flag access', () => {
