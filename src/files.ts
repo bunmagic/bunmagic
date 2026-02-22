@@ -3,6 +3,7 @@ import os from 'node:os';
 import path from 'node:path';
 import type { BunFile, GlobScanOptions } from 'bun';
 import { $ } from 'bun';
+import { warnDeprecationOnce } from './lib/deprecations';
 
 export type PathLike = string;
 export type BlobInput =
@@ -28,6 +29,17 @@ export type WriteTextOptions = {
 	flag?: 'w' | 'wx';
 	atomic?: boolean;
 };
+
+const FILES_DEPRECATION_TARGET = 'v2.0.0';
+const FILES_DEPRECATION_MESSAGE_TAIL =
+	'Use Bun.file(), Bun.write(), or node:fs/promises APIs. `glob()` remains supported.';
+
+function warnFilesDeprecation(name: string) {
+	warnDeprecationOnce(
+		`files:${name}`,
+		`[bunmagic] files.${name}() is deprecated and will be removed in ${FILES_DEPRECATION_TARGET}. ${FILES_DEPRECATION_MESSAGE_TAIL}`,
+	);
+}
 
 function expandTilde(input: string) {
 	if (input === '~') {
@@ -155,8 +167,17 @@ function withSuffixDefaults(options?: SuffixOptions): Required<SuffixOptions> {
 	};
 }
 
+async function pathExistsResolved(resolved: string) {
+	try {
+		await access(resolved);
+		return true;
+	} catch {
+		return false;
+	}
+}
+
 async function assertMissingWhenExclusive(target: string, flag: WriteTextOptions['flag']) {
-	if (flag === 'wx' && (await pathExists(target))) {
+	if (flag === 'wx' && (await pathExistsResolved(target))) {
 		throw createExistsError(target);
 	}
 }
@@ -191,123 +212,31 @@ async function shellCwd() {
 	return (await $`pwd`.text()).trim();
 }
 
-export function resolve(input: PathLike, ...rest: PathLike[]) {
-	const parts = parseResolveInputs(input, rest);
-	return path.resolve(...parts);
-}
-
-export function stem(input: PathLike) {
-	const parsed = path.parse(expandTilde(toPathString(input)));
-	return parsed.name;
-}
-
-export async function pathExists(target: PathLike) {
-	const resolved = resolvePathLike(target);
-	try {
-		await access(resolved);
-		return true;
-	} catch {
-		return false;
-	}
-}
-
-export async function isFile(target: PathLike) {
-	const resolved = resolvePathLike(target);
-	try {
-		return (await stat(resolved)).isFile();
-	} catch {
-		return false;
-	}
-}
-
-export async function isDir(target: PathLike) {
-	const resolved = resolvePathLike(target);
-	try {
-		return (await stat(resolved)).isDirectory();
-	} catch {
-		return false;
-	}
-}
-
-export async function ensureDir(target: PathLike) {
-	const resolved = resolvePathLike(target);
-	await mkdir(resolved, { recursive: true });
-	return resolved;
-}
-
-export async function ensureFile(target: PathLike) {
-	const resolved = resolvePathLike(target);
-	await ensureDir(path.dirname(resolved));
-	const handle = await open(resolved, 'a');
-	await handle.close();
-	return resolved;
-}
-
-export async function emptyDir(target: PathLike) {
-	const resolved = await ensureDir(target);
-	const entries = await readdir(resolved);
-	await Promise.all(
-		entries.map(entry => rm(path.join(resolved, entry), { recursive: true, force: true })),
-	);
-	return resolved;
-}
-
-export async function readFile(target: PathLike) {
-	const resolved = resolvePathLike(target);
-	return Bun.file(resolved).text();
-}
-
-export async function readBytes(target: PathLike) {
-	const resolved = resolvePathLike(target);
-	return new Uint8Array(await Bun.file(resolved).arrayBuffer());
-}
-
-export async function writeFile(target: PathLike, input: BlobInput, options?: WriteTextOptions) {
-	const resolved = resolvePathLike(target);
+async function writeFileResolved(target: string, input: BlobInput, options?: WriteTextOptions) {
 	const writeOptions = withWriteDefaults(options);
 	if (writeOptions.atomic) {
-		return writeFileAtomic(resolved, input, writeOptions);
+		return writeFileAtomic(target, input, writeOptions);
 	}
 
 	if (writeOptions.flag === 'wx') {
-		const handle = await open(resolved, 'wx');
+		const handle = await open(target, 'wx');
 		try {
 			const data = await toWriteData(input);
 			await handle.writeFile(data);
 		} finally {
 			await handle.close();
 		}
-		return Bun.file(resolved).size;
+		return Bun.file(target).size;
 	}
 
-	return Bun.write(resolved, input);
+	return Bun.write(target, input);
 }
 
-export async function outputFile(target: PathLike, input: BlobInput, options?: WriteTextOptions) {
-	const resolved = resolvePathLike(target);
-	await ensureDir(path.dirname(resolved));
-	return writeFile(resolved, input, options);
-}
-
-export async function editFile(
-	target: PathLike,
-	updater: (content: string) => string | Promise<string>,
-	options?: WriteTextOptions,
-) {
-	const resolved = resolvePathLike(target);
-	const content = await readFile(resolved);
-	const next = await updater(content);
-	await writeFile(resolved, next, options);
-	return next;
-}
-
-export async function copy(source: PathLike, destination: PathLike, options: MoveCopyOptions = {}) {
-	const from = resolvePathLike(source);
-	const to = resolvePathLike(destination);
+async function copyResolved(from: string, to: string, options: MoveCopyOptions = {}) {
 	const overwrite = options.overwrite ?? false;
 	const errorOnExist = options.errorOnExist ?? true;
 
-	if (!overwrite && (await pathExists(to))) {
+	if (!overwrite && (await pathExistsResolved(to))) {
 		if (errorOnExist) {
 			throw createExistsError(to);
 		}
@@ -322,9 +251,7 @@ export async function copy(source: PathLike, destination: PathLike, options: Mov
 	return to;
 }
 
-export async function move(source: PathLike, destination: PathLike, options: MoveCopyOptions = {}) {
-	const from = resolvePathLike(source);
-	const to = resolvePathLike(destination);
+async function moveResolved(from: string, to: string, options: MoveCopyOptions = {}) {
 	const overwrite = options.overwrite ?? false;
 	const errorOnExist = options.errorOnExist ?? true;
 
@@ -336,15 +263,15 @@ export async function move(source: PathLike, destination: PathLike, options: Mov
 		throw createOverlapMoveError(from, to);
 	}
 
-	if (!overwrite && (await pathExists(to))) {
+	if (!overwrite && (await pathExistsResolved(to))) {
 		if (errorOnExist) {
 			throw createExistsError(to);
 		}
 		return to;
 	}
 
-	if (overwrite && (await pathExists(to))) {
-		await remove(to);
+	if (overwrite && (await pathExistsResolved(to))) {
+		await rm(to, { recursive: true, force: true });
 	}
 
 	try {
@@ -362,14 +289,192 @@ export async function move(source: PathLike, destination: PathLike, options: Mov
 				force: overwrite,
 				errorOnExist: !overwrite,
 			});
-			await remove(from);
+			await rm(from, { recursive: true, force: true });
 			return to;
 		}
 		throw error;
 	}
 }
 
+async function ensureUniquePathResolved(target: string, options?: SuffixOptions): Promise<string> {
+	const { separator, maxAttempts } = withSuffixDefaults(options);
+	const start = Math.max(1, withSuffixDefaults(options).start);
+	if (!(await pathExistsResolved(target))) {
+		return target;
+	}
+
+	const { dir, name, ext } = path.parse(target);
+	for (let index = start; index <= maxAttempts; index++) {
+		const candidate = path.join(dir, `${name}${separator}${index}${ext}`);
+		if (!(await pathExistsResolved(candidate))) {
+			return candidate;
+		}
+	}
+
+	throw new Error(`Failed to find a safe path for ${target}`);
+}
+
+/**
+ * @deprecated `files.resolve()` is deprecated and will be removed in v2.0.0. Use `path.resolve(...)`.
+ */
+export function resolve(input: PathLike, ...rest: PathLike[]) {
+	warnFilesDeprecation('resolve');
+	const parts = parseResolveInputs(input, rest);
+	return path.resolve(...parts);
+}
+
+/**
+ * @deprecated `files.stem()` is deprecated and will be removed in v2.0.0. Use `path.parse(...).name`.
+ */
+export function stem(input: PathLike) {
+	warnFilesDeprecation('stem');
+	const parsed = path.parse(expandTilde(toPathString(input)));
+	return parsed.name;
+}
+
+/**
+ * @deprecated `files.pathExists()` is deprecated and will be removed in v2.0.0. Use `await Bun.file(path).exists()` or `access/stat`.
+ */
+export async function pathExists(target: PathLike) {
+	warnFilesDeprecation('pathExists');
+	return pathExistsResolved(resolvePathLike(target));
+}
+
+/**
+ * @deprecated `files.isFile()` is deprecated and will be removed in v2.0.0. Use `stat(...).isFile()`.
+ */
+export async function isFile(target: PathLike) {
+	warnFilesDeprecation('isFile');
+	const resolved = resolvePathLike(target);
+	try {
+		return (await stat(resolved)).isFile();
+	} catch {
+		return false;
+	}
+}
+
+/**
+ * @deprecated `files.isDir()` is deprecated and will be removed in v2.0.0. Use `stat(...).isDirectory()`.
+ */
+export async function isDir(target: PathLike) {
+	warnFilesDeprecation('isDir');
+	const resolved = resolvePathLike(target);
+	try {
+		return (await stat(resolved)).isDirectory();
+	} catch {
+		return false;
+	}
+}
+
+/**
+ * @deprecated `files.ensureDir()` is deprecated and will be removed in v2.0.0. Use `mkdir(..., { recursive: true })`.
+ */
+export async function ensureDir(target: PathLike) {
+	warnFilesDeprecation('ensureDir');
+	const resolved = resolvePathLike(target);
+	await mkdir(resolved, { recursive: true });
+	return resolved;
+}
+
+/**
+ * @deprecated `files.ensureFile()` is deprecated and will be removed in v2.0.0. Use `mkdir(...)` + `open(..., 'a')`.
+ */
+export async function ensureFile(target: PathLike) {
+	warnFilesDeprecation('ensureFile');
+	const resolved = resolvePathLike(target);
+	await mkdir(path.dirname(resolved), { recursive: true });
+	const handle = await open(resolved, 'a');
+	await handle.close();
+	return resolved;
+}
+
+/**
+ * @deprecated `files.emptyDir()` is deprecated and will be removed in v2.0.0. Use `readdir` + `rm`.
+ */
+export async function emptyDir(target: PathLike) {
+	warnFilesDeprecation('emptyDir');
+	const resolved = resolvePathLike(target);
+	await mkdir(resolved, { recursive: true });
+	const entries = await readdir(resolved);
+	await Promise.all(
+		entries.map(entry => rm(path.join(resolved, entry), { recursive: true, force: true })),
+	);
+	return resolved;
+}
+
+/**
+ * @deprecated `files.readFile()` is deprecated and will be removed in v2.0.0. Use `await Bun.file(path).text()`.
+ */
+export async function readFile(target: PathLike) {
+	warnFilesDeprecation('readFile');
+	const resolved = resolvePathLike(target);
+	return Bun.file(resolved).text();
+}
+
+/**
+ * @deprecated `files.readBytes()` is deprecated and will be removed in v2.0.0. Use `await Bun.file(path).arrayBuffer()`.
+ */
+export async function readBytes(target: PathLike) {
+	warnFilesDeprecation('readBytes');
+	const resolved = resolvePathLike(target);
+	return new Uint8Array(await Bun.file(resolved).arrayBuffer());
+}
+
+/**
+ * @deprecated `files.writeFile()` is deprecated and will be removed in v2.0.0. Use `Bun.write(...)` or `open(..., 'wx')`.
+ */
+export async function writeFile(target: PathLike, input: BlobInput, options?: WriteTextOptions) {
+	warnFilesDeprecation('writeFile');
+	return writeFileResolved(resolvePathLike(target), input, options);
+}
+
+/**
+ * @deprecated `files.outputFile()` is deprecated and will be removed in v2.0.0. Use `mkdir(...)` + `Bun.write(...)`.
+ */
+export async function outputFile(target: PathLike, input: BlobInput, options?: WriteTextOptions) {
+	warnFilesDeprecation('outputFile');
+	const resolved = resolvePathLike(target);
+	await mkdir(path.dirname(resolved), { recursive: true });
+	return writeFileResolved(resolved, input, options);
+}
+
+/**
+ * @deprecated `files.editFile()` is deprecated and will be removed in v2.0.0. Use explicit read/update/write flow.
+ */
+export async function editFile(
+	target: PathLike,
+	updater: (content: string) => string | Promise<string>,
+	options?: WriteTextOptions,
+) {
+	warnFilesDeprecation('editFile');
+	const resolved = resolvePathLike(target);
+	const content = await Bun.file(resolved).text();
+	const next = await updater(content);
+	await writeFileResolved(resolved, next, options);
+	return next;
+}
+
+/**
+ * @deprecated `files.copy()` is deprecated and will be removed in v2.0.0. Use `cp(...)`.
+ */
+export async function copy(source: PathLike, destination: PathLike, options: MoveCopyOptions = {}) {
+	warnFilesDeprecation('copy');
+	return copyResolved(resolvePathLike(source), resolvePathLike(destination), options);
+}
+
+/**
+ * @deprecated `files.move()` is deprecated and will be removed in v2.0.0. Use `rename(...)` with `EXDEV` fallback.
+ */
+export async function move(source: PathLike, destination: PathLike, options: MoveCopyOptions = {}) {
+	warnFilesDeprecation('move');
+	return moveResolved(resolvePathLike(source), resolvePathLike(destination), options);
+}
+
+/**
+ * @deprecated `files.remove()` is deprecated and will be removed in v2.0.0. Use `rm(..., { recursive: true, force: true })`.
+ */
 export async function remove(target: PathLike) {
+	warnFilesDeprecation('remove');
 	const resolved = resolvePathLike(target);
 	await rm(resolved, { recursive: true, force: true });
 	return resolved;
@@ -394,52 +499,53 @@ export async function glob(pattern = '*', options: GlobScanOptions = {}) {
 	return files;
 }
 
+/**
+ * @deprecated `files.ensureUniquePath()` is deprecated and will be removed in v2.0.0. Use explicit suffixing logic.
+ */
 export async function ensureUniquePath(target: PathLike, options?: SuffixOptions): Promise<string> {
-	const resolved = resolvePathLike(target);
-	const { separator, maxAttempts } = withSuffixDefaults(options);
-	const start = Math.max(1, withSuffixDefaults(options).start);
-	if (!(await pathExists(resolved))) {
-		return resolved;
-	}
-
-	const { dir, name, ext } = path.parse(resolved);
-	for (let index = start; index <= maxAttempts; index++) {
-		const candidate = path.join(dir, `${name}${separator}${index}${ext}`);
-		if (!(await pathExists(candidate))) {
-			return candidate;
-		}
-	}
-
-	throw new Error(`Failed to find a safe path for ${resolved}`);
+	warnFilesDeprecation('ensureUniquePath');
+	return ensureUniquePathResolved(resolvePathLike(target), options);
 }
 
+/**
+ * @deprecated `files.writeFileSafe()` is deprecated and will be removed in v2.0.0. Use explicit unique-path + write flow.
+ */
 export async function writeFileSafe(
 	target: PathLike,
 	input: BlobInput,
 	options: WriteTextOptions & { suffix?: SuffixOptions } = {},
 ) {
-	const unique = await ensureUniquePath(target, options.suffix);
-	await writeFile(unique, input, { ...options, flag: 'wx' });
+	warnFilesDeprecation('writeFileSafe');
+	const unique = await ensureUniquePathResolved(resolvePathLike(target), options.suffix);
+	await writeFileResolved(unique, input, { ...options, flag: 'wx' });
 	return unique;
 }
 
+/**
+ * @deprecated `files.copySafe()` is deprecated and will be removed in v2.0.0. Use explicit unique-path + copy flow.
+ */
 export async function copySafe(
 	source: PathLike,
 	destination: PathLike,
 	options: MoveCopyOptions & { suffix?: SuffixOptions } = {},
 ) {
-	const unique = await ensureUniquePath(destination, options.suffix);
-	await copy(source, unique, { ...options, overwrite: false });
+	warnFilesDeprecation('copySafe');
+	const unique = await ensureUniquePathResolved(resolvePathLike(destination), options.suffix);
+	await copyResolved(resolvePathLike(source), unique, { ...options, overwrite: false });
 	return unique;
 }
 
+/**
+ * @deprecated `files.moveSafe()` is deprecated and will be removed in v2.0.0. Use explicit unique-path + move flow.
+ */
 export async function moveSafe(
 	source: PathLike,
 	destination: PathLike,
 	options: MoveCopyOptions & { suffix?: SuffixOptions } = {},
 ) {
-	const unique = await ensureUniquePath(destination, options.suffix);
-	await move(source, unique, { ...options, overwrite: false });
+	warnFilesDeprecation('moveSafe');
+	const unique = await ensureUniquePathResolved(resolvePathLike(destination), options.suffix);
+	await moveResolved(resolvePathLike(source), unique, { ...options, overwrite: false });
 	return unique;
 }
 

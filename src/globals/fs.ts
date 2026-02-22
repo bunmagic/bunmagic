@@ -1,13 +1,18 @@
+import { mkdir, stat } from 'node:fs/promises';
+import path from 'node:path';
 import type { GlobScanOptions } from 'bun';
 import type { SAF as SAFType } from '../extras/saf';
-import { ensureDir, isDir } from '../files';
 
 export async function isDirectory(target: string) {
-	return isDir(target);
+	try {
+		return (await stat(path.resolve(resolveTilde(target)))).isDirectory();
+	} catch {
+		return false;
+	}
 }
 
 export async function ensureDirectory(target: string) {
-	await ensureDir(target);
+	await mkdir(path.resolve(resolveTilde(target)), { recursive: true });
 	return true;
 }
 

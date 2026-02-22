@@ -1,4 +1,4 @@
-import { pathExists, readFile, writeFile } from '../files';
+import { pathExists, writeFile } from '../lib/internal/fs';
 
 /**
  * Copy prebuilt bunmagic.d.ts into the current directory.
@@ -28,7 +28,7 @@ export default async function copyTypesBundle() {
 		if ((await pathExists(gitignorePath)) === false) {
 			await writeFile(gitignorePath, 'bunmagic.d.ts\n');
 		} else {
-			const content = await readFile(gitignorePath);
+			const content = await Bun.file(gitignorePath).text();
 			if (!content.includes('bunmagic.d.ts')) {
 				const newContent = content.endsWith('\n')
 					? `${content}bunmagic.d.ts\n`

@@ -6,9 +6,104 @@ import { $ } from 'bun';
 import * as files from './files';
 
 let testDir = '';
+const PROJECT_ROOT = path.resolve(import.meta.dir, '..');
+const DEPRECATED_FILES_UTILS = [
+	'resolve',
+	'stem',
+	'pathExists',
+	'isFile',
+	'isDir',
+	'ensureDir',
+	'ensureFile',
+	'emptyDir',
+	'readFile',
+	'readBytes',
+	'writeFile',
+	'outputFile',
+	'editFile',
+	'copy',
+	'move',
+	'remove',
+	'ensureUniquePath',
+	'writeFileSafe',
+	'copySafe',
+	'moveSafe',
+] as const;
 
 function fixture(...parts: string[]) {
 	return path.join(testDir, ...parts);
+}
+
+function countOccurrences(content: string, needle: string) {
+	return content.split(needle).length - 1;
+}
+
+async function runFilesDeprecationProbe(silenceDeprecations = false) {
+	const env = { ...process.env };
+	if (silenceDeprecations) {
+		env.BUNMAGIC_SILENCE_DEPRECATIONS = '1';
+	} else {
+		delete env.BUNMAGIC_SILENCE_DEPRECATIONS;
+	}
+
+	const processResult = Bun.spawn({
+		cmd: [
+			'bun',
+			'--eval',
+			`import { mkdtemp, rm } from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
+import * as files from './src/files.ts';
+
+const root = await mkdtemp(path.join(os.tmpdir(), 'bunmagic-files-deprecation-'));
+const source = path.join(root, 'source.txt');
+const destination = path.join(root, 'destination.txt');
+const moveSource = path.join(root, 'move-source.txt');
+const nested = path.join(root, 'nested');
+const nestedOutput = path.join(root, 'out', 'nested.txt');
+
+files.resolve('~/deprecation-probe');
+files.stem(source);
+await files.pathExists(source);
+await files.isFile(source);
+await files.isDir(root);
+await files.ensureDir(nested);
+await files.ensureFile(source);
+await files.writeFile(source, 'hello');
+await files.readFile(source);
+await files.readBytes(source);
+await files.outputFile(nestedOutput, 'nested');
+await files.editFile(source, content => content.toUpperCase());
+await files.copy(source, destination, { overwrite: true });
+await files.move(destination, path.join(root, 'moved.txt'), { overwrite: true });
+await files.remove(path.join(root, 'moved.txt'));
+await files.emptyDir(nested);
+await files.ensureUniquePath(source);
+await files.writeFileSafe(source, 'safe');
+await files.copySafe(source, source);
+await files.writeFile(moveSource, 'move');
+await files.moveSafe(moveSource, source);
+await files.glob('*', { cwd: root, absolute: false });
+
+await rm(root, { recursive: true, force: true });`,
+		],
+		cwd: PROJECT_ROOT,
+		env,
+		stdout: 'pipe',
+		stderr: 'pipe',
+	});
+
+	const [stdout, stderr, exitCode] = await Promise.all([
+		new Response(processResult.stdout).text(),
+		new Response(processResult.stderr).text(),
+		processResult.exited,
+	]);
+
+	return {
+		stdout,
+		stderr,
+		exitCode,
+	};
 }
 
 describe('files API', () => {
@@ -286,5 +381,26 @@ describe('files API', () => {
 		await expect(files.emptyDir('')).rejects.toThrow('Path must be a non-empty string');
 		await expect(files.pathExists('')).rejects.toThrow('Path must be a non-empty string');
 		await expect(() => files.resolve('')).toThrow('Path must be a non-empty string');
+	});
+});
+
+describe('files deprecation warnings', () => {
+	test('emits one warning for each deprecated files utility and none for glob', async () => {
+		const result = await runFilesDeprecationProbe();
+		expect(result.exitCode).toBe(0);
+		expect(result.stdout).toBe('');
+
+		for (const utility of DEPRECATED_FILES_UTILS) {
+			const message = `[bunmagic] files.${utility}() is deprecated and will be removed in v2.0.0.`;
+			expect(countOccurrences(result.stderr, message)).toBe(1);
+		}
+
+		expect(result.stderr).not.toContain('[bunmagic] files.glob() is deprecated');
+	});
+
+	test('suppresses files deprecation warnings when BUNMAGIC_SILENCE_DEPRECATIONS=1', async () => {
+		const result = await runFilesDeprecationProbe(true);
+		expect(result.exitCode).toBe(0);
+		expect(result.stderr).not.toContain('[bunmagic] files.');
 	});
 });

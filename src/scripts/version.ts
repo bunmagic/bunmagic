@@ -1,4 +1,4 @@
-import { resolve } from '../files';
+import { resolve } from '../lib/internal/fs';
 import { readJsonFile } from '../lib/json';
 
 /**

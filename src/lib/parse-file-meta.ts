@@ -1,5 +1,4 @@
 import { parse } from 'comment-parser';
-import { readBytes } from '../files';
 
 const decoder = new TextDecoder();
 
@@ -38,7 +37,7 @@ export function readFirstComment(view: Uint8Array) {
 }
 
 async function parseFile(filePath: string): Promise<Properties | undefined> {
-	const view = await readBytes(filePath);
+	const view = new Uint8Array(await Bun.file(filePath).arrayBuffer());
 	const contents = readFirstComment(view);
 	return parseContent(contents);
 }

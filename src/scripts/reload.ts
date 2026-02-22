@@ -8,7 +8,7 @@
 import { PATHS } from '@lib/config';
 import type { Script } from '@lib/script';
 import { getSources } from '@lib/sources';
-import { pathExists, remove, resolve, writeFile } from '../files';
+import { pathExists, resolve, writeFile } from '../lib/internal/fs';
 
 const SAFE_SHELL_WORD = /^[A-Za-z0-9_@%+=:,./-]+$/;
 
@@ -44,7 +44,7 @@ export async function ensureScriptBin(
 	const binPath = resolve(PATHS.bins, script.slug);
 	if (flags.force === true && (await pathExists(binPath))) {
 		console.log(`Removing ${ansis.bold(script.slug)} script bin file`);
-		await remove(binPath);
+		await $`rm -f ${binPath}`;
 	}
 
 	const binExists = await pathExists(binPath);

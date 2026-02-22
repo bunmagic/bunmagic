@@ -4,7 +4,6 @@
  */
 import * as config from '@lib/config';
 import { setupAlias } from '@lib/setup';
-import { editFile } from '../files';
 import { addSourceDirectory } from './link';
 
 async function require<T>(callback: () => Promise<T>, attempts = 3): Promise<T> {
@@ -114,14 +113,13 @@ export async function uninstall() {
 	const binaryPath = `${$HOME}/.bunmagic/bin`;
 
 	for (const file of rcFiles) {
-		await editFile(file, content => {
-			if (content.includes(binaryPath)) {
-				console.log(`\n- Removed ${binaryPath} from ${file}`);
-				return content.replace(`export PATH="${binaryPath}:$PATH"\n`, '');
-			}
+		const content = await Bun.file(file).text();
+		if (!content.includes(binaryPath)) {
+			continue;
+		}
 
-			return content;
-		});
+		console.log(`\n- Removed ${binaryPath} from ${file}`);
+		await Bun.write(file, content.replace(`export PATH="${binaryPath}:$PATH"\n`, ''));
 	}
 
 	cd($HOME);

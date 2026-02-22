@@ -1,5 +1,4 @@
 import { Columns } from '@lib/columns';
-import { stem } from '../files';
 import { run } from '../run';
 import { create } from '../scripts/create';
 import { SUPPORTED_FILES } from './config';
@@ -53,7 +52,7 @@ export const displayScripts = (scripts: Map<string, Script>, namespace?: string)
 			continue;
 		}
 
-		const baseName = stem(script.source);
+		const baseName = path.parse(script.source).name;
 		if (baseName.startsWith('_')) {
 			continue;
 		}
